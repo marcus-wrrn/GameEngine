@@ -1,0 +1,2 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"/home/marcus/Projects/2D_Tactics_Test/TestingTactics/Content/Ball.png","/home/marcus/Projects/2D_Tactics_Test/TestingTactics/Content/bin/DesktopGL/Ball.xnb","TextureProcessor","Texture2DContent",679,36949,0.1222578
