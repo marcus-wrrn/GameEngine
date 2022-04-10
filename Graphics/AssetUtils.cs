@@ -4,7 +4,9 @@ using System;
 
 namespace Graphics.Utility {
     public class TextureLocation {
-        public Vector2 Location{ get; private set; }   
+        public Vector2 Location{ get; private set; }
+        public double X{ get {return Location.X;} }
+        public double Y{ get{return Location.Y;} }   
         private Vector2 _drawingLocation;
         private readonly Texture2D _texture;     // TODO Change too a spriteCollection later
 
