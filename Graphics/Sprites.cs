@@ -10,8 +10,7 @@ namespace Graphics.Sprites {
         int Height{ get; }
         Rectangle DestinationRectangle(Vector2 loc);
         void Update();
-
-    }
+    }// end ISprite
 
     public class Sprite : ISprite {
         public virtual Texture2D Texture{ get; }
@@ -35,13 +34,11 @@ namespace Graphics.Sprites {
     }// end Sprite
 
 
-    public interface IAnimatedSprite {
+    public interface IAnimatedSprite : ISprite {
         void ResetSprite();
-        Rectangle SourceRectangle{ get; }
-        Rectangle DestinationRectangle(Vector2 loc);
         int Rows{ get; set; }
         int Columns{ get; set; }
-    }// end interface
+    }// end IAnimatedSprite
 
 
 
@@ -52,28 +49,27 @@ namespace Graphics.Sprites {
         public override int Height{ get { return Texture.Height / Rows; } }
 
         public override Rectangle SourceRectangle{ get { return GetSourceRectangle(); } }
-        private int currentFrame;
-        private int totalFrames;
+        private int _currentFrame;
+        private int _totalFrames;
 
         public AnimatedSprite(Texture2D texture, int rows, int columns) : base(texture) {
             Rows = rows;
             Columns = columns;
-            currentFrame = 0;
-            totalFrames = Rows * Columns;
+            _currentFrame = 0;
+            _totalFrames = Rows * Columns;
         }// end constructor()
 
         public override void Update() {
-            currentFrame++;
-            if (currentFrame >= totalFrames)
-                currentFrame = 0;
+            _currentFrame++;
+            if (_currentFrame >= _totalFrames)
+                _currentFrame = 0;
         }// end Update()
 
         private Rectangle GetSourceRectangle() {
             int width = Texture.Width / Columns;
             int height = Texture.Height / Rows;
-            int row = currentFrame / Columns;
-            int column = currentFrame % Columns;
-            Console.WriteLine("This works");
+            int row = _currentFrame / Columns;
+            int column = _currentFrame % Columns;
             return new Rectangle(width * column, height * row, width, height);
         }// end GetSourceRectangle()
 
@@ -84,8 +80,20 @@ namespace Graphics.Sprites {
         }// end DestinationRectangle()
 
         public void ResetSprite() {
-            currentFrame = 0;
+            _currentFrame = 0;
         }// end ResetSprite()
     }// end AnimatedSprite class
 
-}
+    public interface ISimpleMovingSprite : IAnimatedSprite {
+        void MoveRight();
+        void MoveLeft();
+        void Stop();
+    }// end IComplexAnimatedSprite
+
+    // public class SimpleMovingSprite : ISimpleMovingSprite {
+        
+    // }
+
+
+
+}// end namespace

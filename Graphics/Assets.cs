@@ -6,14 +6,14 @@ using System.Windows;
 using Graphics.Sprites;
 namespace Graphics.Assets {
     // =============================================================== Base Asset ===============================================================
-    public interface IAsset<T> where T: Sprite {
+    public interface IAsset<T> where T: ISprite {
         T AssetSprite{ get; }
         Utility.TextureLocation LocationOnMap{ get; }
         void ChangeSprite(T sprite);
     }
 
     // Base class used for all Assets
-    public class Asset<T> : IAsset<T> where T: Sprite {
+    public class Asset<T> : IAsset<T> where T: ISprite {
         public T AssetSprite{ get; private set; }   // texture of the asset
         public Utility.TextureLocation LocationOnMap{ get; private set; }    // location of the asset
 
@@ -46,7 +46,7 @@ namespace Graphics.Assets {
     }// end Asset
 
     // ======================================================== Moving Asset ===============================================================
-    public interface IMovingAsset<T> where T: Sprite {
+    public interface IMovingAsset<T> where T: ISprite {
         float Speed{ get; }
         void ChangeSpeed(float speed);
         void MoveUp(GameTime gameTime);
@@ -59,7 +59,7 @@ namespace Graphics.Assets {
     }
 
     // An Asset that moves a specific direction
-    public class MovingAsset<T> : Asset<T>, IMovingAsset<T> where T: Sprite {
+    public class MovingAsset<T> : Asset<T>, IMovingAsset<T> where T: ISprite {
         public float Speed{ get; private set; }
 
         public MovingAsset(T sprite, Vector2 location, float maxSpeed, float acceleration) : base(sprite, location) {
