@@ -43,7 +43,7 @@ namespace TestingTactics
             _sprites = new Graphics.SpriteBunch(this);
             _screen = new Graphics.Screen(this, 3840, 2160);
             var sprite = new Graphics.Sprites.Sprite(Content.Load<Texture2D>("Ball"));
-            var rockGuy = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("Rock_Guy_Bandana_Animation"), 18, 0);
+            var rockGuy = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("Rock_Guy_Bandana_Animation"), 1, 18);
             _asset1 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy, new Vector2(1000f, 1000f), 1000f, 10);
             _asset2 = new MovingAsset<Graphics.Sprites.Sprite>(sprite, new Vector2(1920, 1080), 1000f, 100f);
 
@@ -66,6 +66,7 @@ namespace TestingTactics
             
             mousePosition.Y = _screen.Height - mousePosition.Y;
             Console.WriteLine("Location: " + _asset2.LocationOnMap.Location);
+            _asset1.AssetSprite.Update();
             //Console.WriteLine("Width: " + _graphics.PreferredBackBufferWidth);
             // Console.WriteLine("Mouse Location: " + mousePosition);
             //_asset2.MoveDown(gameTime);
@@ -80,7 +81,7 @@ namespace TestingTactics
             _sprites.Begin(true);
             // TODO: Add your drawing code here
             _sprites.Draw(_asset2, Color.AliceBlue);
-            _sprites.Draw(_asset1, Color.AliceBlue);
+            _sprites.Draw(_asset1, _asset1.AssetSprite.SourceRectangle, _asset1.AssetSprite.DestinationRectangle(_asset1.LocationOnMap.Location), Color.AliceBlue);
             _sprites.End();
             
             _screen.UnSet();

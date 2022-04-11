@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-
+using System;
 namespace Graphics.Sprites {
 
     public interface ISprite {
@@ -73,6 +73,7 @@ namespace Graphics.Sprites {
             int height = Texture.Height / Rows;
             int row = currentFrame / Columns;
             int column = currentFrame % Columns;
+            Console.WriteLine("This works");
             return new Rectangle(width * column, height * row, width, height);
         }// end GetSourceRectangle()
 

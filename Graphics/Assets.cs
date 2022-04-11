@@ -124,8 +124,8 @@ namespace Graphics.Assets {
 
         private bool HasReachedDestination(Vector2 destination) {
             var location = LocationOnMap.Location;
-            if(location.X > destination.X - AssetSprite.Texture.Width / 2 && location.X < destination.X + AssetSprite.Texture.Width / 2)
-                if(location.Y > destination.Y - AssetSprite.Texture.Height / 2 && location.Y < destination.Y + AssetSprite.Texture.Width / 2)
+            if(location.X > destination.X - AssetSprite.Width / 2 && location.X < destination.X + AssetSprite.Width / 2)
+                if(location.Y > destination.Y - AssetSprite.Height / 2 && location.Y < destination.Y + AssetSprite.Width / 2)
                     return true;
             return false;
         }
