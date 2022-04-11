@@ -6,11 +6,17 @@ namespace Graphics.Sprites {
     public interface ISprite {
         Texture2D Texture{ get; }
         Rectangle SourceRectangle{ get; }
+        int Width{ get; }
+        int Height{ get; }
         Rectangle DestinationRectangle(Vector2 loc);
+        void Update();
+
     }
 
     public class Sprite : ISprite {
         public virtual Texture2D Texture{ get; }
+        public virtual int Width{ get { return Texture.Width; } }
+        public virtual int Height{ get { return Texture.Height; } }
         public virtual Rectangle SourceRectangle{ get { return GetSourceRectangle(); } }
         public Sprite(Texture2D texture) {
             Texture = texture;
@@ -23,12 +29,13 @@ namespace Graphics.Sprites {
         private Rectangle GetSourceRectangle() {
             return new Rectangle(0, 0, Texture.Width, Texture.Height);
         }// end GetSourceRectangle()
+        
+        // Empty function, important for the interface, do not delete 
+        public virtual void Update() {}
     }// end Sprite
 
 
     public interface IAnimatedSprite {
-        Texture2D Texture{ get; }
-        void Update();
         void ResetSprite();
         Rectangle SourceRectangle{ get; }
         Rectangle DestinationRectangle(Vector2 loc);
@@ -41,8 +48,10 @@ namespace Graphics.Sprites {
     public class AnimatedSprite : Sprite, IAnimatedSprite {
         public int Rows { get; set; }
         public int Columns { get; set; }
-        public override Rectangle SourceRectangle{ get { return GetSourceRectangle(); } }
+        public override int Width{ get { return Texture.Width / Columns; } }
+        public override int Height{ get { return Texture.Height / Rows; } }
 
+        public override Rectangle SourceRectangle{ get { return GetSourceRectangle(); } }
         private int currentFrame;
         private int totalFrames;
 
@@ -53,7 +62,7 @@ namespace Graphics.Sprites {
             totalFrames = Rows * Columns;
         }// end constructor()
 
-        public virtual void Update() {
+        public override void Update() {
             currentFrame++;
             if (currentFrame >= totalFrames)
                 currentFrame = 0;
@@ -76,21 +85,6 @@ namespace Graphics.Sprites {
         public void ResetSprite() {
             currentFrame = 0;
         }// end ResetSprite()
-
-        // public void Draw(SpriteBatch spriteBatch, Vector2 location) {
-        //     int width = Texture.Width / Columns;
-        //     int height = Texture.Height / Rows;
-        //     int row = currentFrame / Columns;
-        //     int column = currentFrame % Columns;
-
-        //     Rectangle sourceRectangle = new Rectangle(width * column, height * row, width, height);
-        //     Rectangle destinationRectangle = new Rectangle((int)location.X, (int)location.Y, width, height);
-
-        //     spriteBatch.Begin();
-        //     spriteBatch.Draw(Texture, destinationRectangle, sourceRectangle, Color.White);
-        //     spriteBatch.End();
-        // }// end Draw()
-
     }// end AnimatedSprite class
 
 }
