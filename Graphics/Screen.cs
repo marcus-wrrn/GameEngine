@@ -58,7 +58,7 @@ namespace Graphics {
             _isSet = false;
         }// end UnSet()
 
-        public void Present(Sprites sprites, bool textureFiltering = true) {
+        public void Present(SpriteBunch sprites, bool textureFiltering = true) {
             if(sprites is null)
                 throw new ArgumentNullException("sprites");
 #if DEBUG

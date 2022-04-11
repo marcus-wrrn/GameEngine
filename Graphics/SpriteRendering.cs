@@ -4,14 +4,14 @@ using System.Runtime.CompilerServices;
 using System;
 
 namespace Graphics {
-    public sealed class Sprites : IDisposable {
+    public sealed class SpriteBunch : IDisposable {
         private SpriteBatch _sprites;
         private BasicEffect _effect;
         private Game _game;
         private bool _isDisposed;
         private bool _hasStarted;
 
-        public Sprites(Game game) {
+        public SpriteBunch(Game game) {
                 if(game is null)
                     throw new ArgumentNullException("game");
                 _game = game;
