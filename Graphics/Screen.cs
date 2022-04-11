@@ -69,7 +69,8 @@ namespace Graphics {
 
             Rectangle destinationRectangle = CalculateDestinationRectangle();
             sprites.Begin(textureFiltering);
-            sprites.Draw(new Assets.Asset(_target), null, destinationRectangle, Color.White);
+            var sprite = new Graphics.Sprites.Sprite(_target);
+            sprites.Draw(new Assets.Asset<Graphics.Sprites.Sprite>(sprite), null, destinationRectangle, Color.White);
             sprites.End();
         }
 

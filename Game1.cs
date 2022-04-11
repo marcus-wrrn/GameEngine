@@ -12,9 +12,9 @@ namespace TestingTactics
         GameKeyboard keyboard = GameKeyboard.Instance;
         private GraphicsDeviceManager _graphics;
         //private SpriteBatch _spriteBatch;
-        private MovingAsset _asset1;
-        private MovingAsset _asset2;
-        private Graphics.Sprites _sprites;
+        private MovingAsset<Graphics.Sprites.AnimatedSprite> _asset1;
+        private MovingAsset<Graphics.Sprites.Sprite> _asset2;
+        private Graphics.SpriteBunch _sprites;
         private Graphics.Screen _screen;
 
         public Game1()
@@ -40,10 +40,12 @@ namespace TestingTactics
 
         protected override void LoadContent()
         {
-            _sprites = new Graphics.Sprites(this);
+            _sprites = new Graphics.SpriteBunch(this);
             _screen = new Graphics.Screen(this, 3840, 2160);
-            _asset1 = new MovingAsset(Content.Load<Texture2D>("Ball"), new Vector2(1000f, 1000f), 1000f, 10);
-            _asset2 = new MovingAsset(Content.Load<Texture2D>("Ball"), new Vector2(1920, 1080), 1000f, 100f);
+            var sprite = new Graphics.Sprites.Sprite(Content.Load<Texture2D>("Ball"));
+            var rockGuy = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("Rock_Guy_Bandana_Animation"), 18, 0);
+            _asset1 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy, new Vector2(1000f, 1000f), 1000f, 10);
+            _asset2 = new MovingAsset<Graphics.Sprites.Sprite>(sprite, new Vector2(1920, 1080), 1000f, 100f);
 
             // TODO: use this.Content to load your game content here
         }
@@ -78,6 +80,7 @@ namespace TestingTactics
             _sprites.Begin(true);
             // TODO: Add your drawing code here
             _sprites.Draw(_asset2, Color.AliceBlue);
+            _sprites.Draw(_asset1, Color.AliceBlue);
             _sprites.End();
             
             _screen.UnSet();

@@ -1,2 +1,3 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
 "/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Ball.png","/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/bin/DesktopGL/Content/Ball.xnb","TextureProcessor","Texture2DContent",679,36949,0.1945396
+"/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Rock_Guy_Bandana_Animation.png","/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/bin/DesktopGL/Content/Rock_Guy_Bandana_Animation.xnb","TextureProcessor","Texture2DContent",2737,73813,0.1381034

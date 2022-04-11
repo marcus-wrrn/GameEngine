@@ -4,9 +4,11 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>/home/marcus/Projects/2D_Tactics_Test/TestingTactics/Content/Ball.png</File>
+    <File>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Ball.png</File>
+    <File>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Rock_Guy_Bandana_Animation.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
 </SourceFileCollection>
