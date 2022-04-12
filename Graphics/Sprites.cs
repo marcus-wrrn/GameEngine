@@ -50,7 +50,7 @@ namespace Graphics.Sprites {
         public int Rows { get; }
         public int Columns { get; }
         public override int Width{ get { return Texture.Width / Columns; } }
-        public override int Height{ get { return GetHeight(); } }
+        public override int Height{ get { return Texture.Height / Rows; } }
 
         public override Rectangle SourceRectangle{ get { return GetSourceRectangle(); } }
         protected int _currentFrame;
@@ -86,14 +86,6 @@ namespace Graphics.Sprites {
             return new Rectangle((int)location.X, (int)location.Y, Width, Height);
         }// end DestinationRectangle()
 
-        private int GetHeight() {
-            var num = Rows;
-            Console.WriteLine("Texture Height: " + Texture.Height);
-            Console.WriteLine("Row number: " + num);
-            Console.WriteLine("Height: " + Texture.Height / num);
-            return Texture.Height / num;
-        }
-
         public virtual void ResetSprite() {
             _currentFrame = 0;
         }// end ResetSprite()
@@ -114,7 +106,6 @@ namespace Graphics.Sprites {
         private int _lastRepeatFrame;
         private State _state;
 
-
         public ControlledAnimatedSprite(Texture2D texture, int rows, int cols, int lastStartFrame, int lastRepeatFrame) : base(texture, rows, cols) {
             if(lastStartFrame < 0 || lastStartFrame > _totalFrames)
                 throw new ArgumentException("Start frame cannot be less than zero or greater than the total number of frames");
@@ -127,8 +118,6 @@ namespace Graphics.Sprites {
         }
         public ControlledAnimatedSprite(AnimatedSprite sprite, int lastStartFrame, int lastRepeatFrame) : 
             this(sprite.Texture, sprite.Rows, sprite.Columns, lastStartFrame, lastRepeatFrame) {}
-
-
 
         public override void Update() {
             if(_state == State.START) {

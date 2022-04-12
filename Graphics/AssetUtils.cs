@@ -19,7 +19,6 @@ namespace Graphics.Utility {
         // Sets the location at the centre of its texture
         private void SetCentreLocation() {
             var destinationRectangle = _sprite.DestinationRectangle(_drawingLocation);
-            //Location = new Vector2(_drawingLocation.X - _sprite.Width / 2, _drawingLocation.Y - _sprite.Height / 2);
             Location = destinationRectangle.Center.ToVector2();
         }// end SetCentreLocation()
 
