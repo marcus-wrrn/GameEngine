@@ -75,7 +75,7 @@ namespace TestingTactics
             // Console.WriteLine("Mouse Location: " + mousePosition);
             //_asset2.MoveDown(gameTime);
             _asset1.MoveToLocation(mousePosition, gameTime);
-            if(mousePosition == _asset1.LocationOnMap.Location)
+            if(mousePosition == _asset1.LocationOnMap.Location) 
                 _asset1.AssetSprite.EndAnimation();
             //_asset2.MoveToLocation(mousePosition, gameTime);
             base.Update(gameTime);
