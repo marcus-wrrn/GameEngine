@@ -63,7 +63,7 @@ namespace Graphics.Rendering {
             _sprites.Draw(asset.AssetSprite.Texture, asset.LocationOnMap.GetLocationToDraw(), null, color, 0f, Vector2.Zero, 1f, SpriteEffects.FlipVertically, 0f);
         }
 
-        public void Draw(Assets.Asset<AnimatedSprite> asset, Color color) {
+        public void Draw<T>(Assets.Asset<T> asset, Color color) where T: IAnimatedSprite {
             var sourceRect = asset.AssetSprite.SourceRectangle;
             var destinationRect = asset.AssetSprite.DestinationRectangle(asset.LocationOnMap.Location);
             //destinationRect.Inflate(100, 100);

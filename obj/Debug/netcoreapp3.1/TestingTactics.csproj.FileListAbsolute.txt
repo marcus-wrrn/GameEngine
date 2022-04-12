@@ -50,3 +50,4 @@
 /home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/obj/Debug/netcoreapp3.1/TestingTactics.genruntimeconfig.cache
 /home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/bin/Debug/netcoreapp3.1/Content/BlueBandannaRolling.xnb
 /home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/bin/Debug/netcoreapp3.1/Content/Rock_Guy_Bandana_Animation.xnb
+/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/bin/Debug/netcoreapp3.1/Content/BlueBandanaAnim.xnb

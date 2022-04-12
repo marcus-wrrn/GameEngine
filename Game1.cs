@@ -4,17 +4,19 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using Input;
 using Graphics.Assets;
+using Graphics.Rendering;
 
 namespace TestingTactics
 {
     public class Game1 : Game
     {
+        int temp = 0;
         GameKeyboard keyboard = GameKeyboard.Instance;
         private GraphicsDeviceManager _graphics;
         //private SpriteBatch _spriteBatch;
-        private MovingAsset<Graphics.Sprites.AnimatedSprite> _asset1;
+        private MovingAsset<Graphics.Sprites.ControlledAnimatedSprite> _asset1;
         private MovingAsset<Graphics.Sprites.Sprite> _asset2;
-        private Graphics.SpriteBunch _sprites;
+        private SpriteBunch _sprites;
         private Graphics.Screen _screen;
 
         public Game1()
@@ -40,11 +42,12 @@ namespace TestingTactics
 
         protected override void LoadContent()
         {
-            _sprites = new Graphics.SpriteBunch(this);
+            _sprites = new SpriteBunch(this);
             _screen = new Graphics.Screen(this, 3840, 2160);
             var sprite = new Graphics.Sprites.Sprite(Content.Load<Texture2D>("Ball"));
-            var rockGuy = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("Rock_Guy_Bandana_Animation"), 1, 18);
-            _asset1 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy, new Vector2(1000f, 1000f), 1000f, 10);
+            var rockGuy = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("BlueBandanaAnim"), 1, 18);
+            var tempRockGuy = new Graphics.Sprites.ControlledAnimatedSprite(rockGuy, 6, 10);
+            _asset1 = new MovingAsset<Graphics.Sprites.ControlledAnimatedSprite>(tempRockGuy, new Vector2(1000f, 1000f), 1000f, 10);
             _asset2 = new MovingAsset<Graphics.Sprites.Sprite>(sprite, new Vector2(1920, 1080), 1000f, 100f);
 
             // TODO: use this.Content to load your game content here
@@ -65,12 +68,16 @@ namespace TestingTactics
             Vector2 p2 = Vector2.Zero;
             
             mousePosition.Y = _screen.Height - mousePosition.Y;
-            Console.WriteLine("Location: " + _asset2.LocationOnMap.Location);
-            _asset1.AssetSprite.Update();
+            if(temp % 10 == 0)
+                _asset1.AssetSprite.Update();
+            temp++;
             //Console.WriteLine("Width: " + _graphics.PreferredBackBufferWidth);
             // Console.WriteLine("Mouse Location: " + mousePosition);
             //_asset2.MoveDown(gameTime);
-            _asset2.MoveToLocation(mousePosition, gameTime);
+            _asset1.MoveToLocation(mousePosition, gameTime);
+            if(mousePosition == _asset1.LocationOnMap.Location)
+                _asset1.AssetSprite.EndAnimation();
+            //_asset2.MoveToLocation(mousePosition, gameTime);
             base.Update(gameTime);
         }
 
@@ -79,9 +86,8 @@ namespace TestingTactics
             _screen.Set();
             GraphicsDevice.Clear(Color.CornflowerBlue);
             _sprites.Begin(true);
-            // TODO: Add your drawing code here
             _sprites.Draw(_asset2, Color.AliceBlue);
-            _sprites.Draw(_asset1, _asset1.AssetSprite.SourceRectangle, _asset1.AssetSprite.DestinationRectangle(_asset1.LocationOnMap.Location), Color.AliceBlue);
+            _sprites.Draw(_asset1, Color.AliceBlue);
             _sprites.End();
             
             _screen.UnSet();
