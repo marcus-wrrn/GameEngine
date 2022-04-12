@@ -2,8 +2,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.CompilerServices;
 using System;
+using Graphics.Sprites;
 
-namespace Graphics {
+namespace Graphics.Rendering {
     public sealed class SpriteBunch : IDisposable {
         private SpriteBatch _sprites;
         private BasicEffect _effect;
@@ -58,17 +59,24 @@ namespace Graphics {
             _hasStarted = false;
         }
 
-        public void Draw(Assets.Asset asset, Color color) {
-            _sprites.Draw(asset.Texture, asset.LocationOnMap.GetLocationToDraw(), null, color, 0f, Vector2.Zero, 1f, SpriteEffects.FlipVertically, 0f);
+        public void Draw(Assets.Asset<Sprite> asset, Color color) {
+            _sprites.Draw(asset.AssetSprite.Texture, asset.LocationOnMap.GetLocationToDraw(), null, color, 0f, Vector2.Zero, 1f, SpriteEffects.FlipVertically, 0f);
+        }
+
+        public void Draw<T>(Assets.Asset<T> asset, Color color) where T: IAnimatedSprite {
+            var sourceRect = asset.AssetSprite.SourceRectangle;
+            var destinationRect = asset.AssetSprite.DestinationRectangle(asset.LocationOnMap.Location);
+            //destinationRect.Inflate(100, 100);
+            _sprites.Draw(asset.AssetSprite.Texture, destinationRect, sourceRect, color, 0f, Vector2.Zero, SpriteEffects.FlipVertically, 0f);
         }
 
 
-        public void Draw(Assets.Asset asset, Rectangle? sourceRectangle, Vector2 originOfTransformation, Vector2 position, float rotation, Vector2 scale, Color color) {
-            _sprites.Draw(asset.Texture, asset.LocationOnMap.GetLocationToDraw(), sourceRectangle, color, rotation, originOfTransformation, scale, SpriteEffects.FlipVertically, 0f);
+        public void Draw<T>(Assets.Asset<T> asset, Rectangle? sourceRectangle, Vector2 originOfTransformation, Vector2 position, float rotation, Vector2 scale, Color color) where T: Sprite {
+            _sprites.Draw(asset.AssetSprite.Texture, asset.LocationOnMap.GetLocationToDraw(), sourceRectangle, color, rotation, originOfTransformation, scale, SpriteEffects.FlipVertically, 0f);
         }
 
-        public void Draw(Assets.Asset asset, Rectangle? sourceRectangle, Rectangle destinationRectangle, Color color) {
-            _sprites.Draw(asset.Texture, destinationRectangle, sourceRectangle, color, 0f, Vector2.Zero, SpriteEffects.FlipVertically, 0f);
+        public void Draw<T>(Assets.Asset<T> asset, Rectangle? sourceRectangle, Rectangle destinationRectangle, Color color) where T: Sprite {
+            _sprites.Draw(asset.AssetSprite.Texture, destinationRectangle, sourceRectangle, color, 0f, Vector2.Zero, SpriteEffects.FlipVertically, 0f);
         }
-    }
-}
+    }// end SpriteBunch Class
+}// end namespace

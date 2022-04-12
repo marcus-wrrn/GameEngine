@@ -3,32 +3,32 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Windows;
-
+using Graphics.Sprites;
 namespace Graphics.Assets {
     // =============================================================== Base Asset ===============================================================
-    public interface IAsset {
-        Texture2D Texture{ get; }
+    public interface IAsset<T> where T: ISprite {
+        T AssetSprite{ get; }
         Utility.TextureLocation LocationOnMap{ get; }
-        void ChangeTexture(Texture2D texture);
+        void ChangeSprite(T sprite);
     }
 
     // Base class used for all Assets
-    public class Asset : IAsset {
-        public Texture2D Texture{ get; private set; }   // texture of the asset
+    public class Asset<T> : IAsset<T> where T: ISprite {
+        public T AssetSprite{ get; private set; }   // texture of the asset
         public Utility.TextureLocation LocationOnMap{ get; private set; }    // location of the asset
 
-        public Asset(Texture2D text, Vector2 loc) {
-            Texture = text;
-            LocationOnMap = new Utility.TextureLocation(text, loc);
+        public Asset(T sprite, Vector2 loc) {
+            AssetSprite = sprite;
+            LocationOnMap = new Utility.TextureLocation(sprite.Texture, loc);
         }// end constructor()
 
         // Additional Constructors
-        public Asset(Texture2D text, GraphicsDeviceManager graphics) : this(text, new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2)) {}
-        public Asset(Texture2D text) : this(text, new Vector2(0, 0)) {}
+        public Asset(T text, GraphicsDeviceManager graphics) : this(text, new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2)) {}
+        public Asset(T text) : this(text, new Vector2(0, 0)) {}
 
         // TODO make it so it depends on Asset class
-        public virtual void ChangeTexture(Texture2D texture) {
-            Texture = texture;
+        public void ChangeSprite(T sprite) {
+            AssetSprite = sprite;
         }
 
         // Immediatly move to a new location
@@ -46,7 +46,7 @@ namespace Graphics.Assets {
     }// end Asset
 
     // ======================================================== Moving Asset ===============================================================
-    public interface IMovingAsset {
+    public interface IMovingAsset<T> where T: ISprite {
         float Speed{ get; }
         void ChangeSpeed(float speed);
         void MoveUp(GameTime gameTime);
@@ -59,22 +59,22 @@ namespace Graphics.Assets {
     }
 
     // An Asset that moves a specific direction
-    public class MovingAsset : Asset, IMovingAsset {
+    public class MovingAsset<T> : Asset<T>, IMovingAsset<T> where T: ISprite {
         public float Speed{ get; private set; }
 
-        public MovingAsset(Texture2D texture, Vector2 location, float maxSpeed, float acceleration) : base(texture, location) {
+        public MovingAsset(T sprite, Vector2 location, float maxSpeed, float acceleration) : base(sprite, location) {
             Speed = maxSpeed;
         }
 
-        public MovingAsset(Texture2D texture, GraphicsDeviceManager graphicsManager, float maxSpeed) : base(texture, graphicsManager) {
+        public MovingAsset(T sprite, GraphicsDeviceManager graphicsManager, float maxSpeed) : base(sprite, graphicsManager) {
             Speed = maxSpeed;
         }
 
-        public MovingAsset(Texture2D texture, Vector2 location) : base(texture, location) {
+        public MovingAsset(T sprite, Vector2 location) : base(sprite, location) {
             Speed = 0.0f;
         }
 
-        public MovingAsset(Texture2D texture) : base(texture) {
+        public MovingAsset(T sprite) : base(sprite) {
             Speed = 0.0f;
         }
 
@@ -124,8 +124,8 @@ namespace Graphics.Assets {
 
         private bool HasReachedDestination(Vector2 destination) {
             var location = LocationOnMap.Location;
-            if(location.X > destination.X - Texture.Width / 2 && location.X < destination.X + Texture.Width / 2)
-                if(location.Y > destination.Y - Texture.Height / 2 && location.Y < destination.Y + Texture.Width / 2)
+            if(location.X > destination.X - AssetSprite.Width / 2 && location.X < destination.X + AssetSprite.Width / 2)
+                if(location.Y > destination.Y - AssetSprite.Height / 2 && location.Y < destination.Y + AssetSprite.Width / 2)
                     return true;
             return false;
         }

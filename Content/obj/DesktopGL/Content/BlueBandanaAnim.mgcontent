@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Ball.png</SourceFile>
-  <SourceTime>2022-04-04T13:29:45.4847664-04:00</SourceTime>
-  <DestFile>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/bin/DesktopGL/Ball.xnb</DestFile>
-  <DestTime>2022-04-11T14:15:54.1491844-04:00</DestTime>
+  <SourceFile>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/BlueBandanaAnim.png</SourceFile>
+  <SourceTime>2022-04-11T15:11:59.1356673-04:00</SourceTime>
+  <DestFile>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/bin/DesktopGL/Content/BlueBandanaAnim.xnb</DestFile>
+  <DestTime>2022-04-11T15:13:36.7960909-04:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2020-08-10T12:17:54-04:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
