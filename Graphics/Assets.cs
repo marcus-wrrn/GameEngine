@@ -8,18 +8,18 @@ namespace Graphics.Assets {
     // =============================================================== Base Asset ===============================================================
     public interface IAsset<T> where T: ISprite {
         T AssetSprite{ get; }
-        Utility.TextureLocation LocationOnMap{ get; }
+        Utility.TextureLocation<T> LocationOnMap{ get; }
         void ChangeSprite(T sprite);
     }
 
     // Base class used for all Assets
     public class Asset<T> : IAsset<T> where T: ISprite {
         public T AssetSprite{ get; private set; }   // texture of the asset
-        public Utility.TextureLocation LocationOnMap{ get; private set; }    // location of the asset
+        public Utility.TextureLocation<T> LocationOnMap{ get; private set; }    // location of the asset
 
         public Asset(T sprite, Vector2 loc) {
             AssetSprite = sprite;
-            LocationOnMap = new Utility.TextureLocation(sprite.Texture, loc);
+            LocationOnMap = new Utility.TextureLocation<T>(sprite, loc);
         }// end constructor()
 
         // Additional Constructors

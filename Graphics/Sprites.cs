@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using System;
 namespace Graphics.Sprites {
 
+    ////////////////////////////////////////////////////////////// Base Sprite /////////////////////////////////////////////////////////////
     public interface ISprite {
         Texture2D Texture{ get; }
         Rectangle SourceRectangle{ get; }
@@ -35,18 +36,19 @@ namespace Graphics.Sprites {
         }
     }// end Sprite
 
+    ////////////////////////////////////////////////////////////// Animated Sprite /////////////////////////////////////////////////////////////
 
     public interface IAnimatedSprite : ISprite {
         void ResetSprite();
-        int Rows{ get; set; }
-        int Columns{ get; set; }
+        int Rows{ get; }
+        int Columns{ get; }
     }// end IAnimatedSprite
 
 
 
     public class AnimatedSprite : Sprite, IAnimatedSprite {
-        public int Rows { get; set; }
-        public int Columns { get; set; }
+        public int Rows { get; }
+        public int Columns { get; }
         public override int Width{ get { return Texture.Width / Columns; } }
         public override int Height{ get { return Texture.Height / Rows; } }
 
@@ -75,34 +77,34 @@ namespace Graphics.Sprites {
         }// end Update()
 
         private Rectangle GetSourceRectangle() {
-            int width = Texture.Width / Columns;
-            int height = Texture.Height / Rows;
             int row = _currentFrame / Columns;
             int column = _currentFrame % Columns;
-            return new Rectangle(width * column, height * row, width, height);
+            return new Rectangle(Width * column, Height * row, Width, Height);
         }// end GetSourceRectangle()
 
         public override Rectangle DestinationRectangle(Vector2 location) {
-            int width = Texture.Width / Columns;
-            int height = Texture.Height / Rows;
-            return new Rectangle((int)location.X, (int)location.Y, width, height);
+            return new Rectangle((int)location.X, (int)location.Y, Width, Height);
         }// end DestinationRectangle()
 
         public virtual void ResetSprite() {
             _currentFrame = 0;
         }// end ResetSprite()
+
     }// end AnimatedSprite class
+
+    ////////////////////////////////////////////////////////////// Controlled Animated Sprite /////////////////////////////////////////////////////////////
 
     public interface IControlledAnimatedSprite : IAnimatedSprite, ISprite {
         void EndAnimation();
+        bool HasStopped{ get; }
     }
 
     public class ControlledAnimatedSprite : AnimatedSprite, IControlledAnimatedSprite {
+        public bool HasStopped{ get { return _state == State.ENDED; } }
         private enum State{ START, MIDDLE, ENDING, ENDED }
         private int _lastStartFrame;
         private int _lastRepeatFrame;
         private State _state;
-
 
         public ControlledAnimatedSprite(Texture2D texture, int rows, int cols, int lastStartFrame, int lastRepeatFrame) : base(texture, rows, cols) {
             if(lastStartFrame < 0 || lastStartFrame > _totalFrames)
@@ -116,8 +118,6 @@ namespace Graphics.Sprites {
         }
         public ControlledAnimatedSprite(AnimatedSprite sprite, int lastStartFrame, int lastRepeatFrame) : 
             this(sprite.Texture, sprite.Rows, sprite.Columns, lastStartFrame, lastRepeatFrame) {}
-
-
 
         public override void Update() {
             if(_state == State.START) {
@@ -164,9 +164,7 @@ namespace Graphics.Sprites {
         }// end ResetSprite()
     }
 
-
-
-
+    ////////////////////////////////////////////////////////////// Simple Moving Sprite /////////////////////////////////////////////////////////////
 
     public interface ISimpleMovingSprite : IAnimatedSprite {
         void MoveRight();
@@ -174,39 +172,132 @@ namespace Graphics.Sprites {
         void Stop();
     }// end IComplexAnimatedSprite
 
-    // public class SimpleMovingSprite : ISimpleMovingSprite {
-    //     private enum Direction { STANDING, MOVING_RIGHT, MOVING_LEFT, STOPPING_RIGHT, STOPPING_LEFT };
-    //     private AnimatedSprite _movingSpriteLeft;
-    //     private AnimatedSprite _movingSpriteRight;
-    //     private AnimatedSprite _standingSprite;
-    //     private Direction _direction;
-    //     private bool _isStoping;
+    public class SimpleMovingSprite : ISimpleMovingSprite {
+        public int Width{ get { return GetCurrentTextureWidth(); } }
+        public int Height{ get { return GetCurrentTextureHeight(); } }
+        public int Rows{ get { return GetCurrentRowNumber(); } }
+        public int Columns{ get { return GetCurrentColNumber(); } }
+        public Texture2D Texture{ get { return GetCurrentTexture(); } }
+        public Rectangle SourceRectangle{ get { return GetSourceRectangle(); } }
 
-    //     public SimpleMovingSprite(AnimatedSprite standingSprite, AnimatedSprite movingSpriteRight, AnimatedSprite movingSpriteLeft) {
-    //         _movingSpriteLeft = movingSpriteLeft;
-    //         _movingSpriteRight = movingSpriteRight;
-    //         _standingSprite = standingSprite;
-    //         _direction = Direction.STANDING;
-    //         _isStoping = false;
-    //     }// end constructor
+        private enum State { IDLE, MOVING_RIGHT, MOVING_LEFT, STOPPING_RIGHT, STOPPING_LEFT };
+        private AnimatedSprite _idleSprite;
+        private ControlledAnimatedSprite _movingSpriteRight;
+        private ControlledAnimatedSprite _movingSpriteLeft;
+        private State _state;
 
-    //     public void MoveRight() {
-    //         _direction = Direction.MOVING_RIGHT;
-    //     }// end MoveRight()
+        public SimpleMovingSprite(AnimatedSprite standingSprite, ControlledAnimatedSprite movingSpriteRight, ControlledAnimatedSprite movingSpriteLeft) {
+            _movingSpriteLeft = movingSpriteLeft;
+            _movingSpriteRight = movingSpriteRight;
+            _idleSprite = standingSprite;
+            _state = State.IDLE;
+        }// end constructor
 
-    //     public void MoveLeft() {
-    //         _direction = Direction.MOVING_LEFT;
-    //     }// end MoveLeft()
+        public void MoveRight() {
+            _state = State.MOVING_RIGHT;
+        }// end MoveRight()
 
-    //     public void Stop() {
-    //         if(_direction == Direction.MOVING_RIGHT || _direction == Direction.STOPPING_RIGHT)
-    //             _direction = Direction.STOPPING_RIGHT;
-    //         else if(_direction == Direction.MOVING_LEFT || _direction == Direction.STOPPING_LEFT)
-    //             _direction = Direction.STOPPING_LEFT;
-    //     }// end Stop()
+        public void MoveLeft() {
+            _state = State.MOVING_LEFT;
+        }// end MoveLeft()
+
+        public void Stop() {
+            if(_movingSpriteLeft.HasStopped || _movingSpriteRight.HasStopped)
+                return;
+            if(_state == State.MOVING_RIGHT || _state == State.STOPPING_RIGHT)
+                _state = State.STOPPING_RIGHT;
+            else if(_state == State.MOVING_LEFT || _state == State.STOPPING_LEFT)
+                _state = State.STOPPING_LEFT;
+            _movingSpriteLeft.EndAnimation();
+            _movingSpriteRight.EndAnimation();
+        }// end Stop()
+
+        public void Update() {
+            if(_state == State.IDLE)
+                _idleSprite.Update();
+            else if(_state == State.STOPPING_RIGHT || _state == State.STOPPING_LEFT) {
+                if(_movingSpriteLeft.HasStopped || _movingSpriteRight.HasStopped)
+                    StopMoving();
+            }
+            else {
+                _movingSpriteRight.Update();
+                _movingSpriteLeft.Update();
+            }
+        }// end Update()
+
+        private void StopMoving() {
+            _movingSpriteLeft.ResetSprite();
+            _movingSpriteRight.ResetSprite();
+            _idleSprite.ResetSprite();
+            _state = State.IDLE;
+        }// end HasStopped
+
+        public void ResetSprite() {
+            // Set state to idle
+            _state = State.IDLE;
+            // Reset all animation states
+            _idleSprite.ResetSprite();
+            _movingSpriteRight.ResetSprite();
+            _movingSpriteLeft.ResetSprite();
+        }// end ResetSprite()
+
+        private int GetCurrentRowNumber() {
+            if(_state == State.MOVING_RIGHT || _state == State.STOPPING_RIGHT)
+                return _movingSpriteRight.Rows;
+            if(_state == State.MOVING_LEFT || _state == State.STOPPING_LEFT)
+                return _movingSpriteLeft.Rows;
+            return _idleSprite.Rows;
+        }// end GetCurrentRowNumber()
+
+        private int GetCurrentColNumber() {
+            if(_state == State.MOVING_RIGHT || _state == State.STOPPING_RIGHT)
+                return _movingSpriteRight.Columns;
+            if(_state == State.MOVING_LEFT || _state == State.STOPPING_LEFT)
+                return _movingSpriteLeft.Columns;
+            return _idleSprite.Columns;
+        }// end GetCurrentColNumber()
+
+        private Texture2D GetCurrentTexture() {
+            if(_state == State.MOVING_RIGHT || _state == State.STOPPING_RIGHT)
+                return _movingSpriteRight.Texture;
+            if(_state == State.MOVING_LEFT || _state == State.STOPPING_LEFT)
+                return _movingSpriteLeft.Texture;
+            return _idleSprite.Texture;
+        }// end GetCurrentTexture()
+
+        private int GetCurrentTextureHeight() {
+            if(_state == State.MOVING_RIGHT || _state == State.STOPPING_RIGHT)
+                return _movingSpriteRight.Height;
+            if(_state == State.MOVING_LEFT || _state == State.STOPPING_LEFT)
+                return _movingSpriteLeft.Height;
+            return _idleSprite.Height;
+        }// end GetCurrentTextureHeight()
+
+        private int GetCurrentTextureWidth() {
+            if(_state == State.MOVING_RIGHT || _state == State.STOPPING_RIGHT)
+                return _movingSpriteRight.Width;
+            if(_state == State.MOVING_LEFT || _state == State.STOPPING_LEFT)
+                return _movingSpriteLeft.Width;
+            return _idleSprite.Width;
+        }
 
 
+        private Rectangle GetSourceRectangle() {
+            if(_state == State.MOVING_RIGHT || _state == State.STOPPING_RIGHT)
+                return _movingSpriteRight.SourceRectangle;
+            if(_state == State.MOVING_LEFT || _state == State.STOPPING_LEFT)
+                return _movingSpriteLeft.SourceRectangle;
+            return _idleSprite.SourceRectangle;
+        }
 
-    // }
+        public Rectangle DestinationRectangle(Vector2 location) {
+            if(_state == State.MOVING_RIGHT || _state == State.STOPPING_RIGHT)
+                return _movingSpriteRight.DestinationRectangle(location);
+            if(_state == State.MOVING_LEFT || _state == State.STOPPING_LEFT)
+                return _movingSpriteLeft.DestinationRectangle(location);
+            return _idleSprite.DestinationRectangle(location);
+        }// end GetDestinationRectangle()
+
+    }// end SimpleMovingSprite class
 
 }// end namespace
