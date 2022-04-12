@@ -50,7 +50,7 @@ namespace Graphics.Sprites {
         public int Rows { get; }
         public int Columns { get; }
         public override int Width{ get { return Texture.Width / Columns; } }
-        public override int Height{ get { return Texture.Height / Rows; } }
+        public override int Height{ get { return GetHeight(); } }
 
         public override Rectangle SourceRectangle{ get { return GetSourceRectangle(); } }
         protected int _currentFrame;
@@ -77,22 +77,27 @@ namespace Graphics.Sprites {
         }// end Update()
 
         private Rectangle GetSourceRectangle() {
-            int width = Texture.Width / Columns;
-            int height = Texture.Height / Rows;
             int row = _currentFrame / Columns;
             int column = _currentFrame % Columns;
-            return new Rectangle(width * column, height * row, width, height);
+            return new Rectangle(Width * column, Height * row, Width, Height);
         }// end GetSourceRectangle()
 
         public override Rectangle DestinationRectangle(Vector2 location) {
-            int width = Texture.Width / Columns;
-            int height = Texture.Height / Rows;
-            return new Rectangle((int)location.X, (int)location.Y, width, height);
+            return new Rectangle((int)location.X, (int)location.Y, Width, Height);
         }// end DestinationRectangle()
+
+        private int GetHeight() {
+            var num = Rows;
+            Console.WriteLine("Texture Height: " + Texture.Height);
+            Console.WriteLine("Row number: " + num);
+            Console.WriteLine("Height: " + Texture.Height / num);
+            return Texture.Height / num;
+        }
 
         public virtual void ResetSprite() {
             _currentFrame = 0;
         }// end ResetSprite()
+
     }// end AnimatedSprite class
 
     ////////////////////////////////////////////////////////////// Controlled Animated Sprite /////////////////////////////////////////////////////////////

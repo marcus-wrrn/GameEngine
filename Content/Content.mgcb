@@ -37,6 +37,30 @@
 /processorParam:TextureFormat=Color
 /build:BlueBandanaAnim.png
 
+#begin Characters/BlueBandanaAnimLeft.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Characters/BlueBandanaAnimLeft.png
+
+#begin Characters/BlueBandanaAnimRight.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Characters/BlueBandanaAnimRight.png
+
 #begin Rock_Guy_Bandana_Animation.png
 /importer:TextureImporter
 /processor:TextureProcessor
