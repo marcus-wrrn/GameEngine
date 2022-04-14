@@ -14,7 +14,7 @@ namespace TestingTactics
         GameKeyboard keyboard = GameKeyboard.Instance;
         private GraphicsDeviceManager _graphics;
         //private SpriteBatch _spriteBatch;
-        private MovingAsset<Graphics.Sprites.ControlledAnimatedSprite> _asset1;
+        private HorizontalMovingAsset<Graphics.Sprites.SimpleMovingSprite> _asset1;
         private MovingAsset<Graphics.Sprites.AnimatedSprite> _asset2;
         private SpriteBunch _sprites;
         private Graphics.Screen _screen;
@@ -46,8 +46,12 @@ namespace TestingTactics
             _screen = new Graphics.Screen(this, 3840, 2160);
             //var sprite = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("./C"));
             var rockGuy = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("./Characters/BlueBandanaAnimRight"), 1, 18);
-            var tempRockGuy = new Graphics.Sprites.ControlledAnimatedSprite(rockGuy, 6, 10);
-            _asset1 = new MovingAsset<Graphics.Sprites.ControlledAnimatedSprite>(tempRockGuy, new Vector2(1000f, 1000f), 1000f, 10);
+            var movingRight = new Graphics.Sprites.ControlledAnimatedSprite(rockGuy, 6, 10);
+            rockGuy = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("./Characters/BlueBandanaAnimLeft"), 1, 18);
+            var movingLeft = new Graphics.Sprites.ControlledAnimatedSprite(rockGuy, 6, 10);
+            rockGuy = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("./Characters/BandanGuyStandingAnim"), 1, 6);
+            var cool = new Graphics.Sprites.SimpleMovingSprite(rockGuy, movingRight, movingLeft);
+            _asset1 = new HorizontalMovingAsset<Graphics.Sprites.SimpleMovingSprite>(cool, new Vector2(1000f, 1000f), 1000f, 10);
             _asset2 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy, new Vector2(1920, 1080), 1000f, 100f);
 
             // TODO: use this.Content to load your game content here
@@ -69,14 +73,11 @@ namespace TestingTactics
             
             mousePosition.Y = _screen.Height - mousePosition.Y;
             if(temp % 10 == 0)
-                _asset2.AssetSprite.Update();
+                _asset1.AssetSprite.Update();
             temp++;
-            //Console.WriteLine("Width: " + _graphics.PreferredBackBufferWidth);
-            // Console.WriteLine("Mouse Location: " + mousePosition);
-            //_asset2.MoveDown(gameTime);
-            _asset2.MoveToLocation(mousePosition, gameTime);
-            if(mousePosition == _asset1.LocationOnMap.Location) 
-                _asset1.AssetSprite.EndAnimation();
+            _asset1.MoveToLocation(mousePosition, gameTime);
+            // if(mousePosition == _asset1.LocationOnMap.Location) 
+            //     _asset1.AssetSprite.EndAnimation();
             //_asset2.MoveToLocation(mousePosition, gameTime);
             base.Update(gameTime);
         }
