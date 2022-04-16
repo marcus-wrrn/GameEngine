@@ -4,8 +4,6 @@ using System;
 // The Tiles objects are currently very bland; this is subject to change. ITile will eventually contain things like sound and
 // and status effects when the characters pass over them
 
-
-
 namespace Graphics.Tiles {
     public interface ITile {
         public Texture2D Texture{ get; }
@@ -21,6 +19,11 @@ namespace Graphics.Tiles {
             _isDisposed = false;
         }// end constructor
 
+        public Tile GetCopy() {
+            return new Tile(Texture);
+        }
+
+
         public void Dispose() {
             if(!_isDisposed) {
                 Texture.Dispose();
@@ -29,4 +32,5 @@ namespace Graphics.Tiles {
         }// end Dispose()
 
     }// end Tile
-}
+
+}// end Graphics.Tiles interface

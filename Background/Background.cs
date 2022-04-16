@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Graphics.Tiles;
 using System;
 
@@ -15,10 +14,9 @@ namespace Background {
         public Tile GetTile(int row, int column);
         public int GetRowNumber(float location);
         public int GetColumnNumber(float location);
+        public Vector2 GetTileLocation(Vector2 location);
         public void UpdateTile(Tile tile, Vector2 location);
         public void UpdateTile(Tile tile, int row, int column);
-        public void ExportToFile(string fileName);
-        public void SaveToFile(string fileName);
 
     }// end ITileBackground interface
 
@@ -75,7 +73,7 @@ namespace Background {
                 x = 0;
             }
         }// end InitializeTileLocations()
-
+        
         public void Dispose() {
             if(!IsDisposed) {
                 for(int i = 0; i < Rows; i++) {
@@ -87,12 +85,6 @@ namespace Background {
             }
         }// end Dispose
 
-        public Tile GetTile(int row, int col) {
-            if(row >= Rows || row < 0 || col >= Columns || col < 0)
-                throw new Exception("Values out of bound\nRow: " + row + "\nCol: " + col);
-            return _map[row,col];
-        }// end GetTile()
-
         public int GetColumnNumber(float locationX) {
             return (int)((locationX - _offset.X)/TileHeight);
         }// end GetColumnNumber()
@@ -101,9 +93,21 @@ namespace Background {
             return (int)((locationY - _offset.Y)/TileWidth);
         }// end getRowNumber()
 
+        public Tile GetTile(int row, int col) {
+            if(row >= Rows || row < 0 || col >= Columns || col < 0)
+                throw new Exception("Values out of bound\nRow: " + row + "\nCol: " + col);
+            return _map[row,col];
+        }// end GetTile()
+
         public Tile GetTile(Vector2 location) {
             return this.GetTile(this.GetRowNumber(location.Y), this.GetColumnNumber(location.X));
         }// end GetTile()
+
+        public Vector2 GetTileLocation(Vector2 location) {
+            int column = GetColumnNumber(location.X);
+            int row = GetRowNumber(location.Y);
+            return new Vector2(column*TileWidth, row*TileHeight);
+        }
 
         public void UpdateTile(Tile tile, Vector2 location) {
             var tileToChange = this.GetTile(location);
@@ -117,13 +121,6 @@ namespace Background {
             tileToChange = tile;
         }// end UpdateTile()
 
-        public void ExportToFile(string fileName) {
-
-        }
-
-        public void SaveToFile(string fileName) {
-            
-        }
-
     }// end TileBackground class
-}
+
+}// end Background namespace
