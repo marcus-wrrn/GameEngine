@@ -13,14 +13,14 @@ namespace Background {
         public Rectangle Boundries{ get; }
         public Tile GetTile(Vector2 location);
         public Tile GetTile(int row, int column);
-        public int GetRowNumber(Vector2 location);
-        public int GetColumnNumber(Vector2 location);
+        public int GetRowNumber(float location);
+        public int GetColumnNumber(float location);
         public void UpdateTile(Tile tile, Vector2 location);
         public void UpdateTile(Tile tile, int row, int column);
         public void ExportToFile(string fileName);
         public void SaveToFile(string fileName);
 
-    }
+    }// end ITileBackground interface
 
     public sealed class TileBackground : ITileBackground {
         private Tile[,] _map;
@@ -31,12 +31,14 @@ namespace Background {
         public int TileHeight{ get; private set; }
         public Rectangle Boundries{ get; private set; }
         private Vector2 _offset;
+        public bool IsDisposed{ get; private set; }
 
         public TileBackground(Tile[,] background, Vector2 startLocation, Vector2 offset, int tileWidth, int tileHeight) {
             _offset = offset;
             InitializeMatrix(background);
             InitializeBounds(startLocation, tileWidth, tileHeight);
             InitializeTileLocations();
+            IsDisposed = false;
         }// end constructor
 
         private void InitializeMatrix(Tile[,] background) {
@@ -74,7 +76,54 @@ namespace Background {
             }
         }// end InitializeTileLocations()
 
+        public void Dispose() {
+            if(!IsDisposed) {
+                for(int i = 0; i < Rows; i++) {
+                    for(int j = 0; j < Columns; j++) {
+                        _map[i,j].Dispose();
+                    }
+                }
+                IsDisposed = true;
+            }
+        }// end Dispose
 
+        public Tile GetTile(int row, int col) {
+            if(row >= Rows || row < 0 || col >= Columns || col < 0)
+                throw new Exception("Values out of bound\nRow: " + row + "\nCol: " + col);
+            return _map[row,col];
+        }// end GetTile()
 
-    }
+        public int GetColumnNumber(float locationX) {
+            return (int)((locationX - _offset.X)/TileHeight);
+        }// end GetColumnNumber()
+
+        public int GetRowNumber(float locationY) {
+            return (int)((locationY - _offset.Y)/TileWidth);
+        }// end getRowNumber()
+
+        public Tile GetTile(Vector2 location) {
+            return this.GetTile(this.GetRowNumber(location.Y), this.GetColumnNumber(location.X));
+        }// end GetTile()
+
+        public void UpdateTile(Tile tile, Vector2 location) {
+            var tileToChange = this.GetTile(location);
+            tileToChange.Dispose();
+            tileToChange = tile;
+        }// end UpdateTile()
+
+        public void UpdateTile(Tile tile, int row, int col) {
+            var tileToChange = this.GetTile(row, col);
+            tileToChange.Dispose();
+            tileToChange = tile;
+        }// end UpdateTile()
+
+        public void ExportToFile(string fileName) {
+
+        }
+
+        public void SaveToFile(string fileName) {
+            
+        }
+
+    }// end TileBackground class
 }
