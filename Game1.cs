@@ -50,9 +50,10 @@ namespace TestingTactics
             rockGuy = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("./Characters/BlueBandanaAnimLeft"), 1, 18);
             var movingLeft = new Graphics.Sprites.ControlledAnimatedSprite(rockGuy, 6, 10);
             rockGuy = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("./Characters/BandanGuyStandingAnim"), 1, 6);
+            var rockGuy2 = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("./Characters/BandanGuyStandingAnim"), 1, 6);
             var cool = new Graphics.Sprites.SimpleMovingSprite(rockGuy, movingRight, movingLeft);
             _asset1 = new HorizontalMovingAsset<Graphics.Sprites.SimpleMovingSprite>(cool, new Vector2(1000f, 1000f), 1000f, 10);
-            _asset2 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy, new Vector2(1920, 1080), 1000f, 100f);
+            _asset2 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy2, new Vector2(1920, 1080), 1000f, 100f);
 
             // TODO: use this.Content to load your game content here
         }
@@ -72,8 +73,11 @@ namespace TestingTactics
             Vector2 p2 = Vector2.Zero;
             
             mousePosition.Y = _screen.Height - mousePosition.Y;
-            if(temp % 10 == 0)
+            if(temp % 10 == 0) {
                 _asset1.AssetSprite.Update();
+                _asset2.AssetSprite.Update();
+            }
+                
             temp++;
             _asset1.MoveToLocation(mousePosition, gameTime);
             // if(mousePosition == _asset1.LocationOnMap.Location) 

@@ -196,12 +196,22 @@ namespace Graphics.Sprites {
         }// end constructor
 
         public void MoveRight() {
-            _isMoving = true;
+            if(_movingSpriteLeft.HasStopped || _movingSpriteRight.HasStopped) {
+                _movingSpriteLeft.ResetSprite();
+                _movingSpriteRight.ResetSprite();
+            }
+            if(!_isMoving)
+                _isMoving = true;
             _state = State.MOVING_RIGHT;
         }// end MoveRight()
 
         public void MoveLeft() {
-            _isMoving = true;
+            if(_movingSpriteLeft.HasStopped || _movingSpriteRight.HasStopped) {
+                _movingSpriteLeft.ResetSprite();
+                _movingSpriteRight.ResetSprite();
+            }
+            if(!_isMoving)
+                _isMoving = true;
             _state = State.MOVING_LEFT;
         }// end MoveLeft()
 
@@ -308,5 +318,7 @@ namespace Graphics.Sprites {
         }// end GetDestinationRectangle()
 
     }// end SimpleMovingSprite class
+
+    
 
 }// end namespace
