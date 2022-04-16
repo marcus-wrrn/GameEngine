@@ -137,6 +137,7 @@ namespace Graphics.Sprites {
         }// end Update Begining
 
         private void UpdateMiddle() {
+            Console.WriteLine("Hi");
             _currentFrame++;
             if(_currentFrame >= _lastRepeatFrame)
                 _currentFrame = _lastStartFrame + 1;
@@ -185,6 +186,7 @@ namespace Graphics.Sprites {
         private ControlledAnimatedSprite _movingSpriteRight;
         private ControlledAnimatedSprite _movingSpriteLeft;
         private State _state;
+        private bool _isMoving;
 
         public SimpleMovingSprite(AnimatedSprite standingSprite, ControlledAnimatedSprite movingSpriteRight, ControlledAnimatedSprite movingSpriteLeft) {
             _movingSpriteLeft = movingSpriteLeft;
@@ -194,28 +196,44 @@ namespace Graphics.Sprites {
         }// end constructor
 
         public void MoveRight() {
+            if(_movingSpriteLeft.HasStopped || _movingSpriteRight.HasStopped) {
+                _movingSpriteLeft.ResetSprite();
+                _movingSpriteRight.ResetSprite();
+            }
+            if(!_isMoving)
+                _isMoving = true;
             _state = State.MOVING_RIGHT;
         }// end MoveRight()
 
         public void MoveLeft() {
+            if(_movingSpriteLeft.HasStopped || _movingSpriteRight.HasStopped) {
+                _movingSpriteLeft.ResetSprite();
+                _movingSpriteRight.ResetSprite();
+            }
+            if(!_isMoving)
+                _isMoving = true;
             _state = State.MOVING_LEFT;
         }// end MoveLeft()
 
         public void Stop() {
             if(_movingSpriteLeft.HasStopped || _movingSpriteRight.HasStopped)
-                return;
+                StopMoving();
             if(_state == State.MOVING_RIGHT || _state == State.STOPPING_RIGHT)
                 _state = State.STOPPING_RIGHT;
             else if(_state == State.MOVING_LEFT || _state == State.STOPPING_LEFT)
                 _state = State.STOPPING_LEFT;
-            _movingSpriteLeft.EndAnimation();
-            _movingSpriteRight.EndAnimation();
+            if(_isMoving) {
+                _movingSpriteLeft.EndAnimation();
+                _movingSpriteRight.EndAnimation();
+            }
         }// end Stop()
 
         public void Update() {
             if(_state == State.IDLE)
                 _idleSprite.Update();
             else if(_state == State.STOPPING_RIGHT || _state == State.STOPPING_LEFT) {
+                _movingSpriteRight.Update();
+                _movingSpriteLeft.Update();
                 if(_movingSpriteLeft.HasStopped || _movingSpriteRight.HasStopped)
                     StopMoving();
             }
@@ -226,6 +244,7 @@ namespace Graphics.Sprites {
         }// end Update()
 
         private void StopMoving() {
+            _isMoving = false;
             _movingSpriteLeft.ResetSprite();
             _movingSpriteRight.ResetSprite();
             _idleSprite.ResetSprite();
@@ -279,7 +298,7 @@ namespace Graphics.Sprites {
             if(_state == State.MOVING_LEFT || _state == State.STOPPING_LEFT)
                 return _movingSpriteLeft.Width;
             return _idleSprite.Width;
-        }
+        }// end GetCurrentTextureWidth()
 
 
         private Rectangle GetSourceRectangle() {
@@ -288,7 +307,7 @@ namespace Graphics.Sprites {
             if(_state == State.MOVING_LEFT || _state == State.STOPPING_LEFT)
                 return _movingSpriteLeft.SourceRectangle;
             return _idleSprite.SourceRectangle;
-        }
+        }// end GetSourceRectangle()
 
         public Rectangle DestinationRectangle(Vector2 location) {
             if(_state == State.MOVING_RIGHT || _state == State.STOPPING_RIGHT)
@@ -299,5 +318,7 @@ namespace Graphics.Sprites {
         }// end GetDestinationRectangle()
 
     }// end SimpleMovingSprite class
+
+    
 
 }// end namespace

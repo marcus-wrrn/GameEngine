@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Windows;
 using Graphics.Sprites;
+
 namespace Graphics.Assets {
     // =============================================================== Base Asset ===============================================================
     public interface IAsset<T> where T: ISprite {
@@ -64,23 +65,23 @@ namespace Graphics.Assets {
 
         public MovingAsset(T sprite, Vector2 location, float maxSpeed, float acceleration) : base(sprite, location) {
             Speed = maxSpeed;
-        }
+        }// end MovingAsset()
 
         public MovingAsset(T sprite, GraphicsDeviceManager graphicsManager, float maxSpeed) : base(sprite, graphicsManager) {
             Speed = maxSpeed;
-        }
+        }// end MovingAsset()
 
         public MovingAsset(T sprite, Vector2 location) : base(sprite, location) {
             Speed = 0.0f;
-        }
+        }// end MovingAsset()
 
         public MovingAsset(T sprite) : base(sprite) {
             Speed = 0.0f;
-        }
+        }// end MovingAsset()
 
         public void ChangeSpeed(float speed) {
             Speed = speed;
-        }
+        }// end ChangeSpeed()
 
 
         public void MoveUp(GameTime gameTime) {
@@ -90,29 +91,29 @@ namespace Graphics.Assets {
             LocationOnMap.ChangeLocation(location);
         }// end MoveUp()
 
-        public void MoveDown(GameTime gameTime) {
+        public virtual void MoveDown(GameTime gameTime) {
             Vector2 location = LocationOnMap.Location;
             location.Y -= Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             this.SetLocation(location);
         }// end MoveDown()
 
-        public void MoveRight(GameTime gameTime) {
+        public virtual void MoveRight(GameTime gameTime) {
             Vector2 location = LocationOnMap.Location;
             location.X += Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             this.SetLocation(location);
         }// end MoveRight()
 
-        public void MoveLeft(GameTime gameTime) {
+        public virtual void MoveLeft(GameTime gameTime) {
             Vector2 location = LocationOnMap.Location;
             location.X -= Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             this.SetLocation(location);
         }// end MoveLeft()
 
-        public void MoveDirection(float x, float y, GameTime gameTime) {
+        public virtual void MoveDirection(float x, float y, GameTime gameTime) {
             this.MoveDirection(new Vector2(x, y), gameTime);
-        }
+        }// end MoveDirection()
 
-        public void MoveDirection(Vector2 nextLocation, GameTime gameTime) {
+        public virtual void MoveDirection(Vector2 nextLocation, GameTime gameTime) {
             Vector2 currLocation = LocationOnMap.Location;
             // Make sure the new location is immutable
             Vector2 tempLocation = nextLocation;
@@ -122,21 +123,57 @@ namespace Graphics.Assets {
             this.SetLocation(currLocation);
         }// end MoveDirection()
 
-        private bool HasReachedDestination(Vector2 destination) {
+        protected bool HasReachedDestination(Vector2 destination) {
             var location = LocationOnMap.Location;
             if(location.X > destination.X - AssetSprite.Width / 2 && location.X < destination.X + AssetSprite.Width / 2)
                 if(location.Y > destination.Y - AssetSprite.Height / 2 && location.Y < destination.Y + AssetSprite.Width / 2)
                     return true;
             return false;
-        }
+        }// end HasReachedDestination()
 
-        public void MoveToLocation(Vector2 destination, GameTime gameTime) {
+        public virtual void MoveToLocation(Vector2 destination, GameTime gameTime) {
             if(!HasReachedDestination(destination))
                 MoveDirection(destination - LocationOnMap.Location, gameTime);
             // Means its close enough to set location to specific spot
             else {
                 SetLocation(destination);
             }
+        }// end MoveToLocation()
+
+    }// end MovingAsset class
+
+    public interface IHorizontalMovingAsset<T> : IMovingAsset<T> where T: ISimpleMovingSprite {
+
+    }
+
+    public class HorizontalMovingAsset<T> : MovingAsset<T>, IHorizontalMovingAsset<T> where T: ISimpleMovingSprite {
+        // (T sprite, Vector2 location, float maxSpeed, float acceleration) : base(sprite, location)
+        public HorizontalMovingAsset(T sprite, Vector2 location, float maxSpeed, float acceleration) 
+            : base (sprite, location, maxSpeed, acceleration) {}
+
+        public override void MoveRight(GameTime gameTime) {
+            base.MoveRight(gameTime);
+            AssetSprite.MoveRight();
+        }
+
+        public override void MoveLeft(GameTime gameTime)
+        {
+            base.MoveLeft(gameTime);
+            AssetSprite.MoveLeft();
+        }
+
+        public override void MoveToLocation(Vector2 destination, GameTime gameTime)
+        {
+            base.MoveToLocation(destination, gameTime);
+            if(HasReachedDestination(destination)) {
+                AssetSprite.Stop();
+            }
+            else if (destination.X - LocationOnMap.X > 0)
+                AssetSprite.MoveRight();
+            else
+                AssetSprite.MoveLeft();
         }
     }
-}
+
+
+}// end namespace
