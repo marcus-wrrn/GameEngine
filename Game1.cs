@@ -55,6 +55,8 @@ namespace TestingTactics
             var cool = new Graphics.Sprites.SimpleMovingSprite(rockGuy, movingRight, movingLeft);
             _asset1 = new HorizontalMovingAsset<Graphics.Sprites.SimpleMovingSprite>(cool, new Vector2(1000f, 1000f), 1000f, 10);
             _asset2 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy2, new Vector2(1920, 1080), 1000f, 100f);
+            
+            // Pretty terrible tile initialization system
             var tiles = new Graphics.Tiles.Tile[50,50];
             for(int i = 0; i < 50; i++) {
                 for(int j = 0; j < 50; j++) {

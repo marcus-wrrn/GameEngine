@@ -9,6 +9,7 @@ namespace Background {
         public int Columns{ get; }
         public int TileWidth{ get; }
         public int TileHeight{ get; }
+        public Vector2 Offset{ get; }
         public Rectangle Boundries{ get; }
         public Tile GetTile(Vector2 location);
         public Tile GetTile(int row, int column);
@@ -28,11 +29,11 @@ namespace Background {
         public int TileWidth{ get; private set; }
         public int TileHeight{ get; private set; }
         public Rectangle Boundries{ get; private set; }
-        private Vector2 _offset;
+        public Vector2 Offset{ get; private set; }
         public bool IsDisposed{ get; private set; }
 
         public TileBackground(Tile[,] background, Vector2 startLocation, Vector2 offset, int tileWidth, int tileHeight) {
-            _offset = offset;
+            Offset = offset;
             InitializeMatrix(background);
             InitializeBounds(startLocation, tileWidth, tileHeight);
             InitializeTileLocations();
@@ -85,11 +86,11 @@ namespace Background {
         }// end Dispose
 
         public int GetColumnNumber(float locationX) {
-            return (int)((locationX - _offset.X)/TileHeight);
+            return (int)((locationX - Offset.X)/TileHeight);
         }// end GetColumnNumber()
 
         public int GetRowNumber(float locationY) {
-            return (int)((locationY - _offset.Y)/TileWidth);
+            return (int)((locationY - Offset.Y)/TileWidth);
         }// end getRowNumber()
 
         public Tile GetTile(int row, int col) {
