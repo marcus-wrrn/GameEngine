@@ -31,8 +31,6 @@ namespace Utilities {
             return mainVal;
         }// end Clamp(): float
 
-        public static void ConvertCoordinate(Vector2 loc) {
-            
-        }
-    }
-}
+    }// end Util class
+
+}// end Utilities namespace

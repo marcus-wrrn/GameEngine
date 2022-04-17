@@ -53,7 +53,6 @@ namespace Background {
                 throw new Exception("Width cannot be less than or equal to zero" + tileWidth);
             if(tileHeight <= 0)
                 throw new Exception("Height cannot be less than or equal to zero" + tileHeight);
-
             TileWidth = tileWidth;
             TileHeight = tileHeight;
             Boundries = new Rectangle((int)startLocation.X, (int)startLocation.Y, tileWidth * Columns, tileHeight * Rows);
@@ -78,7 +77,7 @@ namespace Background {
             if(!IsDisposed) {
                 for(int i = 0; i < Rows; i++) {
                     for(int j = 0; j < Columns; j++) {
-                        _map[i,j].Dispose();
+                        _map[i,j]?.Dispose();
                     }
                 }
                 IsDisposed = true;
@@ -109,13 +108,21 @@ namespace Background {
             return new Vector2(column*TileWidth, row*TileHeight);
         }
 
+        public Vector2 GetTileLocation(int row, int column) {
+            return new Vector2(column*TileWidth, row*TileHeight);
+        }
+
         public void UpdateTile(Tile tile, Vector2 location) {
+            if(tile == null || tile.IsDisposed)
+                throw new NullReferenceException("The tile to be replaced does not exist or is disposed");
             var tileToChange = this.GetTile(location);
             tileToChange.Dispose();
             tileToChange = tile;
         }// end UpdateTile()
 
         public void UpdateTile(Tile tile, int row, int col) {
+            if(tile == null || tile.IsDisposed)
+                throw new NullReferenceException("The tile to be replaced does not exist or is disposed");
             var tileToChange = this.GetTile(row, col);
             tileToChange.Dispose();
             tileToChange = tile;

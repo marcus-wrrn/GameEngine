@@ -7,16 +7,16 @@ using System;
 namespace Graphics.Tiles {
     public interface ITile {
         public Texture2D Texture{ get; }
-        
+        public bool IsDisposed{ get; }
     }
 
     public class Tile : ITile, IDisposable {
         public Texture2D Texture{ get; private set; }
-        private bool _isDisposed;
+        public bool IsDisposed{ get; private set; }
 
         public Tile(Texture2D texture) {
             Texture = texture;
-            _isDisposed = false;
+            IsDisposed = false;
         }// end constructor
 
         public Tile GetCopy() {
@@ -25,9 +25,9 @@ namespace Graphics.Tiles {
 
 
         public void Dispose() {
-            if(!_isDisposed) {
+            if(!IsDisposed) {
                 Texture.Dispose();
-                _isDisposed = true;
+                IsDisposed = true;
             }
         }// end Dispose()
 
