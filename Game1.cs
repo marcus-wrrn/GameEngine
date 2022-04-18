@@ -58,9 +58,9 @@ namespace TestingTactics
             _asset2 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy2, new Vector2(1920, 1080), 1000f, 100f);
 
             // Pretty terrible tile initialization system
-            var tiles = new Graphics.Tiles.Tile[60,60];
-            for(int i = 0; i < 60; i++) {
-                for(int j = 0; j < 60; j++) {
+            var tiles = new Graphics.Tiles.Tile[40,40];
+            for(int i = 0; i < 40; i++) {
+                for(int j = 0; j < 40; j++) {
                     tiles[i,j] = new Graphics.Tiles.Tile(Content.Load<Texture2D>("tile"));
                 }
             }// end for loop
@@ -69,7 +69,7 @@ namespace TestingTactics
             var background = new Background.TileBackground(tiles, Vector2.Zero, Vector2.Zero, texture.Width, texture.Height);
 
             
-            _backgroundController = new Controllers.BackgroundController(this, background);
+            _backgroundController = new Controllers.BackgroundController(this, "TestFile");
             // TODO: use this.Content to load your game content here
         }
 
@@ -82,6 +82,18 @@ namespace TestingTactics
             if (kBoard.IsKeyClicked(Keys.Escape)) {
                 Exit();
             }
+            if (kBoard.IsKeyClicked(Keys.P))
+                _backgroundController.SaveContent("TestFile");
+            if (kBoard.IsKeyDown(Keys.W))
+                _asset1.MoveUp(gameTime);
+            if (kBoard.IsKeyDown(Keys.D))
+                _asset1.MoveRight(gameTime);
+            if (kBoard.IsKeyDown(Keys.S))
+                _asset1.MoveDown(gameTime);
+            if (kBoard.IsKeyDown(Keys.A))
+                _asset1.MoveLeft(gameTime);
+
+
 
             Vector2 mousePosition = new Vector2(mouse.X, mouse.Y);
             Vector2 p1 = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
@@ -94,7 +106,7 @@ namespace TestingTactics
             }
                 
             temp++;
-            _asset1.MoveToLocation(mousePosition, gameTime);
+            //_asset1.MoveToLocation(mousePosition, gameTime);
             // if(mousePosition == _asset1.LocationOnMap.Location) 
             //     _asset1.AssetSprite.EndAnimation();
             //_asset2.MoveToLocation(mousePosition, gameTime);

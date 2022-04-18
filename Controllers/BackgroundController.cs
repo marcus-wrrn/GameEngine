@@ -48,14 +48,18 @@ namespace Controllers {
                 offset.Y = (float)binReader.ReadDouble();
                 // Finds the start location
                 Vector2 startLocation = new Vector2();
-                startLocation.X = (float)binReader.ReadDouble();
-                startLocation.Y = (float)binReader.ReadDouble();
+                startLocation.X = (float)binReader.ReadInt32();
+                startLocation.Y = (float)binReader.ReadInt32();
                 // Finds the width and height of each tile
                 int tileHeight = binReader.ReadInt32();
                 int tileWidth = binReader.ReadInt32();
+                Console.WriteLine("Tile Height: " + tileHeight);
+                Console.WriteLine("Tile Width: " + tileWidth);
                 // Gets the tile information
                 int rows = binReader.ReadInt32();
                 int columns = binReader.ReadInt32();
+                Console.WriteLine("Rows: " + rows);
+                Console.WriteLine("Columns: " + columns);
                 var tiles = new Graphics.Tiles.Tile[rows,columns];
                 // Initializes the tile map
                 for(int i = 0; i < rows; i++) {
@@ -65,7 +69,7 @@ namespace Controllers {
                 }
                 // Returns the tileBackground
                 return new TileBackground(tiles, startLocation, offset, tileWidth, tileHeight);
-            } catch (IOException ioexp) {
+            } catch (Exception ioexp) {
                 Console.WriteLine("Error: {0}", ioexp.Message);
                 return null;
             }
