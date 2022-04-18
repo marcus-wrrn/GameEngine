@@ -58,10 +58,12 @@ namespace TestingTactics
             _asset2 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy2, new Vector2(1920, 1080), 1000f, 100f);
 
             // Pretty terrible tile initialization system
-            var tiles = new Graphics.Tiles.Tile[40,40];
-            for(int i = 0; i < 40; i++) {
-                for(int j = 0; j < 40; j++) {
-                    tiles[i,j] = new Graphics.Tiles.Tile(Content.Load<Texture2D>("tile"));
+            int rows = 40;
+            int columns = 60;
+            var tiles = new Graphics.Tiles.Tile[rows,columns];
+            for(int i = 0; i < rows; i++) {
+                for(int j = 0; j < columns; j++) {
+                    tiles[i,j] = new Graphics.Tiles.Tile(Content.Load<Texture2D>("./Tiles/TileDarkGreen"));
                 }
             }// end for loop
 
@@ -69,7 +71,7 @@ namespace TestingTactics
             var background = new Background.TileBackground(tiles, Vector2.Zero, Vector2.Zero, texture.Width, texture.Height);
 
             
-            _backgroundController = new Controllers.BackgroundController(this, "TestFile");
+            _backgroundController = new Controllers.BackgroundController(this, background);
             // TODO: use this.Content to load your game content here
         }
 
