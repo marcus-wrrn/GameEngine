@@ -59,23 +59,33 @@ namespace Graphics.Rendering {
             _hasStarted = false;
         }
 
+        public void Draw(Texture2D texture, Vector2 location, Color color) {
+            _sprites.Draw(texture, location, null, color, 0f, Vector2.Zero, 1f, SpriteEffects.FlipVertically, 0f);
+        }// end Draw()
+
+        public void Draw(Texture2D texture, Vector2 location, Rectangle sourceRectangle, Color color) {
+            _sprites.Draw(texture, location, sourceRectangle, color, 0f, Vector2.Zero, 1f, SpriteEffects.FlipVertically, 0f);
+        }// end Draw();
+
         public void Draw(Assets.Asset<Sprite> asset, Color color) {
             _sprites.Draw(asset.AssetSprite.Texture, asset.LocationOnMap.GetLocationToDraw(), null, color, 0f, Vector2.Zero, 1f, SpriteEffects.FlipVertically, 0f);
-        }
+        }// end Draw()
 
         public void Draw<T>(Assets.Asset<T> asset, Color color) where T: IAnimatedSprite {
             var sourceRect = asset.AssetSprite.SourceRectangle;
             var destinationRect = asset.AssetSprite.DestinationRectangle(asset.LocationOnMap.GetLocationToDraw());
             _sprites.Draw(asset.AssetSprite.Texture, destinationRect, sourceRect, color, 0f, Vector2.Zero, SpriteEffects.FlipVertically, 0f);
-        }
+        }// end Draw()
 
 
         public void Draw<T>(Assets.Asset<T> asset, Rectangle? sourceRectangle, Vector2 originOfTransformation, Vector2 position, float rotation, Vector2 scale, Color color) where T: Sprite {
             _sprites.Draw(asset.AssetSprite.Texture, asset.LocationOnMap.GetLocationToDraw(), sourceRectangle, color, rotation, originOfTransformation, scale, SpriteEffects.FlipVertically, 0f);
-        }
+        }// end Draw()
 
         public void Draw<T>(Assets.Asset<T> asset, Rectangle? sourceRectangle, Rectangle destinationRectangle, Color color) where T: Sprite {
             _sprites.Draw(asset.AssetSprite.Texture, destinationRectangle, sourceRectangle, color, 0f, Vector2.Zero, SpriteEffects.FlipVertically, 0f);
-        }
+        }// end Draw()
+
     }// end SpriteBunch Class
+
 }// end namespace
