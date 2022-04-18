@@ -86,15 +86,27 @@ namespace TestingTactics
             }
             if (kBoard.IsKeyClicked(Keys.P))
                 _backgroundController.SaveContent("TestFile");
-            if (kBoard.IsKeyDown(Keys.W))
-                _asset1.MoveUp(gameTime);
-            if (kBoard.IsKeyDown(Keys.D))
-                _asset1.MoveRight(gameTime);
-            if (kBoard.IsKeyDown(Keys.S))
-                _asset1.MoveDown(gameTime);
-            if (kBoard.IsKeyDown(Keys.A))
-                _asset1.MoveLeft(gameTime);
 
+            bool isMoving = false;
+            if (kBoard.IsKeyDown(Keys.W)) {
+                _asset1.MoveUp(gameTime);
+                isMoving = true;
+            }
+            if (kBoard.IsKeyDown(Keys.D)) {
+                _asset1.MoveRight(gameTime);
+                isMoving = true;
+            }
+            if (kBoard.IsKeyDown(Keys.S)) {
+                _asset1.MoveDown(gameTime);
+                isMoving = true;   
+            }
+            if (kBoard.IsKeyDown(Keys.A)) {
+                _asset1.MoveLeft(gameTime);
+                isMoving = true;
+            }
+            if (!isMoving) {
+                _asset1.Stop();
+            }
 
 
             Vector2 mousePosition = new Vector2(mouse.X, mouse.Y);

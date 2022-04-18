@@ -44,6 +44,7 @@ namespace Graphics.Assets {
         protected void SetLocation(Vector2 nextLocation) {
             LocationOnMap.ChangeLocation(nextLocation);
         }// end ChangeLocation()
+
     }// end Asset
 
     // ======================================================== Moving Asset ===============================================================
@@ -143,7 +144,7 @@ namespace Graphics.Assets {
     }// end MovingAsset class
 
     public interface IHorizontalMovingAsset<T> : IMovingAsset<T> where T: ISimpleMovingSprite {
-
+        void Stop();
     }
 
     public class HorizontalMovingAsset<T> : MovingAsset<T>, IHorizontalMovingAsset<T> where T: ISimpleMovingSprite {
@@ -156,14 +157,16 @@ namespace Graphics.Assets {
             AssetSprite.MoveRight();
         }
 
-        public override void MoveLeft(GameTime gameTime)
-        {
+        public override void MoveLeft(GameTime gameTime) {
             base.MoveLeft(gameTime);
             AssetSprite.MoveLeft();
         }
 
-        public override void MoveToLocation(Vector2 destination, GameTime gameTime)
-        {
+        public void Stop() {
+            AssetSprite.Stop();
+        }// end Stop()
+
+        public override void MoveToLocation(Vector2 destination, GameTime gameTime) {
             base.MoveToLocation(destination, gameTime);
             if(HasReachedDestination(destination)) {
                 AssetSprite.Stop();
