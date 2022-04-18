@@ -7,14 +7,12 @@ using System.Linq;
 using TestingTactics;
 using Background;
 
-namespace Controllers.Background {
+namespace Controllers {
     public interface IController {
-        void Draw(Graphics.Rendering.SpriteBunch sprites);
-        void Update(GameTime gameTime);
+        Graphics.Rendering.SpriteBunch Draw();
+        //void Update(GameTime gameTime);
         void LoadContent(string fileName);
-        void LoadContent();
         void SaveContent(string fileName);
-        void SaveContent();
     }// end IController interface
 
     public class BackgroundController : IController {
@@ -31,6 +29,14 @@ namespace Controllers.Background {
             if(_tiledBackground == null)
                 throw new NullReferenceException("File Corrupted");
         }// end BackgroundController
+
+        public BackgroundController(Game1 game, TileBackground background) {
+            if(game == null || background == null)
+                throw new NullReferenceException("BackgroundController");
+            _game = game;
+            _spriteBunch = new Graphics.Rendering.SpriteBunch(_game);
+            _tiledBackground = background;
+        }// end BackgroundController()
 
         // Reads the 
         private TileBackground RetrieveBackgroundFromFile(string fileName) {
@@ -66,7 +72,7 @@ namespace Controllers.Background {
         }// end RetrieveBrackgroundFromFile()
 
         // Saves the tiled Background to a file
-        private void SaveData(string fileName) {
+        public void SaveContent(string fileName) {
              using (BinaryWriter binWriter = new BinaryWriter(File.Open(fileName, FileMode.Create))) {
                 try {
                     // Record the OffSet of the map
@@ -93,6 +99,24 @@ namespace Controllers.Background {
                 }
             }
         }//  end ExportToBinary()
+
+        public void LoadContent(string fileName) {
+            var tempVal = RetrieveBackgroundFromFile(fileName);
+            if(tempVal == null)
+                throw new Exception("Bad File");
+            _tiledBackground = tempVal;
+        }// end LoadContent()
+
+        public Graphics.Rendering.SpriteBunch Draw() {
+            _spriteBunch.Begin(true);
+            for(int i = 0; i < _tiledBackground.Rows; i++) {
+                for(int j = 0; j < _tiledBackground.Columns; j++) {
+                    _spriteBunch.Draw(_tiledBackground.GetTile(i,j).Texture, _tiledBackground.GetTileLocation(i,j), Color.AliceBlue);
+                }
+            }
+            _spriteBunch.End();
+            return _spriteBunch;
+        }
 
     }// end BackgroundController class
 

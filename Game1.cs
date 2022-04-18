@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+
 using Input;
 using Graphics.Assets;
 using Graphics.Rendering;
@@ -13,7 +14,7 @@ namespace TestingTactics
         int temp = 0;
         GameKeyboard keyboard = GameKeyboard.Instance;
         private GraphicsDeviceManager _graphics;
-        private Background.TileBackground _tileBackground;
+        private Controllers.BackgroundController _backgroundController;
         //private SpriteBatch _spriteBatch;
         private HorizontalMovingAsset<Graphics.Sprites.SimpleMovingSprite> _asset1;
         private MovingAsset<Graphics.Sprites.AnimatedSprite> _asset2;
@@ -55,18 +56,20 @@ namespace TestingTactics
             var cool = new Graphics.Sprites.SimpleMovingSprite(rockGuy, movingRight, movingLeft);
             _asset1 = new HorizontalMovingAsset<Graphics.Sprites.SimpleMovingSprite>(cool, new Vector2(1000f, 1000f), 1000f, 10);
             _asset2 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy2, new Vector2(1920, 1080), 1000f, 100f);
-            
+
             // Pretty terrible tile initialization system
-            var tiles = new Graphics.Tiles.Tile[50,50];
-            for(int i = 0; i < 50; i++) {
-                for(int j = 0; j < 50; j++) {
+            var tiles = new Graphics.Tiles.Tile[60,60];
+            for(int i = 0; i < 60; i++) {
+                for(int j = 0; j < 60; j++) {
                     tiles[i,j] = new Graphics.Tiles.Tile(Content.Load<Texture2D>("tile"));
                 }
-            }
-
+            }// end for loop
 
             var texture = Content.Load<Texture2D>("tile");
-            _tileBackground = new Background.TileBackground(tiles, Vector2.Zero, Vector2.Zero, texture.Width, texture.Height);
+            var background = new Background.TileBackground(tiles, Vector2.Zero, Vector2.Zero, texture.Width, texture.Height);
+
+            
+            _backgroundController = new Controllers.BackgroundController(this, background);
             // TODO: use this.Content to load your game content here
         }
 
@@ -103,24 +106,24 @@ namespace TestingTactics
             _screen.Set();
             GraphicsDevice.Clear(Color.CornflowerBlue);
             _sprites.Begin(true);
-            DrawBackground(_sprites);
+            var backgroundSprites = _backgroundController.Draw();
             _sprites.Draw(_asset2, Color.AliceBlue);
             _sprites.Draw(_asset1, Color.AliceBlue);
             _sprites.End();
             
             _screen.UnSet();
+            _screen.Present(backgroundSprites);
             _screen.Present(_sprites);
             base.Draw(gameTime);
         }
 
-        private void DrawBackground(Graphics.Rendering.SpriteBunch sprites) {
-            for(int i = 0; i < _tileBackground.Rows; i++) {
-                for(int j = 0; j < _tileBackground.Columns; j++) {
-                    var tile = _tileBackground.GetTile(i, j);
-                    var location = _tileBackground.GetTileLocation(i, j);
-                    sprites.Draw(tile.Texture, location, Color.AliceBlue);
-                }
-            }
+        public int GetScreenHeight() {
+            return _screen.Height;
         }
+
+        public int GetScreenWidth() {
+            return _screen.Width;
+        }
+
     }
 }
