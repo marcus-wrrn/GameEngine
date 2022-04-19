@@ -4,7 +4,7 @@ using System;
 namespace Graphics.Sprites {
 
     ////////////////////////////////////////////////////////////// Base Sprite /////////////////////////////////////////////////////////////
-    public interface ISprite {
+    public interface ISprite : IDisposable {
         Texture2D Texture{ get; }
         Rectangle SourceRectangle{ get; }
         int Width{ get; }
@@ -18,8 +18,10 @@ namespace Graphics.Sprites {
         public virtual int Width{ get { return Texture.Width; } }
         public virtual int Height{ get { return Texture.Height; } }
         public virtual Rectangle SourceRectangle{ get { return GetSourceRectangle(); } }
+        public bool IsDisposed{ get; private set; }
         public Sprite(Texture2D texture) {
             Texture = texture;
+            IsDisposed = false;
         }// end constructor
 
         public virtual Rectangle DestinationRectangle(Vector2 location) {
@@ -34,6 +36,14 @@ namespace Graphics.Sprites {
         public virtual void Update() {
             var text = Texture;
         }
+
+        public void Dispose() {
+            if(IsDisposed)
+                return;
+            Texture.Dispose();
+            IsDisposed = true;
+        }// end Dispose()
+
     }// end Sprite
 
     ////////////////////////////////////////////////////////////// Animated Sprite /////////////////////////////////////////////////////////////
@@ -180,6 +190,7 @@ namespace Graphics.Sprites {
         public int Columns{ get { return GetCurrentColNumber(); } }
         public Texture2D Texture{ get { return GetCurrentTexture(); } }
         public Rectangle SourceRectangle{ get { return GetSourceRectangle(); } }
+        public bool IsDisposed{ get; private set; }
 
         private enum State { IDLE, MOVING_RIGHT, MOVING_LEFT, STOPPING_RIGHT, STOPPING_LEFT };
         private AnimatedSprite _idleSprite;
@@ -193,6 +204,7 @@ namespace Graphics.Sprites {
             _movingSpriteRight = movingSpriteRight;
             _idleSprite = standingSprite;
             _state = State.IDLE;
+            IsDisposed = false;
         }// end constructor
 
         public void MoveRight() {
@@ -316,6 +328,15 @@ namespace Graphics.Sprites {
                 return _movingSpriteLeft.DestinationRectangle(location);
             return _idleSprite.DestinationRectangle(location);
         }// end GetDestinationRectangle()
+
+        public void Dispose() {
+            if(IsDisposed)
+                return;
+            _idleSprite.Dispose();
+            _movingSpriteLeft.Dispose();
+            _movingSpriteRight.Dispose();
+            IsDisposed = true;
+        }
 
     }// end SimpleMovingSprite class
 

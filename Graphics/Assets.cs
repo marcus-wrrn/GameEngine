@@ -7,7 +7,7 @@ using Graphics.Sprites;
 
 namespace Graphics.Assets {
     // =============================================================== Base Asset ===============================================================
-    public interface IAsset<T> where T: ISprite {
+    public interface IAsset<T> : IDisposable where T: ISprite {
         T AssetSprite{ get; }
         Utility.TextureLocation<T> LocationOnMap{ get; }
         void ChangeSprite(T sprite);
@@ -17,10 +17,12 @@ namespace Graphics.Assets {
     public class Asset<T> : IAsset<T> where T: ISprite {
         public T AssetSprite{ get; private set; }   // texture of the asset
         public Utility.TextureLocation<T> LocationOnMap{ get; private set; }    // location of the asset
+        public bool IsDisposed{ get; private set; }
 
         public Asset(T sprite, Vector2 loc) {
             AssetSprite = sprite;
             LocationOnMap = new Utility.TextureLocation<T>(sprite, loc);
+            IsDisposed = false;
         }// end constructor()
 
         // Additional Constructors
@@ -44,6 +46,13 @@ namespace Graphics.Assets {
         protected void SetLocation(Vector2 nextLocation) {
             LocationOnMap.ChangeLocation(nextLocation);
         }// end ChangeLocation()
+
+        public void Dispose() {
+            if(IsDisposed)
+                return;
+            AssetSprite.Dispose();
+            IsDisposed = true;
+        }// end Dispose()
 
     }// end Asset
 

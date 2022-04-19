@@ -41,7 +41,7 @@ namespace TestingTactics
             base.Initialize();
             
         }
-
+        
         protected override void LoadContent()
         {
             _sprites = new SpriteBunch(this);
@@ -71,7 +71,7 @@ namespace TestingTactics
             var background = new Background.TileBackground(tiles, Vector2.Zero, Vector2.Zero, texture.Width, texture.Height);
 
             
-            _backgroundController = new Controllers.BackgroundController(this, background);
+            _backgroundController = new Controllers.BackgroundController(this, _sprites, "TestFile");
             // TODO: use this.Content to load your game content here
         }
 
@@ -132,13 +132,13 @@ namespace TestingTactics
             _screen.Set();
             GraphicsDevice.Clear(Color.CornflowerBlue);
             _sprites.Begin(true);
-            var backgroundSprites = _backgroundController.Draw();
+            _backgroundController.Draw();
             _sprites.Draw(_asset2, Color.AliceBlue);
             _sprites.Draw(_asset1, Color.AliceBlue);
             _sprites.End();
             
             _screen.UnSet();
-            _screen.Present(backgroundSprites);
+            //_screen.Present(backgroundSprites);
             _screen.Present(_sprites);
             base.Draw(gameTime);
         }
