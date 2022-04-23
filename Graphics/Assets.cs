@@ -184,8 +184,9 @@ namespace Graphics.Assets {
                 AssetSprite.MoveRight();
             else
                 AssetSprite.MoveLeft();
-        }
-    }
+        }// end MoveToLocation()
+
+    }// end HorizontleMovingAsset class
 
 
 }// end namespace
