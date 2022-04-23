@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Tiles/TileDarkGreen.png</SourceFile>
-  <SourceTime>2022-04-18T12:53:25.1377859-04:00</SourceTime>
-  <DestFile>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/bin/DesktopGL/Tiles/TileDarkGreen.xnb</DestFile>
-  <DestTime>2022-04-23T19:51:14.0448696-04:00</DestTime>
+  <SourceFile>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Characters/RockGuyDeathAnim.png</SourceFile>
+  <SourceTime>2022-04-23T19:49:28.9574719-04:00</SourceTime>
+  <DestFile>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/bin/DesktopGL/Characters/RockGuyDeathAnim.xnb</DestFile>
+  <DestTime>2022-04-23T19:51:14.0408696-04:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2020-08-10T12:17:54-04:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
