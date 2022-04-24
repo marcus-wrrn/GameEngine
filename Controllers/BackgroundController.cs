@@ -1,15 +1,13 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.IO;
-using System.Linq;
 using TestingTactics;
 using Background;
 
 namespace Controllers {
     public interface IController {
-        Graphics.Rendering.SpriteBunch Draw();
+        void Draw();
         //void Update(GameTime gameTime);
         void LoadContent(string fileName);
         void SaveContent(string fileName);
@@ -20,21 +18,21 @@ namespace Controllers {
         private Graphics.Rendering.SpriteBunch _spriteBunch;
         private TileBackground _tiledBackground;
 
-        public BackgroundController(Game1 game, string backgroundFileName) {
+        public BackgroundController(Game1 game, Graphics.Rendering.SpriteBunch spriteBunch, string backgroundFileName) {
             if(game == null)
                 throw new NullReferenceException("BackgroundController");
             _game = game;
-            _spriteBunch = new Graphics.Rendering.SpriteBunch(_game);
+            _spriteBunch = spriteBunch;
             _tiledBackground = RetrieveBackgroundFromFile(backgroundFileName);
             if(_tiledBackground == null)
                 throw new NullReferenceException("File Corrupted");
         }// end BackgroundController
 
-        public BackgroundController(Game1 game, TileBackground background) {
+        public BackgroundController(Game1 game, Graphics.Rendering.SpriteBunch spriteBunch, TileBackground background) {
             if(game == null || background == null)
                 throw new NullReferenceException("BackgroundController");
             _game = game;
-            _spriteBunch = new Graphics.Rendering.SpriteBunch(_game);
+            _spriteBunch = spriteBunch;
             _tiledBackground = background;
         }// end BackgroundController()
 
@@ -111,16 +109,13 @@ namespace Controllers {
             _tiledBackground = tempVal;
         }// end LoadContent()
 
-        public Graphics.Rendering.SpriteBunch Draw() {
-            _spriteBunch.Begin(true);
+        public void Draw() {
             for(int i = 0; i < _tiledBackground.Rows; i++) {
                 for(int j = 0; j < _tiledBackground.Columns; j++) {
                     _spriteBunch.Draw(_tiledBackground.GetTile(i,j).Texture, _tiledBackground.GetTileLocation(i,j), Color.AliceBlue);
                 }
             }
-            _spriteBunch.End();
-            return _spriteBunch;
-        }
+        }// end Draw()
 
     }// end BackgroundController class
 

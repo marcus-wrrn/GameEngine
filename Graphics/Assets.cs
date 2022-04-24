@@ -7,7 +7,7 @@ using Graphics.Sprites;
 
 namespace Graphics.Assets {
     // =============================================================== Base Asset ===============================================================
-    public interface IAsset<T> where T: ISprite {
+    public interface IAsset<T> : IDisposable where T: ISprite {
         T AssetSprite{ get; }
         Utility.TextureLocation<T> LocationOnMap{ get; }
         void ChangeSprite(T sprite);
@@ -17,10 +17,12 @@ namespace Graphics.Assets {
     public class Asset<T> : IAsset<T> where T: ISprite {
         public T AssetSprite{ get; private set; }   // texture of the asset
         public Utility.TextureLocation<T> LocationOnMap{ get; private set; }    // location of the asset
+        public bool IsDisposed{ get; private set; }
 
         public Asset(T sprite, Vector2 loc) {
             AssetSprite = sprite;
             LocationOnMap = new Utility.TextureLocation<T>(sprite, loc);
+            IsDisposed = false;
         }// end constructor()
 
         // Additional Constructors
@@ -44,6 +46,14 @@ namespace Graphics.Assets {
         protected void SetLocation(Vector2 nextLocation) {
             LocationOnMap.ChangeLocation(nextLocation);
         }// end ChangeLocation()
+
+        public void Dispose() {
+            if(IsDisposed)
+                return;
+            AssetSprite.Dispose();
+            IsDisposed = true;
+        }// end Dispose()
+
     }// end Asset
 
     // ======================================================== Moving Asset ===============================================================
@@ -143,7 +153,7 @@ namespace Graphics.Assets {
     }// end MovingAsset class
 
     public interface IHorizontalMovingAsset<T> : IMovingAsset<T> where T: ISimpleMovingSprite {
-
+        void Stop();
     }
 
     public class HorizontalMovingAsset<T> : MovingAsset<T>, IHorizontalMovingAsset<T> where T: ISimpleMovingSprite {
@@ -156,14 +166,16 @@ namespace Graphics.Assets {
             AssetSprite.MoveRight();
         }
 
-        public override void MoveLeft(GameTime gameTime)
-        {
+        public override void MoveLeft(GameTime gameTime) {
             base.MoveLeft(gameTime);
             AssetSprite.MoveLeft();
         }
 
-        public override void MoveToLocation(Vector2 destination, GameTime gameTime)
-        {
+        public void Stop() {
+            AssetSprite.Stop();
+        }// end Stop()
+
+        public override void MoveToLocation(Vector2 destination, GameTime gameTime) {
             base.MoveToLocation(destination, gameTime);
             if(HasReachedDestination(destination)) {
                 AssetSprite.Stop();
@@ -172,8 +184,9 @@ namespace Graphics.Assets {
                 AssetSprite.MoveRight();
             else
                 AssetSprite.MoveLeft();
-        }
-    }
+        }// end MoveToLocation()
+
+    }// end HorizontleMovingAsset class
 
 
 }// end namespace

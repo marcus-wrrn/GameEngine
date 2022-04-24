@@ -41,7 +41,7 @@ namespace TestingTactics
             base.Initialize();
             
         }
-
+        
         protected override void LoadContent()
         {
             _sprites = new SpriteBunch(this);
@@ -58,10 +58,12 @@ namespace TestingTactics
             _asset2 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy2, new Vector2(1920, 1080), 1000f, 100f);
 
             // Pretty terrible tile initialization system
-            var tiles = new Graphics.Tiles.Tile[40,40];
-            for(int i = 0; i < 40; i++) {
-                for(int j = 0; j < 40; j++) {
-                    tiles[i,j] = new Graphics.Tiles.Tile(Content.Load<Texture2D>("tile"));
+            int rows = 40;
+            int columns = 60;
+            var tiles = new Graphics.Tiles.Tile[rows,columns];
+            for(int i = 0; i < rows; i++) {
+                for(int j = 0; j < columns; j++) {
+                    tiles[i,j] = new Graphics.Tiles.Tile(Content.Load<Texture2D>("./Tiles/TileDarkGreen"));
                 }
             }// end for loop
 
@@ -69,7 +71,7 @@ namespace TestingTactics
             var background = new Background.TileBackground(tiles, Vector2.Zero, Vector2.Zero, texture.Width, texture.Height);
 
             
-            _backgroundController = new Controllers.BackgroundController(this, "TestFile");
+            _backgroundController = new Controllers.BackgroundController(this, _sprites, "TestFile");
             // TODO: use this.Content to load your game content here
         }
 
@@ -84,15 +86,27 @@ namespace TestingTactics
             }
             if (kBoard.IsKeyClicked(Keys.P))
                 _backgroundController.SaveContent("TestFile");
-            if (kBoard.IsKeyDown(Keys.W))
-                _asset1.MoveUp(gameTime);
-            if (kBoard.IsKeyDown(Keys.D))
-                _asset1.MoveRight(gameTime);
-            if (kBoard.IsKeyDown(Keys.S))
-                _asset1.MoveDown(gameTime);
-            if (kBoard.IsKeyDown(Keys.A))
-                _asset1.MoveLeft(gameTime);
 
+            bool isMoving = false;
+            if (kBoard.IsKeyDown(Keys.W)) {
+                _asset1.MoveUp(gameTime);
+                isMoving = true;
+            }
+            if (kBoard.IsKeyDown(Keys.D)) {
+                _asset1.MoveRight(gameTime);
+                isMoving = true;
+            }
+            if (kBoard.IsKeyDown(Keys.S)) {
+                _asset1.MoveDown(gameTime);
+                isMoving = true;   
+            }
+            if (kBoard.IsKeyDown(Keys.A)) {
+                _asset1.MoveLeft(gameTime);
+                isMoving = true;
+            }
+            if (!isMoving) {
+                _asset1.Stop();
+            }
 
 
             Vector2 mousePosition = new Vector2(mouse.X, mouse.Y);
@@ -118,13 +132,13 @@ namespace TestingTactics
             _screen.Set();
             GraphicsDevice.Clear(Color.CornflowerBlue);
             _sprites.Begin(true);
-            var backgroundSprites = _backgroundController.Draw();
+            _backgroundController.Draw();
             _sprites.Draw(_asset2, Color.AliceBlue);
             _sprites.Draw(_asset1, Color.AliceBlue);
             _sprites.End();
             
             _screen.UnSet();
-            _screen.Present(backgroundSprites);
+            //_screen.Present(backgroundSprites);
             _screen.Present(_sprites);
             base.Draw(gameTime);
         }

@@ -6,7 +6,7 @@ namespace Graphics.Utility {
         public double X{ get {return Location.X;} }
         public double Y{ get{return Location.Y;} }   
         private Vector2 _drawingLocation;
-        private readonly T _sprite;     // TODO Change too a spriteCollection later
+        private readonly T _sprite;     
 
         public TextureLocation(T sprite, Vector2 location) {
             _drawingLocation = location;
