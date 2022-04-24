@@ -9,11 +9,13 @@
     <File>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Characters/BandanGuyStandingAnim.png</File>
     <File>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Characters/BlueBandanaAnimLeft.png</File>
     <File>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Characters/BlueBandanaAnimRight.png</File>
+    <File>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Characters/RockGuyDeathAnim.png</File>
     <File>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Rock_Guy_Bandana_Animation.png</File>
     <File>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/tile.png</File>
     <File>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Tiles/TileDarkGreen.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

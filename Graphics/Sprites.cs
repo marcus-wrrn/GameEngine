@@ -14,6 +14,7 @@ namespace Graphics.Sprites {
         void Update();
     }// end ISprite
 
+    // Static Sprite (Just a Texture)
     public class Sprite : ISprite {
         public virtual Texture2D Texture{ get; }
         public virtual int Width{ get { return Texture.Width; } }
@@ -55,14 +56,11 @@ namespace Graphics.Sprites {
         int Columns{ get; }
     }// end IAnimatedSprite
 
-
-
     public class AnimatedSprite : Sprite, IAnimatedSprite {
         public int Rows { get; }
         public int Columns { get; }
         public override int Width{ get { return Texture.Width / Columns; } }
         public override int Height{ get { return Texture.Height / Rows; } }
-        public bool HasEnded{ get { return _currentFrame == _totalFrames - 1; } }
         public override Rectangle SourceRectangle{ get { return GetSourceRectangle(); } }
         protected int _currentFrame;
         protected int _totalFrames;
@@ -105,12 +103,42 @@ namespace Graphics.Sprites {
 
     }// end AnimatedSprite class
 
-    ////////////////////////////////////////////////////////////// Controlled Animated Sprite /////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////// NoRepeatSprite //////////////////////////////////////////////////////////////////////////////////
 
+    public interface INoRepeatSprite : IAnimatedSprite, ISprite {
+        bool HasStopped{ get; }
+    }// end INoRepeatSprite interface
+
+    public class NoRepeatSprite : AnimatedSprite, INoRepeatSprite {
+        public bool HasStopped{ get; private set; }
+
+        public NoRepeatSprite(AnimatedSprite sprite) : base(sprite) {
+            HasStopped = false;
+        }// end NoRepeatSprite constructor
+
+        public override void Update() {  
+            if(HasStopped)
+                return;
+            _currentFrame++;
+            if(_currentFrame >= _totalFrames) {
+                HasStopped = true;
+            }
+        }// end Update()
+
+        public override void ResetSprite() {
+            _currentFrame = 0;
+            HasStopped = false;
+        }// end ResetSprite
+
+    }// end NoRepeatSprite class
+
+    ////////////////////////////////////////////////////////////// Controlled Animated Sprite /////////////////////////////////////////////////////////////////////////
+
+    // Repeating Sprite with a Start, Middle and End
     public interface IControlledAnimatedSprite : IAnimatedSprite, ISprite {
         void EndAnimation();
         bool HasStopped{ get; }
-    }
+    }// end IControlledAnimatedSprite
 
     public class ControlledAnimatedSprite : AnimatedSprite, IControlledAnimatedSprite {
         public bool HasStopped{ get { return _state == State.ENDED; } }
@@ -195,6 +223,7 @@ namespace Graphics.Sprites {
         public Texture2D Texture{ get { return GetCurrentTexture(); } }
         public Rectangle SourceRectangle{ get { return GetSourceRectangle(); } }
         public bool IsDisposed{ get; private set; }
+        public bool HasEnded{ get { return CheckIfEnded(); } }
 
         private enum State { IDLE, MOVING_RIGHT, MOVING_LEFT, STOPPING_RIGHT, STOPPING_LEFT };
         private AnimatedSprite _idleSprite;
@@ -340,14 +369,24 @@ namespace Graphics.Sprites {
             _movingSpriteLeft.Dispose();
             _movingSpriteRight.Dispose();
             IsDisposed = true;
+        }// end Dispose()
+
+        private bool CheckIfEnded() {
+            if(_isMoving) {
+                if(_movingSpriteLeft.HasStopped || _movingSpriteRight.HasStopped)
+                    return true;
+                return false;
+            }
+            // If the sprite is idle than the animation is considered to have ended
+            return true;
         }
 
     }// end SimpleMovingSprite class
 
-    public interface IPlayerSprite : IAnimatedSprite {
+    // ========================================================== Player Sprite ===================================================================================================
+
+    public interface IPlayerSprite : ISimpleMovingSprite {
         void MoveUp();
-        void MoveRight();
-        void MoveLeft();
         void StopMoving();   
     }// end PlayerSprite interface
 
@@ -359,17 +398,16 @@ namespace Graphics.Sprites {
         public int                  Columns{ get; }
         public int                  Width{ get; }
         public int                  Height{ get; }
+        public bool                 HasEnded{ get; }
         public bool                 IsDisposed{ get; private set; }
         private SimpleMovingSprite  _baseSprite;
-        private AnimatedSprite[]    _animationEvents;
+        private NoRepeatSprite[]    _animationEvents;
         private T                   _currentState;
         private T[]                 _animationNames;
-        private AnimatedSprite      _currentSprite;
+        private NoRepeatSprite      _currentSprite;
         private bool                _isAnimationPlaying;
 
-
-
-        public PlayerSprite(SimpleMovingSprite baseSprite, AnimatedSprite[] animationEvents, T[] animationNames) {
+        public PlayerSprite(SimpleMovingSprite baseSprite, NoRepeatSprite[] animationEvents, T[] animationNames) {
             // Exception checking
             if(animationEvents.Length != animationEvents.GetLength(0))
                 throw new RankException("Array must be 1 dimensional");
@@ -444,7 +482,7 @@ namespace Graphics.Sprites {
         public void Update() {
             // If an animation is playing
             if(_isAnimationPlaying) {
-                if(_currentSprite.HasEnded)
+                if(_currentSprite.HasStopped)
                     EndAnimation();
                 else 
                     _currentSprite.Update();
@@ -464,6 +502,12 @@ namespace Graphics.Sprites {
                 EndAnimation();
             _baseSprite.ResetSprite();
         }// end ResetSprite()
+
+        public void Stop() {
+            if(_isAnimationPlaying)
+                EndAnimation();
+            _baseSprite.Stop();
+        }// end Stop()
 
         public void MoveUp() {
             // TODO Implement a move up function
@@ -493,10 +537,12 @@ namespace Graphics.Sprites {
             _baseSprite.Stop();
         }// end StopMoving()
 
-
+        private bool CheckIfEnded() {
+            if(_isAnimationPlaying)
+                return _currentSprite.HasStopped;
+            return _baseSprite.HasEnded;
+        }
 
     }// end PlayerSprite class
-
-    
 
 }// end namespace
