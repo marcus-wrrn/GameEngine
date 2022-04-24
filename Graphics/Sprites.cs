@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System;
+using Utilities;
 namespace Graphics.Sprites {
 
     ////////////////////////////////////////////////////////////// Base Sprite /////////////////////////////////////////////////////////////
@@ -61,7 +62,7 @@ namespace Graphics.Sprites {
         public int Columns { get; }
         public override int Width{ get { return Texture.Width / Columns; } }
         public override int Height{ get { return Texture.Height / Rows; } }
-
+        public bool HasEnded{ get { return _currentFrame == _totalFrames - 1; } }
         public override Rectangle SourceRectangle{ get { return GetSourceRectangle(); } }
         protected int _currentFrame;
         protected int _totalFrames;
@@ -72,6 +73,8 @@ namespace Graphics.Sprites {
             _currentFrame = 0;
             _totalFrames = Rows * Columns;
         }// end constructor()
+
+        public AnimatedSprite(Texture2D texture, int columns) : this(texture, 1, columns) {}
 
         public AnimatedSprite(AnimatedSprite other) : base(other.Texture) {
             Rows = other.Rows;
@@ -126,6 +129,7 @@ namespace Graphics.Sprites {
             _lastStartFrame = lastStartFrame;
             _lastRepeatFrame = lastRepeatFrame;
         }
+        
         public ControlledAnimatedSprite(AnimatedSprite sprite, int lastStartFrame, int lastRepeatFrame) : 
             this(sprite.Texture, sprite.Rows, sprite.Columns, lastStartFrame, lastRepeatFrame) {}
 
@@ -340,7 +344,158 @@ namespace Graphics.Sprites {
 
     }// end SimpleMovingSprite class
 
-    
+    public interface IPlayerSprite : IAnimatedSprite {
+        void MoveUp();
+        void MoveRight();
+        void MoveLeft();
+        void StopMoving();   
+    }// end PlayerSprite interface
+
+    public class PlayerSprite<T> : IPlayerSprite where T: Enum {
+
+        public Texture2D            Texture{ get; }
+        public Rectangle            SourceRectangle{ get; }
+        public int                  Rows{ get; }
+        public int                  Columns{ get; }
+        public int                  Width{ get; }
+        public int                  Height{ get; }
+        public bool                 IsDisposed{ get; private set; }
+        private SimpleMovingSprite  _baseSprite;
+        private AnimatedSprite[]    _animationEvents;
+        private T                   _currentState;
+        private T[]                 _animationNames;
+        private AnimatedSprite      _currentSprite;
+        private bool                _isAnimationPlaying;
+
+
+
+        public PlayerSprite(SimpleMovingSprite baseSprite, AnimatedSprite[] animationEvents, T[] animationNames) {
+            // Exception checking
+            if(animationEvents.Length != animationEvents.GetLength(0))
+                throw new RankException("Array must be 1 dimensional");
+            if(animationNames.Length != animationNames.GetLength(0))
+                throw new RankException("Array must be 1 dimensional");
+            if(animationEvents.Length != animationNames.Length)
+                throw new Exception("Length of names and events must be the same");
+            if(animationEvents.Length == 0)
+                throw new Exception("Array cannot have a length of 0");
+            if(animationNames.Length == 0)
+                throw new Exception("Array cannot have a length of 0");
+            if(baseSprite == null)
+                throw new Exception("Sprite cannot be null");
+            // Assigns values
+            _baseSprite = baseSprite;
+            _animationEvents = animationEvents;
+            _animationNames = animationNames;
+            _isAnimationPlaying = false;
+        }// end PlayerSprite constructor
+
+        public void Dispose() {
+            if(!IsDisposed) {
+                _baseSprite.Dispose();
+                for(int i = 0; i < _animationEvents.Length; i++)
+                    _animationEvents[i].Dispose();
+            }
+        }// end Dispose()
+
+        private AnimatedSprite FindAnimation(T state) {
+            for(int i = 0; i < _animationNames.Length; i++) {
+                if(_animationNames[i].Equals(state)) {
+                    return _animationEvents[i];
+                }
+            }
+            return null;
+        }// end FindAnimation()
+
+        // Sets the animation to play for a specific task
+        private void SetNewAnimation(T animation) {
+            for(int i = 0; i < _animationNames.Length; i++) {
+                if(_animationNames[i].Equals(animation)) {
+                    // If another sprite is playing end it
+                    if(_isAnimationPlaying)
+                        EndAnimation();
+                    // Starts new animation
+                    StartNewAnimation(i);
+                }
+            }
+            // Throws an Error if the animation value does not exist in the sprite
+            throw new ArgumentException("Animation is not available for this sprite");
+        }// end SetNewAnimation()
+
+        // Plays an animation
+        public void PlayAnimation(T animation) {
+            SetNewAnimation(animation);
+            _isAnimationPlaying = true;
+        }// end PlayAnimation()
+
+        private void EndAnimation() {
+            _currentSprite.ResetSprite();
+            _isAnimationPlaying = false;
+        }// end Animation
+
+        private void StartNewAnimation(int index) {
+            if(!_isAnimationPlaying)
+                _baseSprite.ResetSprite();
+            _currentSprite = _animationEvents[index];
+            _currentState = _animationNames[index];
+            _isAnimationPlaying = true;
+        }// end StartNewAnimation()
+
+        public void Update() {
+            // If an animation is playing
+            if(_isAnimationPlaying) {
+                if(_currentSprite.HasEnded)
+                    EndAnimation();
+                else 
+                    _currentSprite.Update();
+            }
+            else
+                _baseSprite.Update();
+        }// end Update()
+                
+        public Rectangle DestinationRectangle(Vector2 location) {
+            if(_isAnimationPlaying)
+                return _currentSprite.DestinationRectangle(location);
+            return _baseSprite.DestinationRectangle(location);
+        }// end DestinationRectangle()
+
+        public void ResetSprite() {
+            if(_isAnimationPlaying)
+                EndAnimation();
+            _baseSprite.ResetSprite();
+        }// end ResetSprite()
+
+        public void MoveUp() {
+            // TODO Implement a move up function
+            throw new Exception("This Function is currently unfinished");
+        }// end MoveUp()
+
+        public void MoveDown() {
+            // TODO Implement a move up function
+            throw new Exception("This Function is currently unfinished");
+        }// end MoveDown()
+
+        public void MoveRight() {
+            if(_isAnimationPlaying)
+                return;
+            _baseSprite.MoveRight();
+        }// end MoveRight()
+
+        public void MoveLeft() {
+            if(_isAnimationPlaying)
+                return;
+            _baseSprite.MoveLeft();
+        }// end MoveLeft()
+
+        public void StopMoving() {
+            if(_isAnimationPlaying)
+                return;
+            _baseSprite.Stop();
+        }// end StopMoving()
+
+
+
+    }// end PlayerSprite class
 
     
 

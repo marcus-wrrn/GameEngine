@@ -31,6 +31,14 @@ namespace Utilities {
             return mainVal;
         }// end Clamp(): float
 
+        public static bool IsInArray<T>(T[] array, T value) {
+            foreach(T arrayVal in array) {
+                if(arrayVal.Equals(value))
+                    return true;
+            }
+            return false;
+        }// end IsInArray()
+
     }// end Util class
 
     public class DoubleBool<T> where T: Enum {
@@ -42,7 +50,7 @@ namespace Utilities {
         public T FalseVal{ get; private set; }
         // Gets the current Enum Value 
         public T CurrentVal{ get { return GetCurrentValue(); } }
-        
+
         public DoubleBool(T trueState, T falseState ) {
             SetVal(true);
             TrueVal = trueState;
