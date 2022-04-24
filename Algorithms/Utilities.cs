@@ -33,4 +33,37 @@ namespace Utilities {
 
     }// end Util class
 
+    public class DoubleBool<T> where T: Enum {
+        public bool IsTrue{ get; private set; }
+        public bool IsFalse{ get; private set; }
+        // Gets what the Enum Value would be if it was True
+        public T TrueVal{ get; private set; }
+        // Gets what the Enum Value would be if it was False
+        public T FalseVal{ get; private set; }
+        // Gets the current Enum Value 
+        public T CurrentVal{ get { return GetCurrentValue(); } }
+        
+        public DoubleBool(T trueState, T falseState ) {
+            SetVal(true);
+            TrueVal = trueState;
+            FalseVal = falseState;
+        }// end DoubleBool constructor
+
+        private T GetCurrentValue() {
+            if(IsTrue)
+                return TrueVal;
+            return FalseVal;
+        }// end GetCurrentValue()
+
+        public void SetVal(bool val) {
+            IsTrue = val;
+            IsFalse = !IsTrue;
+        }// end SetVal()
+
+        public void Swap() {
+            SetVal(!IsTrue);
+        }// end SwapVal()
+        
+    }// end DoubleBool class
+
 }// end Utilities namespace
