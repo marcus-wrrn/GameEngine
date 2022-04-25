@@ -17,7 +17,8 @@ namespace TestingTactics
         private Controllers.BackgroundController _backgroundController;
         //private SpriteBatch _spriteBatch;
         private HorizontalMovingAsset<Graphics.Sprites.SimpleMovingSprite> _asset1;
-        private MovingAsset<Graphics.Sprites.AnimatedSprite> _asset2;
+        // private MovingAsset<Graphics.Sprites.AnimatedSprite> _asset2;
+        private RockGuy _rockGuy;
         private SpriteBunch _sprites;
         private Graphics.Screen _screen;
 
@@ -46,7 +47,6 @@ namespace TestingTactics
         {
             _sprites = new SpriteBunch(this);
             _screen = new Graphics.Screen(this, 3840, 2160);
-            //var sprite = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("./C"));
             var rockGuy = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("./Characters/BlueBandanaAnimRight"), 1, 18);
             var movingRight = new Graphics.Sprites.ControlledAnimatedSprite(rockGuy, 6, 10);
             rockGuy = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("./Characters/BlueBandanaAnimLeft"), 1, 18);
@@ -55,7 +55,10 @@ namespace TestingTactics
             var rockGuy2 = new Graphics.Sprites.AnimatedSprite(Content.Load<Texture2D>("./Characters/BandanGuyStandingAnim"), 1, 6);
             var cool = new Graphics.Sprites.SimpleMovingSprite(rockGuy, movingRight, movingLeft);
             _asset1 = new HorizontalMovingAsset<Graphics.Sprites.SimpleMovingSprite>(cool, new Vector2(1000f, 1000f), 1000f, 10);
-            _asset2 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy2, new Vector2(1920, 1080), 1000f, 100f);
+            // _asset2 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy2, new Vector2(1920, 1080), 1000f, 100f);
+
+            var factory = new Graphics.Assets.RockGuyFactory();
+            _rockGuy = factory.BuildRockGuy(this, new Vector2(500, 700));
 
             // Pretty terrible tile initialization system
             int rows = 40;
@@ -87,39 +90,48 @@ namespace TestingTactics
             if (kBoard.IsKeyClicked(Keys.P))
                 _backgroundController.SaveContent("TestFile");
 
-            bool isMoving = false;
-            if (kBoard.IsKeyDown(Keys.W)) {
-                _asset1.MoveUp(gameTime);
-                isMoving = true;
-            }
-            if (kBoard.IsKeyDown(Keys.D)) {
-                _asset1.MoveRight(gameTime);
-                isMoving = true;
-            }
-            if (kBoard.IsKeyDown(Keys.S)) {
-                _asset1.MoveDown(gameTime);
-                isMoving = true;   
-            }
-            if (kBoard.IsKeyDown(Keys.A)) {
-                _asset1.MoveLeft(gameTime);
-                isMoving = true;
-            }
-            if (!isMoving) {
-                _asset1.Stop();
-            }
+            // bool isMoving = false;
+            // if (kBoard.IsKeyDown(Keys.W)) {
+            //     RockGuy.MoveUp(gameTime);
+            //     isMoving = true;
+            // }
+            // if (kBoard.IsKeyDown(Keys.D)) {
+            //     _asset1.MoveRight(gameTime);
+            //     isMoving = true;
+            // }
+            // if (kBoard.IsKeyDown(Keys.S)) {
+            //     _asset1.MoveDown(gameTime);
+            //     isMoving = true;   
+            // }
+            // if (kBoard.IsKeyDown(Keys.A)) {
+            //     _asset1.MoveLeft(gameTime);
+            //     isMoving = true;
+            // }
+            // if (!isMoving) {
+            //     _asset1.Stop();
+            // }
 
 
             Vector2 mousePosition = new Vector2(mouse.X, mouse.Y);
             Vector2 p1 = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             Vector2 p2 = Vector2.Zero;
+
+            if(kBoard.IsKeyClicked(Keys.K))
+                _rockGuy.Kill();
+            temp++;
+            if(kBoard.IsKeyClicked(Keys.J))
+                _rockGuy.BringBackFromDead();
             
             mousePosition.Y = _screen.Height - mousePosition.Y;
-            if(temp % 10 == 0) {
-                _asset1.AssetSprite.Update();
-                _asset2.AssetSprite.Update();
+            _rockGuy.MoveToLocation(mousePosition, gameTime);
+            //_asset1.MoveToLocation(mousePosition, gameTime);
+            if(temp % 7 == 0) {
+                //_asset1.AssetSprite.Update();
+                // _asset2.AssetSprite.Update();
+                _rockGuy.Update();
             }
-                
-            temp++;
+
+            
             //_asset1.MoveToLocation(mousePosition, gameTime);
             // if(mousePosition == _asset1.LocationOnMap.Location) 
             //     _asset1.AssetSprite.EndAnimation();
@@ -133,8 +145,9 @@ namespace TestingTactics
             GraphicsDevice.Clear(Color.CornflowerBlue);
             _sprites.Begin(true);
             _backgroundController.Draw();
-            _sprites.Draw(_asset2, Color.AliceBlue);
-            _sprites.Draw(_asset1, Color.AliceBlue);
+            // _sprites.Draw(_asset2, Color.AliceBlue);
+            //_sprites.Draw(_asset1, Color.AliceBlue);
+            _sprites.Draw(_rockGuy.Texture, _rockGuy.SourceRectangle, _rockGuy.DestinationRectangle, Color.AliceBlue);
             _sprites.End();
             
             _screen.UnSet();

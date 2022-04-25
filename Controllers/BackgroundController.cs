@@ -51,13 +51,9 @@ namespace Controllers {
                 // Finds the width and height of each tile
                 int tileHeight = binReader.ReadInt32();
                 int tileWidth = binReader.ReadInt32();
-                Console.WriteLine("Tile Height: " + tileHeight);
-                Console.WriteLine("Tile Width: " + tileWidth);
                 // Gets the tile information
                 int rows = binReader.ReadInt32();
                 int columns = binReader.ReadInt32();
-                Console.WriteLine("Rows: " + rows);
-                Console.WriteLine("Columns: " + columns);
                 var tiles = new Graphics.Tiles.Tile[rows,columns];
                 // Initializes the tile map
                 for(int i = 0; i < rows; i++) {
