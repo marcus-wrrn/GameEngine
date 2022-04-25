@@ -124,9 +124,9 @@ namespace TestingTactics
             
             mousePosition.Y = _screen.Height - mousePosition.Y;
             _rockGuy.MoveToLocation(mousePosition, gameTime);
-            _asset1.MoveToLocation(mousePosition, gameTime);
+            //_asset1.MoveToLocation(mousePosition, gameTime);
             if(temp % 7 == 0) {
-                _asset1.AssetSprite.Update();
+                //_asset1.AssetSprite.Update();
                 // _asset2.AssetSprite.Update();
                 _rockGuy.Update();
             }
@@ -146,7 +146,7 @@ namespace TestingTactics
             _sprites.Begin(true);
             _backgroundController.Draw();
             // _sprites.Draw(_asset2, Color.AliceBlue);
-            _sprites.Draw(_asset1, Color.AliceBlue);
+            //_sprites.Draw(_asset1, Color.AliceBlue);
             _sprites.Draw(_rockGuy.Texture, _rockGuy.SourceRectangle, _rockGuy.DestinationRectangle, Color.AliceBlue);
             _sprites.End();
             

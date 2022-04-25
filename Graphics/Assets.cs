@@ -129,14 +129,12 @@ namespace Graphics.Assets {
             Vector2 tempLocation = nextLocation;
             tempLocation.Normalize();
             // Find new location
-            Console.WriteLine("Location 1: " + currLocation);
             currLocation += tempLocation * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             this.SetLocation(currLocation);
         }// end MoveDirection()
 
         protected bool HasReachedDestination(Vector2 destination) {
             var location = LocationOnMap.Location;
-            Console.WriteLine("Width " + AssetSprite.Width);
             if(location.X > destination.X - AssetSprite.Width / 2 && location.X < destination.X + AssetSprite.Width / 2)
                 if(location.Y > destination.Y - AssetSprite.Height / 2 && location.Y < destination.Y + AssetSprite.Width / 2)
                     return true;
@@ -146,7 +144,7 @@ namespace Graphics.Assets {
         public virtual void MoveToLocation(Vector2 destination, GameTime gameTime) {
             if(!HasReachedDestination(destination))
                 MoveDirection(destination - LocationOnMap.Location, gameTime);
-            // Means its close enough to set loc            Console.WriteLine("Also made it here");ation to specific spot
+            // Means its close enough to set location to specific spot
             else {
                 SetLocation(destination);
             }

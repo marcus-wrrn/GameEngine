@@ -3,7 +3,7 @@
   <SourceFile>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/Characters/BandanGuyStandingAnim.png</SourceFile>
   <SourceTime>2022-04-24T20:27:30.4682325-04:00</SourceTime>
   <DestFile>/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/Content/bin/DesktopGL/Characters/BandanGuyStandingAnim.xnb</DestFile>
-  <DestTime>2022-04-24T20:27:48.2810749-04:00</DestTime>
+  <DestTime>2022-04-25T01:07:04.7596358-04:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2020-08-10T12:17:54-04:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
