@@ -27,7 +27,7 @@ namespace Graphics.Assets {
         public int NumberOfTurns{ get; private set; }
         public int Initiative{ get; private set; }
         public Vector2 Location{ get { return _asset.LocationOnMap.Location; } }
-        public Vector2 LocationToDraw{ get { return GetLocationToDraw(); } }
+        public Vector2 LocationToDraw{ get { return _asset.LocationOnMap.GetLocationToDraw(); } }
         public bool IsAlive{ get; private set; }
         public bool IsDisposed{ get; private set; }
         private HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> _asset;
@@ -51,20 +51,16 @@ namespace Graphics.Assets {
             IsAlive = true;
         }// end constructor
 
-        private Vector2 GetLocationToDraw() {
-            var location = _asset.LocationOnMap.GetLocationToDraw();
-            location.X += _asset.AssetSprite.Width * _asset.AssetSprite.Rows;
-            return location;
-        }// end GetLocationToDraw()
-
         private Texture2D GetTexture() {
             return _asset.AssetSprite.Texture;
         }// end GetTexture()
 
 
         public void MoveToLocation(Vector2 location, GameTime gameTime) {
-            if(IsAlive)
+            if(IsAlive) {
                 _asset.MoveToLocation(location, gameTime);
+            }
+                
         }// end MoveToLocation()
 
         public void Dispose() {

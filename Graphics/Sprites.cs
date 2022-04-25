@@ -396,8 +396,8 @@ namespace Graphics.Sprites {
         public Rectangle            SourceRectangle{ get { return GetSourceRectangle(); } }
         public int                  Rows{ get { return GetRows(); } }
         public int                  Columns{ get { return GetColumns(); } }
-        public int                  Width{ get { return Texture.Width; } }
-        public int                  Height{ get { return Texture.Height; } }
+        public int                  Width{ get { return GetWidth(); } }
+        public int                  Height{ get { return GetHeight(); } }
         public bool                 HasEnded{ get; }
         public bool                 IsDisposed{ get; private set; }
         private SimpleMovingSprite  _baseSprite;
@@ -455,6 +455,18 @@ namespace Graphics.Sprites {
                 return _currentSprite.Columns;
             return _baseSprite.Columns;
         }// end GetColumns()
+
+        private int GetWidth() {
+            if(_isAnimationPlaying)
+                return _currentSprite.Width;
+            return _baseSprite.Width;
+        }// end getWidth()
+
+        private int GetHeight() {
+            if(_isAnimationPlaying)
+                return _currentSprite.Height;
+            return _baseSprite.Height;
+        }// end GetHeight()
 
         private Rectangle GetSourceRectangle() {
             if(_isAnimationPlaying)
