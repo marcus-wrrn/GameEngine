@@ -121,6 +121,7 @@ namespace Graphics.Sprites {
                 return;
             _currentFrame++;
             if(_currentFrame >= _totalFrames) {
+                _currentFrame -= 1;
                 HasStopped = true;
             }
         }// end Update()
@@ -179,7 +180,6 @@ namespace Graphics.Sprites {
         }// end Update Begining
 
         private void UpdateMiddle() {
-            Console.WriteLine("Hi");
             _currentFrame++;
             if(_currentFrame >= _lastRepeatFrame)
                 _currentFrame = _lastStartFrame + 1;
@@ -392,12 +392,12 @@ namespace Graphics.Sprites {
 
     public class PlayerSprite<T> : IPlayerSprite where T: Enum {
 
-        public Texture2D            Texture{ get; }
-        public Rectangle            SourceRectangle{ get; }
-        public int                  Rows{ get; }
-        public int                  Columns{ get; }
-        public int                  Width{ get; }
-        public int                  Height{ get; }
+        public Texture2D            Texture{ get { return GetTexture(); } }
+        public Rectangle            SourceRectangle{ get { return GetSourceRectangle(); } }
+        public int                  Rows{ get { return GetRows(); } }
+        public int                  Columns{ get { return GetColumns(); } }
+        public int                  Width{ get { return Texture.Width; } }
+        public int                  Height{ get { return Texture.Height; } }
         public bool                 HasEnded{ get; }
         public bool                 IsDisposed{ get; private set; }
         private SimpleMovingSprite  _baseSprite;
@@ -406,6 +406,7 @@ namespace Graphics.Sprites {
         private T[]                 _animationNames;
         private NoRepeatSprite      _currentSprite;
         private bool                _isAnimationPlaying;
+        private bool                _isPlayingNonRepeatAnimation;
 
         public PlayerSprite(SimpleMovingSprite baseSprite, NoRepeatSprite[] animationEvents, T[] animationNames) {
             // Exception checking
@@ -426,6 +427,7 @@ namespace Graphics.Sprites {
             _animationEvents = animationEvents;
             _animationNames = animationNames;
             _isAnimationPlaying = false;
+            _isPlayingNonRepeatAnimation = false;
         }// end PlayerSprite constructor
 
         public void Dispose() {
@@ -435,6 +437,36 @@ namespace Graphics.Sprites {
                     _animationEvents[i].Dispose();
             }
         }// end Dispose()
+
+        private Texture2D GetTexture() {
+            if(_isAnimationPlaying)
+                return _currentSprite.Texture;
+            return _baseSprite.Texture;
+        }// end GetTexture()
+
+        private int GetRows() {
+            if(_isAnimationPlaying)
+                return _currentSprite.Rows;
+            return _baseSprite.Rows;
+        }// end GetRows()
+
+        private int GetColumns() {
+            if(_isAnimationPlaying)
+                return _currentSprite.Columns;
+            return _baseSprite.Columns;
+        }// end GetColumns()
+
+        private Rectangle GetSourceRectangle() {
+            if(_isAnimationPlaying)
+                return _currentSprite.SourceRectangle;
+            return _baseSprite.SourceRectangle;
+        }// end GetSourceRectangle()
+
+        public Rectangle DestinationRectangle(Vector2 location) {
+            if(_isAnimationPlaying)
+                return _currentSprite.DestinationRectangle(location);
+            return _baseSprite.DestinationRectangle(location);
+        }// end DestinationRectangle()
 
         private AnimatedSprite FindAnimation(T state) {
             for(int i = 0; i < _animationNames.Length; i++) {
@@ -454,6 +486,7 @@ namespace Graphics.Sprites {
                         EndAnimation();
                     // Starts new animation
                     StartNewAnimation(i);
+                    return;
                 }
             }
             // Throws an Error if the animation value does not exist in the sprite
@@ -464,12 +497,21 @@ namespace Graphics.Sprites {
         public void PlayAnimation(T animation) {
             SetNewAnimation(animation);
             _isAnimationPlaying = true;
+            _isPlayingNonRepeatAnimation = false;
         }// end PlayAnimation()
+
+        // Plays an animation that stops on its final frame
+        public void PlayFinalAnimation(T animation) {
+            SetNewAnimation(animation);
+            _isAnimationPlaying = true;
+            _isPlayingNonRepeatAnimation = true;
+        }// end PlayFinalAnimation()
 
         private void EndAnimation() {
             _currentSprite.ResetSprite();
             _isAnimationPlaying = false;
-        }// end Animation
+            _isPlayingNonRepeatAnimation = false;
+        }// end EndAnimation()
 
         private void StartNewAnimation(int index) {
             if(!_isAnimationPlaying)
@@ -482,20 +524,16 @@ namespace Graphics.Sprites {
         public void Update() {
             // If an animation is playing
             if(_isAnimationPlaying) {
-                if(_currentSprite.HasStopped)
+                if(_currentSprite.HasStopped && !_isPlayingNonRepeatAnimation)
                     EndAnimation();
-                else 
+                else if(!_currentSprite.HasStopped)
                     _currentSprite.Update();
+                else
+                    return;
             }
             else
                 _baseSprite.Update();
         }// end Update()
-                
-        public Rectangle DestinationRectangle(Vector2 location) {
-            if(_isAnimationPlaying)
-                return _currentSprite.DestinationRectangle(location);
-            return _baseSprite.DestinationRectangle(location);
-        }// end DestinationRectangle()
 
         public void ResetSprite() {
             if(_isAnimationPlaying)
@@ -541,7 +579,7 @@ namespace Graphics.Sprites {
             if(_isAnimationPlaying)
                 return _currentSprite.HasStopped;
             return _baseSprite.HasEnded;
-        }
+        }// CheckIfEnded()
 
     }// end PlayerSprite class
 

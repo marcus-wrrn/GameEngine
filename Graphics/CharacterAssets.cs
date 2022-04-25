@@ -9,6 +9,9 @@ namespace Graphics.Assets {
     public interface IRockGuy : IDisposable {
         int Health{ get; }
         int Initiative{ get; }
+        Texture2D Texture{ get; }
+        Rectangle SourceRectangle{ get; }
+        Rectangle DestinationRectangle{ get; }
         void MoveToLocation(Vector2 location, GameTime gameTime);
         void Update();
         void Kill();
@@ -17,10 +20,14 @@ namespace Graphics.Assets {
     public enum RockGuyAnimations { DEATH }
 
     public class RockGuy : IRockGuy, IDisposable {
+        public Texture2D Texture{ get { return GetTexture(); } }
+        public Rectangle SourceRectangle{ get { return _asset.AssetSprite.SourceRectangle; } }
+        public Rectangle DestinationRectangle{ get { return _asset.AssetSprite.DestinationRectangle(LocationToDraw); } }
         public int Health{ get; private set; }
         public int NumberOfTurns{ get; private set; }
         public int Initiative{ get; private set; }
         public Vector2 Location{ get { return _asset.LocationOnMap.Location; } }
+        public Vector2 LocationToDraw{ get { return GetLocationToDraw(); } }
         public bool IsAlive{ get; private set; }
         public bool IsDisposed{ get; private set; }
         private HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> _asset;
@@ -44,6 +51,17 @@ namespace Graphics.Assets {
             IsAlive = true;
         }// end constructor
 
+        private Vector2 GetLocationToDraw() {
+            var location = _asset.LocationOnMap.GetLocationToDraw();
+            location.X += _asset.AssetSprite.Width * _asset.AssetSprite.Rows;
+            return location;
+        }// end GetLocationToDraw()
+
+        private Texture2D GetTexture() {
+            return _asset.AssetSprite.Texture;
+        }// end GetTexture()
+
+
         public void MoveToLocation(Vector2 location, GameTime gameTime) {
             if(IsAlive)
                 _asset.MoveToLocation(location, gameTime);
@@ -62,20 +80,26 @@ namespace Graphics.Assets {
 
         public void Kill() {
             IsAlive = false;
-            _asset.AssetSprite.PlayAnimation(RockGuyAnimations.DEATH);
+            _asset.AssetSprite.PlayFinalAnimation(RockGuyAnimations.DEATH);
         }// end Kill()
+
+        public void BringBackFromDead() {
+            IsAlive = true;
+            _asset.AssetSprite.ResetSprite();
+        }
 
     }// end RockGuy class
 
     public class RockGuyFactory {
         public RockGuy BuildRockGuy(TestingTactics.Game1 game, Vector2 location) {
-            int MAX_SPEED = 20;
+            int MAX_SPEED = 1000;
             int acceleration = 10;
+            string path = "./Characters/";
             // Load Textures
-            Texture2D idleSprite = game.Content.Load<Texture2D>("BandanGuyStandingAnim");
-            Texture2D movingSpriteLeft = game.Content.Load<Texture2D>("BlueBandanaAnimLeft");
-            Texture2D movingSpriteRight = game.Content.Load<Texture2D>("BlueBandanaAnimRight");
-            Texture2D deathSprite = game.Content.Load<Texture2D>("RockGuyDeathAnim");
+            Texture2D idleSprite = game.Content.Load<Texture2D>(path + "BandanGuyStandingAnim");
+            Texture2D movingSpriteLeft = game.Content.Load<Texture2D>(path + "BlueBandanaAnimLeft");
+            Texture2D movingSpriteRight = game.Content.Load<Texture2D>(path + "BlueBandanaAnimRight");
+            Texture2D deathSprite = game.Content.Load<Texture2D>(path + "RockGuyDeathAnim");
             // Build Animated Sprite
             AnimatedSprite idleAnimation = new AnimatedSprite(idleSprite, 6);
             AnimatedSprite movingLeftAnimationU = new AnimatedSprite(movingSpriteLeft, 18);     // U stands for Uncontrolled
