@@ -1,8 +1,5 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
-using System.Windows;
 using Graphics.Sprites;
 
 namespace Graphics.Assets {
@@ -154,7 +151,7 @@ namespace Graphics.Assets {
 
     public interface IHorizontalMovingAsset<T> : IMovingAsset<T> where T: ISimpleMovingSprite {
         void Stop();
-    }
+    }// end IHorizontal
 
     public class HorizontalMovingAsset<T> : MovingAsset<T>, IHorizontalMovingAsset<T> where T: ISimpleMovingSprite {
         // (T sprite, Vector2 location, float maxSpeed, float acceleration) : base(sprite, location)
@@ -187,6 +184,5 @@ namespace Graphics.Assets {
         }// end MoveToLocation()
 
     }// end HorizontleMovingAsset class
-
 
 }// end namespace

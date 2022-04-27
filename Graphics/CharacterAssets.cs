@@ -6,9 +6,10 @@ using System;
 
 namespace Graphics.Assets {
     
-    public interface IRockGuy : IDisposable {
+    public interface ISentientAsset : IDisposable {
         int Health{ get; }
         int Initiative{ get; }
+        int NumberOfTurns{ get; }
         Texture2D Texture{ get; }
         Rectangle SourceRectangle{ get; }
         Rectangle DestinationRectangle{ get; }
@@ -19,7 +20,7 @@ namespace Graphics.Assets {
 
     public enum RockGuyAnimations { DEATH }
 
-    public class RockGuy : IRockGuy, IDisposable {
+    public class RockGuy : ISentientAsset, IDisposable {
         public Texture2D Texture{ get { return GetTexture(); } }
         public Rectangle SourceRectangle{ get { return _asset.AssetSprite.SourceRectangle; } }
         public Rectangle DestinationRectangle{ get { return _asset.AssetSprite.DestinationRectangle(LocationToDraw); } }
@@ -32,7 +33,6 @@ namespace Graphics.Assets {
         public bool IsDisposed{ get; private set; }
         private HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> _asset;
 
-        public enum hello  { START, HELLO };
         public RockGuy(HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> asset, int health, int initiative, int numberOfTurns) {
             // Error checking
             if(asset == null)
@@ -52,15 +52,16 @@ namespace Graphics.Assets {
         }// end constructor
 
         private Texture2D GetTexture() {
+            if(IsDisposed)
+                throw new ObjectDisposedException("Rock Guy is disposed");
             return _asset.AssetSprite.Texture;
         }// end GetTexture()
 
-
         public void MoveToLocation(Vector2 location, GameTime gameTime) {
-            if(IsAlive) {
+            if(IsDisposed)
+                return;
+            if(IsAlive)
                 _asset.MoveToLocation(location, gameTime);
-            }
-                
         }// end MoveToLocation()
 
         public void Dispose() {
@@ -71,26 +72,44 @@ namespace Graphics.Assets {
         }// end Dispose()
 
         public void Update() {
+            if(IsDisposed)
+                return;
             _asset.AssetSprite.Update();
         }// end Update()
 
         public void Kill() {
+            if(IsDisposed)
+                return;
             IsAlive = false;
             _asset.AssetSprite.PlayFinalAnimation(RockGuyAnimations.DEATH);
         }// end Kill()
 
         public void BringBackFromDead() {
+            if(IsDisposed)
+                return;
             IsAlive = true;
             _asset.AssetSprite.ResetSprite();
         }
 
     }// end RockGuy class
 
-    public class RockGuyFactory {
+    public class CharacterFactory {
         public RockGuy BuildRockGuy(TestingTactics.Game1 game, Vector2 location) {
             int MAX_SPEED = 1000;
-            int acceleration = 10;
+            int ACCELERATION = 10;
+            int HEALTH = 3;
+            int INITIATIVE = 10;
+            int NUM_OF_TURNS = 2;
+            // Assigns the Path
             string path = "./Characters/";
+            var mainSprite = BuildRockGuySprite(game, path);
+            // Build Asset
+            HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> asset = 
+                                    new HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>>(mainSprite, location, MAX_SPEED, ACCELERATION);
+            return new RockGuy(asset, HEALTH, INITIATIVE, NUM_OF_TURNS);
+        }// end BuildRockGuy()
+
+        private PlayerSprite<RockGuyAnimations> BuildRockGuySprite(TestingTactics.Game1 game, string path) {
             // Load Textures
             Texture2D idleSprite = game.Content.Load<Texture2D>(path + "BandanGuyStandingAnim");
             Texture2D movingSpriteLeft = game.Content.Load<Texture2D>(path + "BlueBandanaAnimLeft");
@@ -111,14 +130,10 @@ namespace Graphics.Assets {
             RockGuyAnimations[] animationNamesList = new RockGuyAnimations[]{ RockGuyAnimations.DEATH };
             // Build SimpleMovingSprite
             SimpleMovingSprite baseSprite = new SimpleMovingSprite(idleAnimation, movingRightAnimationC, movingLeftAnimationC);
-            PlayerSprite<RockGuyAnimations> mainSprite = new PlayerSprite<RockGuyAnimations>(baseSprite, animationList, animationNamesList);
+            // Builds Main Sprite
+            return new PlayerSprite<RockGuyAnimations>(baseSprite, animationList, animationNamesList);
+        }// end BuildRockGuySprite()
 
-            // Build Asset
-            HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> asset = 
-                                    new HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>>(mainSprite, location, MAX_SPEED, acceleration);
-            return new RockGuy(asset, 3, 10, 2);
-        }// end BuildRockGuy()
-
-    }
+    }// end Factory Class
 
 }// end Graphics.Assets namespace
