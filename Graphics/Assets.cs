@@ -1,24 +1,33 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using Graphics.Sprites;
 
 namespace Graphics.Assets {
     // =============================================================== Base Asset ===============================================================
-    public interface IAsset<T> : IDisposable where T: ISprite {
-        T AssetSprite{ get; }
-        Utility.TextureLocation<T> LocationOnMap{ get; }
-        void ChangeSprite(T sprite);
-    }
+    public interface IAsset : IDisposable {
+        Texture2D Texture{ get; }
+        Rectangle SourceRectangle { get; }
+        Rectangle DestinationRectangle{ get; }
+        Vector2 Location{ get; }
+        Vector2 DrawingLocation{ get; }
+    }// end IAsset interface
 
     // Base class used for all Assets
-    public class Asset<T> : IAsset<T> where T: ISprite {
+    public class Asset<T> : IAsset where T: ISprite {
         public T AssetSprite{ get; private set; }   // texture of the asset
-        public Utility.TextureLocation<T> LocationOnMap{ get; private set; }    // location of the asset
+        protected Utility.TextureLocation<T> _locationOnMap;   // location of the asset
         public bool IsDisposed{ get; private set; }
+        public Vector2 Location { get { return _locationOnMap.Location; } }
+        public Vector2 DrawingLocation { get { return _locationOnMap.GetLocationToDraw(); } }
+        public Rectangle SourceRectangle{ get { return AssetSprite.SourceRectangle; } }
+        public Rectangle DestinationRectangle{ get { return AssetSprite.DestinationRectangle(DrawingLocation); } }
+        public Texture2D Texture{ get { return AssetSprite.Texture; } }
+        
 
-        public Asset(T sprite, Vector2 loc) {
+        public Asset(T sprite, Vector2 loc, bool hasCollision = true) {
             AssetSprite = sprite;
-            LocationOnMap = new Utility.TextureLocation<T>(sprite, loc);
+            _locationOnMap = new Utility.TextureLocation<T>(sprite, loc);
             IsDisposed = false;
         }// end constructor()
 
@@ -26,22 +35,17 @@ namespace Graphics.Assets {
         public Asset(T text, GraphicsDeviceManager graphics) : this(text, new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2)) {}
         public Asset(T text) : this(text, new Vector2(0, 0)) {}
 
-        // TODO make it so it depends on Asset class
-        public void ChangeSprite(T sprite) {
-            AssetSprite = sprite;
-        }
-
         // Immediatly move to a new location
         // TODO Make this depend on the map screen/other objects
         protected void SetLocation(float x, float y) {
-            LocationOnMap.ChangeLocation(new Vector2(x, y));
+            _locationOnMap.ChangeLocation(new Vector2(x, y));
         }// end ChangeLocation()
 
         /*
         Immediatly move to a new location
         */ 
         protected void SetLocation(Vector2 nextLocation) {
-            LocationOnMap.ChangeLocation(nextLocation);
+            _locationOnMap.ChangeLocation(nextLocation);
         }// end ChangeLocation()
 
         public void Dispose() {
@@ -93,25 +97,25 @@ namespace Graphics.Assets {
 
         public void MoveUp(GameTime gameTime) {
             // Change speed
-            Vector2 location = LocationOnMap.Location;
+            Vector2 location = Location;
             location.Y += Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            LocationOnMap.ChangeLocation(location);
+            _locationOnMap.ChangeLocation(location);
         }// end MoveUp()
 
         public virtual void MoveDown(GameTime gameTime) {
-            Vector2 location = LocationOnMap.Location;
+            Vector2 location = Location;
             location.Y -= Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            this.SetLocation(location);
+            this.SetLocation(Location);
         }// end MoveDown()
 
         public virtual void MoveRight(GameTime gameTime) {
-            Vector2 location = LocationOnMap.Location;
+            Vector2 location = Location;
             location.X += Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             this.SetLocation(location);
         }// end MoveRight()
 
         public virtual void MoveLeft(GameTime gameTime) {
-            Vector2 location = LocationOnMap.Location;
+            Vector2 location = Location;
             location.X -= Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             this.SetLocation(location);
         }// end MoveLeft()
@@ -121,7 +125,7 @@ namespace Graphics.Assets {
         }// end MoveDirection()
 
         public virtual void MoveDirection(Vector2 nextLocation, GameTime gameTime) {
-            Vector2 currLocation = LocationOnMap.Location;
+            Vector2 currLocation = Location;
             // Make sure the new location is immutable
             Vector2 tempLocation = nextLocation;
             tempLocation.Normalize();
@@ -131,7 +135,7 @@ namespace Graphics.Assets {
         }// end MoveDirection()
 
         protected bool HasReachedDestination(Vector2 destination) {
-            var location = LocationOnMap.Location;
+            var location = Location;
             if(location.X > destination.X - AssetSprite.Width / 2 && location.X < destination.X + AssetSprite.Width / 2)
                 if(location.Y > destination.Y - AssetSprite.Height / 2 && location.Y < destination.Y + AssetSprite.Width / 2)
                     return true;
@@ -140,7 +144,7 @@ namespace Graphics.Assets {
 
         public virtual void MoveToLocation(Vector2 destination, GameTime gameTime) {
             if(!HasReachedDestination(destination))
-                MoveDirection(destination - LocationOnMap.Location, gameTime);
+                MoveDirection(destination - Location, gameTime);
             // Means its close enough to set location to specific spot
             else {
                 SetLocation(destination);
@@ -177,7 +181,7 @@ namespace Graphics.Assets {
             if(HasReachedDestination(destination)) {
                 AssetSprite.Stop();
             }
-            else if (destination.X - LocationOnMap.X > 0)
+            else if (destination.X - _locationOnMap.X > 0)
                 AssetSprite.MoveRight();
             else
                 AssetSprite.MoveLeft();

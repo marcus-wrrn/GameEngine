@@ -385,7 +385,7 @@ namespace Graphics.Sprites {
 
     // ========================================================== Player Sprite ===================================================================================================
 
-    public interface IPlayerSprite : ISimpleMovingSprite {
+    public interface IPlayerSprite : ISimpleMovingSprite, ISprite {
         void MoveUp();
         void StopMoving();   
     }// end PlayerSprite interface

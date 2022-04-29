@@ -6,13 +6,10 @@ using System;
 
 namespace Graphics.Assets {
     
-    public interface ISentientAsset : IDisposable {
+    public interface ISentientAsset : IAsset, IDisposable  {
         int Health{ get; }
         int Initiative{ get; }
         int NumberOfTurns{ get; }
-        Texture2D Texture{ get; }
-        Rectangle SourceRectangle{ get; }
-        Rectangle DestinationRectangle{ get; }
         void MoveToLocation(Vector2 location, GameTime gameTime);
         void Update();
         void Kill();
@@ -22,15 +19,16 @@ namespace Graphics.Assets {
 
     public class RockGuy : ISentientAsset, IDisposable {
         public Texture2D Texture{ get { return GetTexture(); } }
-        public Rectangle SourceRectangle{ get { return _asset.AssetSprite.SourceRectangle; } }
-        public Rectangle DestinationRectangle{ get { return _asset.AssetSprite.DestinationRectangle(LocationToDraw); } }
+        public Rectangle SourceRectangle{ get { return _asset.SourceRectangle; } }
+        public Rectangle DestinationRectangle { get { return _asset.DestinationRectangle; } }
         public int Health{ get; private set; }
         public int NumberOfTurns{ get; private set; }
         public int Initiative{ get; private set; }
-        public Vector2 Location{ get { return _asset.LocationOnMap.Location; } }
-        public Vector2 LocationToDraw{ get { return _asset.LocationOnMap.GetLocationToDraw(); } }
+        public Vector2 Location{ get { return _asset.Location; } }
+        public Vector2 DrawingLocation{ get { return _asset.DrawingLocation; } }
         public bool IsAlive{ get; private set; }
         public bool IsDisposed{ get; private set; }
+
         private HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> _asset;
 
         public RockGuy(HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> asset, int health, int initiative, int numberOfTurns) {
@@ -54,39 +52,39 @@ namespace Graphics.Assets {
         private Texture2D GetTexture() {
             if(IsDisposed)
                 throw new ObjectDisposedException("Rock Guy is disposed");
-            return _asset.AssetSprite.Texture;
+            return _asset.Texture;
         }// end GetTexture()
 
         public void MoveToLocation(Vector2 location, GameTime gameTime) {
             if(IsDisposed)
-                return;
+                throw new ObjectDisposedException("Rock Guy is disposed");
             if(IsAlive)
                 _asset.MoveToLocation(location, gameTime);
         }// end MoveToLocation()
 
         public void Dispose() {
             if(IsDisposed)
-                return;
+                throw new ObjectDisposedException("Rock Guy is disposed");
             _asset.Dispose();
             IsDisposed = true;
         }// end Dispose()
 
         public void Update() {
             if(IsDisposed)
-                return;
+                throw new ObjectDisposedException("Rock Guy is disposed");
             _asset.AssetSprite.Update();
         }// end Update()
 
         public void Kill() {
             if(IsDisposed)
-                return;
+                throw new ObjectDisposedException("Rock Guy is disposed");
             IsAlive = false;
             _asset.AssetSprite.PlayFinalAnimation(RockGuyAnimations.DEATH);
         }// end Kill()
 
         public void BringBackFromDead() {
             if(IsDisposed)
-                return;
+                throw new ObjectDisposedException("Rock Guy is disposed");
             IsAlive = true;
             _asset.AssetSprite.ResetSprite();
         }
