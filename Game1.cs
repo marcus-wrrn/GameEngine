@@ -111,7 +111,6 @@ namespace TestingTactics
             //     _asset1.Stop();
             // }
 
-
             Vector2 mousePosition = new Vector2(mouse.X, mouse.Y);
             Vector2 p1 = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             Vector2 p2 = Vector2.Zero;
@@ -128,7 +127,7 @@ namespace TestingTactics
             if(temp % 7 == 0) {
                 //_asset1.AssetSprite.Update();
                 // _asset2.AssetSprite.Update();
-                _rockGuy.Update();
+                _rockGuy.UpdateSprite();
             }
 
             

@@ -6,18 +6,17 @@ using System;
 
 namespace Graphics.Assets {
     
-    public interface ISentientAsset : IAsset, IDisposable  {
+    public interface ICharacterAsset : IAsset, IDisposable  {
         int Health{ get; }
         int Initiative{ get; }
         int NumberOfTurns{ get; }
         void MoveToLocation(Vector2 location, GameTime gameTime);
-        void Update();
         void Kill();
     }// end IRockGuy interface
 
     public enum RockGuyAnimations { DEATH }
 
-    public class RockGuy : ISentientAsset, IDisposable {
+    public class RockGuy : ICharacterAsset, IDisposable {
         public Texture2D Texture{ get { return GetTexture(); } }
         public Rectangle SourceRectangle{ get { return _asset.SourceRectangle; } }
         public Rectangle DestinationRectangle { get { return _asset.DestinationRectangle; } }
@@ -69,7 +68,7 @@ namespace Graphics.Assets {
             IsDisposed = true;
         }// end Dispose()
 
-        public void Update() {
+        public void UpdateSprite() {
             if(IsDisposed)
                 throw new ObjectDisposedException("Rock Guy is disposed");
             _asset.AssetSprite.Update();

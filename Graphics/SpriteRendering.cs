@@ -81,8 +81,8 @@ namespace Graphics.Rendering {
             _sprites.Draw(asset.AssetSprite.Texture, asset.DrawingLocation, sourceRectangle, color, rotation, originOfTransformation, scale, SpriteEffects.FlipVertically, 0f);
         }// end Draw()
 
-        public void Draw<T>(Assets.Asset<T> asset, Rectangle? sourceRectangle, Rectangle destinationRectangle, Color color) where T: Sprite {
-            _sprites.Draw(asset.AssetSprite.Texture, destinationRectangle, sourceRectangle, color, 0f, Vector2.Zero, SpriteEffects.FlipVertically, 0f);
+        public void Draw<T>(Texture2D texture, Rectangle? sourceRectangle, Rectangle destinationRectangle, Color color) where T: Sprite {
+            _sprites.Draw(texture, destinationRectangle, sourceRectangle, color, 0f, Vector2.Zero, SpriteEffects.FlipVertically, 0f);
         }// end Draw()
 
         public void Draw(Texture2D texture, Rectangle? sourceRectangle, Rectangle destinationRectangle, Color color) {

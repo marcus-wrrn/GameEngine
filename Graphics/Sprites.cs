@@ -36,7 +36,7 @@ namespace Graphics.Sprites {
         
         // Empty function, important for the interface, do not delete 
         public virtual void Update() {
-            var text = Texture;
+            //var text = Texture;
         }
 
         public void Dispose() {
