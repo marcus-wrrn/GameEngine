@@ -57,7 +57,7 @@ namespace TestingTactics
             _asset1 = new HorizontalMovingAsset<Graphics.Sprites.SimpleMovingSprite>(cool, new Vector2(1000f, 1000f), 1000f, 10);
             // _asset2 = new MovingAsset<Graphics.Sprites.AnimatedSprite>(rockGuy2, new Vector2(1920, 1080), 1000f, 100f);
 
-            var factory = new Graphics.Assets.RockGuyFactory();
+            var factory = new Graphics.Assets.CharacterFactory();
             _rockGuy = factory.BuildRockGuy(this, new Vector2(500, 700));
 
             // Pretty terrible tile initialization system
@@ -110,7 +110,6 @@ namespace TestingTactics
             // if (!isMoving) {
             //     _asset1.Stop();
             // }
-
 
             Vector2 mousePosition = new Vector2(mouse.X, mouse.Y);
             Vector2 p1 = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);

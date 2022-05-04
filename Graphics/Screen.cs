@@ -71,7 +71,7 @@ namespace Graphics {
             Rectangle destinationRectangle = CalculateDestinationRectangle();
             sprites.Begin(textureFiltering);
             var sprite = new Graphics.Sprites.Sprite(_target);
-            sprites.Draw(new Assets.Asset<Graphics.Sprites.Sprite>(sprite), null, destinationRectangle, Color.White);
+            sprites.Draw(sprite.Texture, null, destinationRectangle, Color.White);
             sprites.End();
         }
 

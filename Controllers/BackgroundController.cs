@@ -8,6 +8,7 @@ using Background;
 namespace Controllers {
     public interface IController {
         void Draw();
+        void Update();
         //void Update(GameTime gameTime);
         void LoadContent(string fileName);
         void SaveContent(string fileName);
@@ -104,6 +105,8 @@ namespace Controllers {
                 throw new Exception("Bad File");
             _tiledBackground = tempVal;
         }// end LoadContent()
+
+        public void Update() {}
 
         public void Draw() {
             for(int i = 0; i < _tiledBackground.Rows; i++) {
