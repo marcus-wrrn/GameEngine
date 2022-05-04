@@ -51,7 +51,7 @@ namespace Controllers {
             if(IsDisposed)
                 throw new ObjectDisposedException("Controller has already been disposed");
             foreach (var asset in _characterAssets) {
-                asset.UpdateSprite();
+                asset.Update();
             }
         }// end Update()
 

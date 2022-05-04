@@ -127,7 +127,7 @@ namespace TestingTactics
             if(temp % 7 == 0) {
                 //_asset1.AssetSprite.Update();
                 // _asset2.AssetSprite.Update();
-                _rockGuy.UpdateSprite();
+                _rockGuy.Update();
             }
 
             

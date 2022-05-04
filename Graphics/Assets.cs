@@ -11,7 +11,7 @@ namespace Graphics.Assets {
         Rectangle DestinationRectangle{ get; }
         Vector2 Location{ get; }
         Vector2 DrawingLocation{ get; }
-        void UpdateSprite();
+        void Update();
     }// end IAsset interface
 
     // Base class used for all Assets
@@ -56,14 +56,14 @@ namespace Graphics.Assets {
             IsDisposed = true;
         }// end Dispose()
 
-        public virtual void UpdateSprite() {
+        public virtual void Update() {
             AssetSprite.Update();
         }// end Update()
 
     }// end Asset
 
     // ======================================================== Moving Asset ===============================================================
-    public interface IMovingAsset {
+    public interface IMovingAsset : IAsset {
         float Speed{ get; }
         void ChangeSpeed(float speed);
         void MoveUp(GameTime gameTime);
@@ -158,11 +158,11 @@ namespace Graphics.Assets {
 
     }// end MovingAsset class
 
-    public interface IHorizontalMovingAsset<T> : IMovingAsset where T: ISimpleMovingSprite {
+    public interface IHorizontalMovingAsset : IMovingAsset {
         void Stop();
     }// end IHorizontal
 
-    public class HorizontalMovingAsset<T> : MovingAsset<T>, IHorizontalMovingAsset<T> where T: ISimpleMovingSprite {
+    public class HorizontalMovingAsset<T> : MovingAsset<T>, IHorizontalMovingAsset where T: ISimpleMovingSprite {
         // (T sprite, Vector2 location, float maxSpeed, float acceleration) : base(sprite, location)
         public HorizontalMovingAsset(T sprite, Vector2 location, float maxSpeed, float acceleration) 
             : base (sprite, location, maxSpeed, acceleration) {}

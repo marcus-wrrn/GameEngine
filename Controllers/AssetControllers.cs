@@ -35,7 +35,7 @@ namespace AssetControl {
     }// end IAssetController interface
 
     public class AssetController<T> : IAssetController where T: IAsset {
-        private T _asset;
+        protected T _asset;
         // Determines how fast the animation of the sprite runs for
         private int _animationSpeed;
         private int _animationCounter;
@@ -65,7 +65,7 @@ namespace AssetControl {
             if(IsDisposed)
                 throw new ObjectDisposedException("Controller already disposed");
             if(_animationCounter >= _animationSpeed) {
-                _asset.UpdateSprite();
+                _asset.Update();
                 _animationCounter = 0;
             }
             else
@@ -77,5 +77,23 @@ namespace AssetControl {
         }// end Draw()
 
     }// end AssetController class
+
+    public class CharacterController<T> : AssetController<T> where T : ICharacterAsset {
+        
+        CharacterController(T asset, int animationSpeed) : base(asset, animationSpeed) {}
+
+        public override void Update() {
+            // Put All checks here
+            if(_asset.IsAlive) {
+                if(_asset.Health <= 0) {
+                    _asset.Kill();
+                }
+            }
+            // Make it be able to make some informed decisions
+
+            // Update Base
+            base.Update();
+        }
+    }
 
 }// end AssetControl namespace
