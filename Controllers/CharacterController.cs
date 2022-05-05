@@ -29,7 +29,7 @@ namespace Controllers {
         public bool IsDisposed { get; private set; }
 
         public AssetController(Game1 game) {
-            var factory = new Graphics.Assets.CharacterFactory();
+            var factory = new Factory.CharacterFactory();
             // var rockGuy = factory.BuildRockGuy(game, Vector2.Zero);
             // var rockGuy2 = factory.BuildRockGuy(game, new Vector2(300f, 200f));
             // _assets.Add(rockGuy);
