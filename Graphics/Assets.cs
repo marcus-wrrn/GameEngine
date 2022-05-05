@@ -71,7 +71,7 @@ namespace Graphics.Assets {
         void MoveLeft(GameTime gameTime);
         void MoveRight(GameTime gameTime);
         void MoveDirection(Vector2 vector, GameTime gameTime);
-        void MoveDirection(float x, float y, GameTime gameTime);
+        //void MoveDirection(float x, float y, GameTime gameTime);
         void MoveToLocation(Vector2 vector, GameTime gameTime);
         void Stop();
     }// end IMovingAsset interface
@@ -100,7 +100,6 @@ namespace Graphics.Assets {
             Speed = speed;
         }// end ChangeSpeed()
 
-
         public void MoveUp(GameTime gameTime) {
             // Change speed
             Vector2 location = Location;
@@ -111,19 +110,19 @@ namespace Graphics.Assets {
         public virtual void MoveDown(GameTime gameTime) {
             Vector2 location = Location;
             location.Y -= Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            this.SetLocation(Location);
+            _locationOnMap.ChangeLocation(location);
         }// end MoveDown()
 
         public virtual void MoveRight(GameTime gameTime) {
             Vector2 location = Location;
             location.X += Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            this.SetLocation(location);
+            _locationOnMap.ChangeLocation(location);
         }// end MoveRight()
 
         public virtual void MoveLeft(GameTime gameTime) {
             Vector2 location = Location;
             location.X -= Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            this.SetLocation(location);
+            _locationOnMap.ChangeLocation(location);
         }// end MoveLeft()
 
         public virtual void MoveDirection(float x, float y, GameTime gameTime) {

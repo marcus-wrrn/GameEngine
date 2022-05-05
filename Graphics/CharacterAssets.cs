@@ -6,13 +6,13 @@ using System;
 
 namespace Graphics.Assets {
     
-    public interface ICharacterAsset : IAsset, IDisposable  {
+    public interface ICharacterAsset : IMovingAsset, IDisposable  {
         uint Health{ get; }
         uint MaxHealth{ get; }
         bool IsAlive { get; }
         int Initiative{ get; }
         uint NumberOfTurns{ get; }
-        void MoveToLocation(Vector2 location, GameTime gameTime);
+        //void MoveToLocation(Vector2 location, GameTime gameTime);
         void Kill();
     }// end IRockGuy interface
 
@@ -26,6 +26,7 @@ namespace Graphics.Assets {
         public uint MaxHealth { get; protected set; }
         public uint NumberOfTurns{ get; protected set; }
         public int Initiative{ get; protected set; }
+        public float Speed { get { return _asset.Speed; } }
         public Vector2 Location{ get { return _asset.Location; } }
         public Vector2 DrawingLocation{ get { return _asset.DrawingLocation; } }
         public bool IsAlive{ get; private set; }
@@ -52,6 +53,39 @@ namespace Graphics.Assets {
                 throw new ObjectDisposedException("Asset is disposed");
             return _asset.Texture;
         }// end GetTexture()
+
+        public virtual void MoveUp(GameTime gameTime) {
+            if(IsAlive)
+                _asset.MoveUp(gameTime);
+        }// end MoveUp()
+
+        public virtual void MoveDown(GameTime gameTime) {
+            if(IsAlive)
+                _asset.MoveDown(gameTime);
+        }// end MoveDown()
+
+        public virtual void MoveLeft(GameTime gameTime) {
+            if(IsAlive)
+                _asset.MoveLeft(gameTime);
+        }// end MoveLeft()
+
+        public virtual void MoveRight(GameTime gameTime) {
+            if(IsAlive)
+                _asset.MoveRight(gameTime);
+        }// end MoveRight()
+
+        public void ChangeSpeed(float speed) {
+            _asset.ChangeSpeed(speed);
+        }// end ChangeSpeed()
+
+        public virtual void Stop() {
+            if(IsAlive)
+                _asset.Stop();
+        }// end Stop()
+
+        public void MoveDirection(Vector2 direction, GameTime gameTime) {
+            _asset.MoveDirection(direction, gameTime);
+        }// end MoveDirection()
 
         public virtual void MoveToLocation(Vector2 location, GameTime gameTime) {
             if(IsDisposed)
