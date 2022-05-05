@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Graphics.Sprites;
 using System.IO;
 using System;
@@ -19,7 +18,7 @@ namespace Graphics.Assets {
 
 
 
-    public class BaseCharacter<T> : ICharacterAsset where T : IHorizontalMovingAsset {
+    public class BaseCharacter<T> : ICharacterAsset where T : IMovingAsset {
         public Texture2D Texture{ get { return GetTexture(); } }
         public Rectangle SourceRectangle{ get { return _asset.SourceRectangle; } }
         public Rectangle DestinationRectangle { get { return _asset.DestinationRectangle; } }

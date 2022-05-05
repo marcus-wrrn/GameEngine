@@ -17,21 +17,112 @@ namespace Containers {
 
     public interface IMovingAssetContainer : IBaseAssetContainer {
         float Speed { get; }
-        void ChangeSpeed(float speed);
-        void MoveUp(GameTime gameTime);
-        void MoveDown(GameTime gameTime);
-        void MoveLeft(GameTime gameTime);
-        void MoveRight(GameTime gameTime);
-        void MoveToLocation(Vector2 vector, GameTime gameTime);
-        void MoveDirection(Vector2 vector, GameTime gameTime);
+        void ChangeAssetSpeed(float speed);
+        // void MoveAssetUp(GameTime gameTime);
+        // void MoveAssetDown(GameTime gameTime);
+        // void MoveAssetLeft(GameTime gameTime);
+        // void MoveAssetRight(GameTime gameTime);
+        void MoveAssetToLocation(Vector2 vector);
+        //void MoveAssetInDirection(Vector2 vector, GameTime gameTime);
         void Stop();
     }// end IMovingAssetContainer interface
 
     public interface ICharacterAssetContainer : IMovingAssetContainer {
+        Classifier.CharacterClassifier CharacterInfo { get; }
+        uint CharacterHealth { get; }
+        uint CharacterMaxHealth { get; }
+        bool IsCharacterAlive { get; }
+        int CharacterInitiative { get; }
+        uint NumberOfTurns { get; }
+        
+    }// end ICharacterAssetContainer()
 
-    }
+    public class AssetContainer<T> : IBaseAssetContainer where T : IAsset {
+        protected T _asset;
+        public virtual Classifier.AssetClassifier AssetInfo { get; private set; }
+        // Will later contain a Controller Object and a pointer to the MasterAssetContainer
+        public Rectangle DestinationRectangle { get { return _asset.DestinationRectangle; } }
+        public Vector2 Location { get { return _asset.Location; } }
+        public bool IsDisposed { get; private set; }
 
-    public class AssetContainer {
+        public AssetContainer(T asset, Classifier.AssetClassifier info) {
+            AssetInfo = info;
+            _asset = asset;
+            IsDisposed = false;
+        }// end AssetContainer constructor
+        
+        // Makes a base static object
+        public AssetContainer(T asset) : this(asset, new Classifier.AssetClassifier(true)) {}
+
+        public virtual void Dispose() {
+            if(IsDisposed)
+                throw new ObjectDisposedException("Container already disposed");
+            _asset.Dispose();
+            IsDisposed = true;
+        }// end Dispose()
+
+        public virtual void Update(GameTime gameTime) {
+            _asset.Update();
+        }// end Update()
+
+        public virtual void Draw(SpriteBunch spriteBunch) {
+            spriteBunch.Draw(_asset.Texture, _asset.SourceRectangle, _asset.DestinationRectangle, Color.AliceBlue);
+        }// end Draw()
+
+    }// end AssetContainer class
+
+    public class MovingAssetContainer<T> : AssetContainer<T>, IMovingAssetContainer where T : IMovingAsset {
+        public float Speed { get { return _asset.Speed; } }
+        public bool IsMoving { get; private set; }
+        private Vector2 _locationToMove;
+        
+        public MovingAssetContainer(T asset, Classifier.AssetClassifier classifier) : base(asset, classifier) {
+            IsMoving = false;
+            _locationToMove = asset.Location;
+        }// end MovingAssetContainer()
+
+        public void ChangeAssetSpeed(float speed) {
+            _asset.ChangeSpeed(speed);
+        }// end ChangeAssetSpeed()
+
+        public void MoveAssetToLocation(Vector2 location) {
+            // If the object is currently static than a request to move should never have been called
+            if(AssetInfo.IsStatic)
+                throw new MethodAccessException("Asset is currently static");
+            // set IsMoving to true
+            IsMoving = true;
+            _locationToMove = location;
+        }// end MoveAssetToLocation()
+
+        public virtual void Stop() {
+            if(AssetInfo.IsStatic)
+                throw new MethodAccessException("Asset is currently static");
+            _locationToMove = Location;
+            IsMoving = false;
+            _asset.Stop();
+        }// end Stop()
+
+        // This section will be replaced with a specific controller for a more defined container
+        public override void Update(GameTime gameTime)
+        {
+            if(AssetInfo.IsStatic) {
+                base.Update(gameTime);
+                return;
+            }
+            if(IsMoving) {
+                _asset.MoveToLocation(_locationToMove, gameTime);
+                base.Update(gameTime);
+            }
+            // If Asset has reached its destination stop moving
+            // Remember that once an asset is in a specific range of a point it will automatically set its location to that point
+            if(IsMoving && _locationToMove == Location)
+                IsMoving = false;
+        }// end Update()
+
+    }// end MovingAssetContainer class
+
+
+    public class MasterAssetContainer {
         public List<IAsset>             AllAssets{ get; private set; }              // All Assets will be stored in this list (useful for drawing or map wide effect)
         public List<IAsset>             StaticAssets { get; private set; }          // Static objects go here
         public List<IMovingAsset>       MovingAssets { get; private set; }         // Assets that move but don't have a sophistcated AI go here
@@ -40,7 +131,7 @@ namespace Containers {
         public List<ICharacterAsset>    PlayerCharacters { get; private set; }      // All Player Characters here
 
         // TODO: Further optomizations
-        public AssetContainer(List<IAsset> staticAssets, List<IMovingAsset> movingAssets, List<ICharacterAsset> nonPlayerCharacters, List<ICharacterAsset> playerCharacters) {
+        public MasterAssetContainer(List<IAsset> staticAssets, List<IMovingAsset> movingAssets, List<ICharacterAsset> nonPlayerCharacters, List<ICharacterAsset> playerCharacters) {
             // Check validity of moving vs static assets
             CheckStaticVsMovingAssets(staticAssets, movingAssets);
             // Check for validity of player vs non player characters

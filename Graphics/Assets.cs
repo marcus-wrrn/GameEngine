@@ -73,6 +73,7 @@ namespace Graphics.Assets {
         void MoveDirection(Vector2 vector, GameTime gameTime);
         void MoveDirection(float x, float y, GameTime gameTime);
         void MoveToLocation(Vector2 vector, GameTime gameTime);
+        void Stop();
     }// end IMovingAsset interface
 
     // An Asset that moves a specific direction
@@ -156,13 +157,11 @@ namespace Graphics.Assets {
             }
         }// end MoveToLocation()
 
+        public virtual void Stop() { }
+
     }// end MovingAsset class
 
-    public interface IHorizontalMovingAsset : IMovingAsset {
-        void Stop();
-    }// end IHorizontal
-
-    public class HorizontalMovingAsset<T> : MovingAsset<T>, IHorizontalMovingAsset where T: ISimpleMovingSprite {
+    public class HorizontalMovingAsset<T> : MovingAsset<T>, IMovingAsset where T: ISimpleMovingSprite {
         // (T sprite, Vector2 location, float maxSpeed, float acceleration) : base(sprite, location)
         public HorizontalMovingAsset(T sprite, Vector2 location, float maxSpeed, float acceleration) 
             : base (sprite, location, maxSpeed, acceleration) {}
@@ -177,7 +176,7 @@ namespace Graphics.Assets {
             AssetSprite.MoveLeft();
         }
 
-        public void Stop() {
+        public override void Stop() {
             AssetSprite.Stop();
         }// end Stop()
 

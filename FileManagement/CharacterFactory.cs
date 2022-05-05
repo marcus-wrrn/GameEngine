@@ -11,15 +11,6 @@ using System;
 namespace Factory {
 
     public class CharacterFactory {
-        public RockGuy BuildRockGuy(TestingTactics.Game1 game, Vector2 location) {
-            int maxSpeed = 1000;
-            int acceleration = 10;
-            uint health = 3;
-            int initiative = 10;
-            uint numberOfTurns = 2;
-            return BuildRockGuy(game, location, health, initiative, numberOfTurns, acceleration, maxSpeed);
-        }// end BuildRockGuy()
-
         public RockGuy BuildRockGuy(TestingTactics.Game1 game, Vector2 location, uint health = 3, int initiative = 10, uint numberOfTurns = 2, int acceleration = 10, int maxSpeed = 1000) {
             // Assigns the Path
             string path = "./Characters/";
