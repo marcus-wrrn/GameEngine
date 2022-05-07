@@ -16,7 +16,7 @@ namespace Containers {
     }// end IBaseAssetContainer()
 
     public interface IMovingAssetContainer : IBaseAssetContainer {
-        float Speed { get; }
+        float AssetSpeed { get; }
         void ChangeAssetSpeed(float speed);
         // void MoveAssetUp(GameTime gameTime);
         // void MoveAssetDown(GameTime gameTime);
@@ -33,7 +33,7 @@ namespace Containers {
         uint CharacterMaxHealth { get; }
         bool IsCharacterAlive { get; }
         int CharacterInitiative { get; }
-        uint NumberOfTurns { get; }
+        uint CharacterNumberOfTurns { get; }
         
     }// end ICharacterAssetContainer()
 
@@ -72,7 +72,7 @@ namespace Containers {
     }// end AssetContainer class
 
     public class MovingAssetContainer<T> : AssetContainer<T>, IMovingAssetContainer where T : IMovingAsset {
-        public float Speed { get { return _asset.Speed; } }
+        public float AssetSpeed { get { return _asset.Speed; } }
         public bool IsMoving { get; private set; }
         private Vector2 _locationToMove;
         
@@ -113,6 +113,7 @@ namespace Containers {
                 _asset.MoveToLocation(_locationToMove, gameTime);
                 base.Update(gameTime);
             }
+
             // If Asset has reached its destination stop moving
             // Remember that once an asset is in a specific range of a point it will automatically set its location to that point
             if(IsMoving && _locationToMove == Location)
@@ -121,109 +122,75 @@ namespace Containers {
 
     }// end MovingAssetContainer class
 
+    public class CharacterContainer<T> : MovingAssetContainer<T>, ICharacterAssetContainer where T: ICharacterAsset {
+        private Vector2 _locationToBeMoved;
+        // A bit redundant but allows for characters to be classified alongside non character assets
+        public override Classifier.AssetClassifier AssetInfo { get { return CharacterInfo; } }
+        public Classifier.CharacterClassifier CharacterInfo { get; private set; }
+        public uint CharacterHealth { get { return _asset.Health; } }
+        public uint CharacterMaxHealth { get { return _asset.MaxHealth; } }
+        public int CharacterInitiative { get { return _asset.Initiative; } }
+        public uint CharacterNumberOfTurns { get { return _asset.NumberOfTurns; } }
+        public bool IsCharacterAlive { get { return _asset.IsAlive; } }
+
+        public CharacterContainer(T asset, Classifier.CharacterClassifier characterClassifier) : base(asset, characterClassifier) {
+            CharacterInfo = characterClassifier;
+        }// end CharacterContainer constructor
+
+    }// end CharacterClassifier
+
 
     public class MasterAssetContainer {
-        public List<IAsset>             AllAssets{ get; private set; }              // All Assets will be stored in this list (useful for drawing or map wide effect)
-        public List<IAsset>             StaticAssets { get; private set; }          // Static objects go here
-        public List<IMovingAsset>       MovingAssets { get; private set; }         // Assets that move but don't have a sophistcated AI go here
-        public List<ICharacterAsset>    AllCharacters { get; private set; }         // Every Asset with an AI go here
-        public List<ICharacterAsset>    NonPlayerCharacters { get; private set; }   // All NPCs go here
-        public List<ICharacterAsset>    PlayerCharacters { get; private set; }      // All Player Characters here
+        // Note while HashSet would be useful for getting rid of duplicates, it's important that I'm able to sort the main list of arrays
+        // This is important for rendering objects by their location
+        // All other collections of assets will be in Hashsets that will then be fed into the main list 
+        public List<IBaseAssetContainer>           AllAssets{ get; private set; }              // All Assets will be stored in this list (useful for drawing or map wide effect)
+        public HashSet<IBaseAssetContainer>        NonSentiantAssets{ get; private set; }
+        public HashSet<IBaseAssetContainer>        StaticAssets { get; private set; }          // Static objects go here
+        public HashSet<IMovingAssetContainer>      MovingObjects { get; private set; }         // Assets that move but don't have a sophistcated AI go here
+        public HashSet<ICharacterAssetContainer>   AllCharacters { get; private set; }         // Every Asset with an AI go here
+        public HashSet<ICharacterAssetContainer>   NonPlayerCharacters { get; private set; }   // All NPCs go here
+        public HashSet<ICharacterAssetContainer>   PlayerCharacters { get; private set; }      // All Player Characters here
 
         // TODO: Further optomizations
-        public MasterAssetContainer(List<IAsset> staticAssets, List<IMovingAsset> movingAssets, List<ICharacterAsset> nonPlayerCharacters, List<ICharacterAsset> playerCharacters) {
-            // Check validity of moving vs static assets
-            CheckStaticVsMovingAssets(staticAssets, movingAssets);
-            // Check for validity of player vs non player characters
-            CheckCharacters(nonPlayerCharacters, playerCharacters);
-            // Add all values to the list
-            AddToList(StaticAssets, staticAssets);
-            AddToList(MovingAssets, movingAssets);
-            // Add all charaters to their respective lists
-            AddToList(NonPlayerCharacters, nonPlayerCharacters);
-            AddToList(PlayerCharacters, playerCharacters);
-            // Add all characters to the All characters list
-            AddToList(AllCharacters, PlayerCharacters);
-            AddToList(AllCharacters, NonPlayerCharacters);
-        }// end AssetContainer constructor
+        public MasterAssetContainer(List<IBaseAssetContainer> staticAssets, List<IMovingAssetContainer> movingAssets, List<ICharacterAssetContainer> sentiantAssets) {
+            // Sort into corresponding containers
+            LoadStaticSet(staticAssets);
+        }// end construtor
 
-        private void CheckStaticVsMovingAssets(List<IAsset> staticAssets, List<IMovingAsset> movingAssets) {
-            // Checking to see if moving assets contains a static asset
-            foreach(var movingAsset in movingAssets) {
-                if(staticAssets.Contains(movingAsset))
-                    throw new ArgumentException("An Asset cannot be both static and dynamic");
-            }
-        }// end CheckStaticVsMovingAssets()
-
-        private void CheckCharacters(List<ICharacterAsset> npcs, List<ICharacterAsset> players) {
-            foreach(var npc in players) {
-                if(players.Contains(npc))
-                    throw new ArgumentException("A Character cannot be player controlled and an npc");
-            }
-        }// end CheckCharacters()
-
-        // Add all non duplicate items to a list from another list
-        private void AddToList<T>(List<T> mainList, List<T> listToBeAdded)  {
-            foreach(T item in listToBeAdded) {
-                if(!mainList.Contains(item)) {
-                    mainList.Add(item);
+        private void LoadStaticSet(List<IBaseAssetContainer> staticAssets) {
+            bool added;
+            foreach(var asset in staticAssets) {
+                if(asset.AssetInfo.IsStatic) {
+                    added = StaticAssets.Add(asset);
+                    if(!added)
+                        throw new Exception("Duplicate asset found in list");
+                    if(!asset.AssetInfo.IsSentiant)
+                        NonSentiantAssets.Add(asset);
                 }
+                else
+                    throw new ArgumentException("Asset in static asset list not static");
             }
-        }// end AddToList()
+        }// end LoadStaticSet()
 
-        // AddToMainList needs its own method as the List might not have the same interface type
-        private void AddToMainList<T>(List<T> list) where T: IAsset {
-            foreach(var asset in list) {
-                if(!AllAssets.Contains(asset))
-                    AllAssets.Add(asset);
+        private void LoadMovingAsset(List<IMovingAssetContainer> movingAssets) {
+            foreach(var asset in movingAssets) {
+                if(!asset.AssetInfo.IsStatic) {
+                    // Add to moving objects list
+                    
+                    // If asset is not sentiant add to non sentiant assets
+                    if(!asset.AssetInfo.IsSentiant)
+                        NonSentiantAssets.Add(asset);
+                }
+                else
+                    throw new ArgumentException("Asset in moving asset list is static");
             }
-        }// end AddToMainList()
+        }// end LoadMovingAsset
 
-        // sorts assets by Y location (ensures that no object is drawn infront of the other)
-        private void SortMainAssetList() {
-            AllAssets.Sort((x, y) => x.Location.Y.CompareTo(y.Location.Y));
-        }// end SortMainAssetList()
-
-        private void AllAssetListConstructor() {
-            // Adds all assets into the assets list then sorts it by the Y location on the map
-            AddToMainList(MovingAssets);
-            AddToMainList(AllCharacters);
-            // Sort Asset list
-            SortMainAssetList();
-        }// end AllAssetListContructor()
-
-        private void AddAssetToMainList(IAsset asset) {
-            AllAssets.Add(asset);
-            AllAssets.Sort((x, y) => x.Location.Y.CompareTo(y.Location.Y));
-        }// end AddAssetToMainList()
-
-        private void CheckForDuplicateAsset(ICharacterAsset asset) {
-            foreach(var currAsset in AllAssets) {
-                if(currAsset.Equals(asset))
-                    throw new DuplicateWaitObjectException("Asset already exists whithin array");
-            }
-        }// end CheckForDuplicateAsset()
-
-
-
-        public void AddNPC(ICharacterAsset asset) {
-            // If object already present in the list throw an error
-            CheckForDuplicateAsset(asset);
-            // If object not in the array add it to the NPC list
-            NonPlayerCharacters.Add(asset);
-            // Add Character to the main characters list
-            AllCharacters.Add(asset);
-            // Add asset to the main container
-            AddAssetToMainList(asset);
-        }// end AddNPC()
-
-        public void AddPlayerCharacter(ICharacterAsset asset) {
-            // If object already present in the list throw an error
-            CheckForDuplicateAsset(asset);
-            PlayerCharacters.Add(asset);
-            AllCharacters.Add(asset);
-            AddAssetToMainList(asset);
-        }// end AddPlayerCharacter()
+        private void AddMovingObject(IMovingAssetContainer asset) {
+            if(!MovingObjects.Add(asset))
+                throw new Exception("Duplicate asset found in list");
+        }// end AddMovingObject()
 
 
     }// end AssetContainer class
