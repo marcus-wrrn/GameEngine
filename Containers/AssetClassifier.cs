@@ -57,8 +57,12 @@ namespace Classifier {
     public class CharacterClassifier : AssetClassifier, ICharacterClassifier {
         public CharacterAllegiance Allegiance { get; private set; }
         public bool IsPlayerControlled { get; private set; }
-        // By making Sentiant false, the character will effectively be brain dead (i.e the AI will be non functional)
+        // By making IsSentiant false, the character will effectively be brain dead (i.e the AI will be non functional)
         // This is mostly useful for testing purposes
+        // This will also get rid of any stats or health the character may have if sorted into the non sentiant object list
+                // Try to avoid this but it's not the end of the world since it should never occur normally
+                // All constructors for characters should be designed to feed directly into the characters list unless speciffically told not to
+        // For most purposes IsSentiant should always be true
         public CharacterClassifier(bool isStatic, bool isSentiant, bool isPlayerControlled, CharacterAllegiance allegiance) : 
                         base(isStatic, isSentiant) {
             Allegiance = allegiance;

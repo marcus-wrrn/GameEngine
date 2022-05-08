@@ -123,7 +123,6 @@ namespace Containers {
     }// end MovingAssetContainer class
 
     public class CharacterContainer<T> : MovingAssetContainer<T>, ICharacterAssetContainer where T: ICharacterAsset {
-        private Vector2 _locationToBeMoved;
         // A bit redundant but allows for characters to be classified alongside non character assets
         public override Classifier.AssetClassifier AssetInfo { get { return CharacterInfo; } }
         public Classifier.CharacterClassifier CharacterInfo { get; private set; }
@@ -144,54 +143,165 @@ namespace Containers {
         // Note while HashSet would be useful for getting rid of duplicates, it's important that I'm able to sort the main list of arrays
         // This is important for rendering objects by their location
         // All other collections of assets will be in Hashsets that will then be fed into the main list 
-        public List<IBaseAssetContainer>           AllAssets{ get; private set; }              // All Assets will be stored in this list (useful for drawing or map wide effect)
-        public HashSet<IBaseAssetContainer>        NonSentiantAssets{ get; private set; }
-        public HashSet<IBaseAssetContainer>        StaticAssets { get; private set; }          // Static objects go here
-        public HashSet<IMovingAssetContainer>      MovingObjects { get; private set; }         // Assets that move but don't have a sophistcated AI go here
-        public HashSet<ICharacterAssetContainer>   AllCharacters { get; private set; }         // Every Asset with an AI go here
+        public List<IBaseAssetContainer>           AllAssets { get; private set; }              // All Assets will be stored in this list (useful for drawing or map wide effect)
+        public HashSet<IBaseAssetContainer>        NonSentiantObjects { get; private set; }     // Contains all nonsentiant objects (like rocks, trees, pillars....)
+        public HashSet<IBaseAssetContainer>        StaticObjects { get; private set; }          // Static objects go here
+        public HashSet<IMovingAssetContainer>      MovingObjects { get; private set; }         // Objects that move but don't have a sophistcated AI go here
+        public HashSet<ICharacterAssetContainer>   AllCharacters { get; private set; }         // Every Asset with an AI go here 
         public HashSet<ICharacterAssetContainer>   NonPlayerCharacters { get; private set; }   // All NPCs go here
         public HashSet<ICharacterAssetContainer>   PlayerCharacters { get; private set; }      // All Player Characters here
 
         // TODO: Further optomizations
-        public MasterAssetContainer(List<IBaseAssetContainer> staticAssets, List<IMovingAssetContainer> movingAssets, List<ICharacterAssetContainer> sentiantAssets) {
+        public MasterAssetContainer(List<IBaseAssetContainer> staticObjects, List<IMovingAssetContainer> movingObjects, List<ICharacterAssetContainer> characters) {
             // Sort into corresponding containers
-            LoadStaticSet(staticAssets);
+            LoadStaticObjects(staticObjects);
+            LoadMovingObjects(movingObjects);
+            LoadCharacters(characters);
+
         }// end construtor
 
-        private void LoadStaticSet(List<IBaseAssetContainer> staticAssets) {
-            bool added;
+        private void LoadStaticObjects(List<IBaseAssetContainer> staticAssets) {
             foreach(var asset in staticAssets) {
                 if(asset.AssetInfo.IsStatic) {
-                    added = StaticAssets.Add(asset);
-                    if(!added)
-                        throw new Exception("Duplicate asset found in list");
-                    if(!asset.AssetInfo.IsSentiant)
-                        NonSentiantAssets.Add(asset);
+                    AddStaticObject(asset);
+                    AddNonSentiantObject(asset);
                 }
                 else
                     throw new ArgumentException("Asset in static asset list not static");
             }
         }// end LoadStaticSet()
 
-        private void LoadMovingAsset(List<IMovingAssetContainer> movingAssets) {
+        private void LoadMovingObjects(List<IMovingAssetContainer> movingAssets) {
             foreach(var asset in movingAssets) {
                 if(!asset.AssetInfo.IsStatic) {
                     // Add to moving objects list
-                    
-                    // If asset is not sentiant add to non sentiant assets
-                    if(!asset.AssetInfo.IsSentiant)
-                        NonSentiantAssets.Add(asset);
+                    AddMovingObject(asset);
+                    AddNonSentiantObject(asset);
                 }
                 else
                     throw new ArgumentException("Asset in moving asset list is static");
             }
         }// end LoadMovingAsset
 
+        private void LoadCharacters(List<ICharacterAssetContainer> characters) {
+            foreach(var character in characters) {
+                AddAllCharacterObject(character);
+                if(character.CharacterInfo.IsPlayerControlled)
+                    AddPlayerCharacterObject(character);
+                else
+                    AddNonPlayerCharacterObject(character);
+            }
+        }// end LoadCharacters()
+
+        private void LoadAllAssetsIntoMainList() {
+            foreach(var obj in NonSentiantObjects) {
+                AllAssets.Add(obj);
+            }
+            foreach(var obj in AllCharacters) {
+                AllAssets.Add(obj);
+            }
+        }// end LoadAllAssetsIntoMainList()
+
+        // Adders (Mainly for debugging)
         private void AddMovingObject(IMovingAssetContainer asset) {
             if(!MovingObjects.Add(asset))
                 throw new Exception("Duplicate asset found in list");
         }// end AddMovingObject()
 
+        private void AddStaticObject(IBaseAssetContainer asset) {
+            if(!StaticObjects.Add(asset))
+                throw new Exception("Duplicate asset found in list");
+        }// end AddStaticObject()
+
+        private void AddNonSentiantObject(IBaseAssetContainer asset) {
+            if(asset.AssetInfo.IsSentiant)
+                throw new ArgumentException("Object cannot be sentiant");
+            if(!NonSentiantObjects.Add(asset))
+                throw new Exception("Duplicate asset found in list");
+        }// end AddNonSentiantObject()
+
+        private void AddNonPlayerCharacterObject(ICharacterAssetContainer asset) {
+            if(!NonPlayerCharacters.Add(asset))
+                throw new Exception("Duplicate asset found in list");
+        }// end AddNonPlayerCharacterObject()
+
+        private void AddPlayerCharacterObject(ICharacterAssetContainer asset) {
+            if(!PlayerCharacters.Add(asset))
+                throw new Exception("Duplicate asset found in list");
+        }// end AddPlayerCharacterObject()
+
+        private void AddAllCharacterObject(ICharacterAssetContainer asset) {
+            if(!AllCharacters.Add(asset))
+                throw new Exception("Duplicate asset found in list");
+        }// end AddAllCharacterObject()
+
+        // For Deletion
+
+        private void DeleteMovingObject(IMovingAssetContainer obj) {
+            
+        }// end DeleteMovingObject()
+
+        public void AddCharacter(ICharacterAssetContainer character) {
+            // Determine which type of character to add to which set
+            if(character.CharacterInfo.IsPlayerControlled)
+                AddPlayerCharacterObject(character);
+            else
+                AddNonPlayerCharacterObject(character);
+            // Add to the main sets
+            AddAllCharacterObject(character);
+            AllAssets.Add(character);
+        }// end AddCharacter()
+
+        public void AddObject(IMovingAssetContainer obj) {
+            if(obj.AssetInfo.IsSentiant)
+                throw new ArgumentException("Sentiant Character cannot be treated as an object");
+            if(obj.AssetInfo.IsStatic)
+                AddStaticObject(obj);
+            else
+                AddMovingObject(obj);
+            // Add to the main sets
+            AddNonSentiantObject(obj);
+            AllAssets.Add(obj);
+        }// end AddObject()
+
+        public void AddObject(IBaseAssetContainer obj) {
+            if(obj.AssetInfo.IsSentiant)
+                throw new ArgumentException("Sentiant Character cannot be treated as an object");
+            if(!obj.AssetInfo.IsStatic)
+                throw new ArgumentException("Cannot be a dynamic object yet inherit from the base asset container");
+            AddStaticObject(obj);
+            AddNonSentiantObject(obj);
+            AllAssets.Add(obj);
+        }// end AddObject()
+
+        public void DeleteObject(IMovingAssetContainer obj) {
+            if(!obj.AssetInfo.IsStatic) {
+
+            }
+            else {
+
+            }
+        }// end DeleteObject()
+
+        private void SortAssets() {
+            AllAssets.Sort(delegate(IBaseAssetContainer x, IBaseAssetContainer y) { 
+                return x.Location.Y.CompareTo(y.Location.Y); 
+            });
+        }// end SortAssets()
+
+        public void Update(GameTime gameTime) {
+            // Update all Assets
+            foreach(var obj in AllAssets)
+                obj.Update(gameTime);
+            // Sort Assets for rendering
+            SortAssets();
+        }// end Update()
+
+        public void Draw(SpriteBunch spriteBunch) {
+            foreach(var obj in AllAssets) {
+                obj.Draw(spriteBunch);
+            }
+        }
 
     }// end AssetContainer class
 
