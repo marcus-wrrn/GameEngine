@@ -57,3 +57,4 @@
 /home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/bin/Debug/netcoreapp3.1/Content/tile.xnb
 /home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/bin/Debug/netcoreapp3.1/Content/Tiles/TileDarkGreen.xnb
 /home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/bin/Debug/netcoreapp3.1/Content/Characters/RockGuyDeathAnim.xnb
+/home/marcus/Projects/2D_Tactics_Test/TestingTacticsActual/bin/Debug/netcoreapp3.1/Content/Characters/RockGuyHitAnim.xnb

@@ -1,25 +1,24 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Graphics.Sprites;
 using System.IO;
 using System;
 
 namespace Graphics.Assets {
     
-    public interface ICharacterAsset : IAsset, IDisposable  {
+    public interface ICharacterAsset : IMovingAsset, IDisposable  {
         uint Health{ get; }
         uint MaxHealth{ get; }
         bool IsAlive { get; }
         int Initiative{ get; }
         uint NumberOfTurns{ get; }
-        void MoveToLocation(Vector2 location, GameTime gameTime);
+        //void MoveToLocation(Vector2 location, GameTime gameTime);
         void Kill();
     }// end IRockGuy interface
 
 
 
-    public class BaseCharacter<T> : ICharacterAsset where T : IHorizontalMovingAsset {
+    public class BaseCharacter<T> : ICharacterAsset where T : IMovingAsset {
         public Texture2D Texture{ get { return GetTexture(); } }
         public Rectangle SourceRectangle{ get { return _asset.SourceRectangle; } }
         public Rectangle DestinationRectangle { get { return _asset.DestinationRectangle; } }
@@ -27,6 +26,7 @@ namespace Graphics.Assets {
         public uint MaxHealth { get; protected set; }
         public uint NumberOfTurns{ get; protected set; }
         public int Initiative{ get; protected set; }
+        public float Speed { get { return _asset.Speed; } }
         public Vector2 Location{ get { return _asset.Location; } }
         public Vector2 DrawingLocation{ get { return _asset.DrawingLocation; } }
         public bool IsAlive{ get; private set; }
@@ -53,6 +53,39 @@ namespace Graphics.Assets {
                 throw new ObjectDisposedException("Asset is disposed");
             return _asset.Texture;
         }// end GetTexture()
+
+        public virtual void MoveUp(GameTime gameTime) {
+            if(IsAlive)
+                _asset.MoveUp(gameTime);
+        }// end MoveUp()
+
+        public virtual void MoveDown(GameTime gameTime) {
+            if(IsAlive)
+                _asset.MoveDown(gameTime);
+        }// end MoveDown()
+
+        public virtual void MoveLeft(GameTime gameTime) {
+            if(IsAlive)
+                _asset.MoveLeft(gameTime);
+        }// end MoveLeft()
+
+        public virtual void MoveRight(GameTime gameTime) {
+            if(IsAlive)
+                _asset.MoveRight(gameTime);
+        }// end MoveRight()
+
+        public void ChangeSpeed(float speed) {
+            _asset.ChangeSpeed(speed);
+        }// end ChangeSpeed()
+
+        public virtual void Stop() {
+            if(IsAlive)
+                _asset.Stop();
+        }// end Stop()
+
+        public void MoveDirection(Vector2 direction, GameTime gameTime) {
+            _asset.MoveDirection(direction, gameTime);
+        }// end MoveDirection()
 
         public virtual void MoveToLocation(Vector2 location, GameTime gameTime) {
             if(IsDisposed)
@@ -193,52 +226,5 @@ namespace Graphics.Assets {
         }// end BringBackFromDead()
 
     }// end Player class
-
-    public class CharacterFactory {
-        public RockGuy BuildRockGuy(TestingTactics.Game1 game, Vector2 location) {
-            int maxSpeed = 1000;
-            int acceleration = 10;
-            uint health = 3;
-            int initiative = 10;
-            uint numberOfTurns = 2;
-            return BuildRockGuy(game, location, health, initiative, numberOfTurns, acceleration, maxSpeed);
-        }// end BuildRockGuy()
-
-        public RockGuy BuildRockGuy(TestingTactics.Game1 game, Vector2 location, uint health = 3, int initiative = 10, uint numberOfTurns = 2, int acceleration = 10, int maxSpeed = 1000) {
-            // Assigns the Path
-            string path = "./Characters/";
-            var mainSprite = BuildRockGuySprite(game, path);
-            // Build Asset
-            HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> asset = 
-                                    new HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>>(mainSprite, location, maxSpeed, acceleration);
-            return new RockGuy(asset, health, initiative, numberOfTurns);
-        }
-
-        private PlayerSprite<RockGuyAnimations> BuildRockGuySprite(TestingTactics.Game1 game, string path) {
-            // Load Textures
-            Texture2D idleSprite = game.Content.Load<Texture2D>(path + "BandanGuyStandingAnim");
-            Texture2D movingSpriteLeft = game.Content.Load<Texture2D>(path + "BlueBandanaAnimLeft");
-            Texture2D movingSpriteRight = game.Content.Load<Texture2D>(path + "BlueBandanaAnimRight");
-            Texture2D deathSprite = game.Content.Load<Texture2D>(path + "RockGuyDeathAnim");
-            // Build Animated Sprite
-            AnimatedSprite idleAnimation = new AnimatedSprite(idleSprite, 6);
-            AnimatedSprite movingLeftAnimationU = new AnimatedSprite(movingSpriteLeft, 18);     // U stands for Uncontrolled
-            AnimatedSprite movingRightAnimationU = new AnimatedSprite(movingSpriteRight, 18);
-            AnimatedSprite deathAnimationU = new AnimatedSprite(deathSprite, 9);
-            // Builds Controlled Animated Sprites
-            ControlledAnimatedSprite movingLeftAnimationC = new ControlledAnimatedSprite(movingLeftAnimationU, 6, 10);
-            ControlledAnimatedSprite movingRightAnimationC = new ControlledAnimatedSprite(movingRightAnimationU, 6, 10);
-            // Builds non repeatable animations
-            NoRepeatSprite deathAnimationC = new NoRepeatSprite(deathAnimationU);
-            // Puts sprites into list
-            NoRepeatSprite[] animationList = new NoRepeatSprite[]{ deathAnimationC };
-            RockGuyAnimations[] animationNamesList = new RockGuyAnimations[]{ RockGuyAnimations.DEATH };
-            // Build SimpleMovingSprite
-            SimpleMovingSprite baseSprite = new SimpleMovingSprite(idleAnimation, movingRightAnimationC, movingLeftAnimationC);
-            // Builds Main Sprite
-            return new PlayerSprite<RockGuyAnimations>(baseSprite, animationList, animationNamesList);
-        }// end BuildRockGuySprite()
-
-    }// end Factory Class
 
 }// end Graphics.Assets namespace
