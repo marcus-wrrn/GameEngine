@@ -46,6 +46,10 @@ namespace Containers {
         public bool IsDisposed { get; private set; }
 
         public AssetContainer(T asset, Classifier.AssetClassifier info) {
+            // Test to see if the object inherits from MovingAsset
+            IMovingAsset test = asset as IMovingAsset;
+            if(test == null && !info.IsStatic)
+                throw new ArgumentException("Container cannot posses a dynamic object that inherits from a static asset");
             AssetInfo = info;
             _asset = asset;
             IsDisposed = false;

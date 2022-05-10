@@ -69,6 +69,11 @@ namespace Classifier {
             IsPlayerControlled = isPlayerControlled;
         }// end constructor
 
+        public CharacterClassifier(CharacterClassifier classifier) : base(classifier.IsStatic, classifier.IsSentiant) {
+            Allegiance = classifier.Allegiance;
+            IsPlayerControlled = classifier.IsPlayerControlled;
+        }// end constructor
+
     }// end CharacterClassifier class
 
 }// end Classifier namespace
