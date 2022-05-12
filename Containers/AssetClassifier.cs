@@ -19,8 +19,8 @@ namespace Classifier {
 
 
     public enum AssetMovement { STATIC, DYNAMIC };
-    public enum CharacterAllegiance { FRIEND, ENEMY, NEUTRAL, NA };
-    public enum CharacterType { NPC, PLAYER };
+    public enum CharacterAllegiance { FRIEND, ENEMY, NEUTRAL, PLAYER, NA };
+    public enum CharacterType { ROCK_GUY, ROCK_MAN };
 
     public interface IAssetClassifier {
         //CharacterAllegiance Allegiance { get; }
@@ -56,6 +56,7 @@ namespace Classifier {
     // Classifier for characters
     public class CharacterClassifier : AssetClassifier, ICharacterClassifier {
         public CharacterAllegiance Allegiance { get; private set; }
+        public CharacterType Type { get; private set; }
         public bool IsPlayerControlled { get; private set; }
         // By making IsSentiant false, the character will effectively be brain dead (i.e the AI will be non functional)
         // This is mostly useful for testing purposes
@@ -63,15 +64,16 @@ namespace Classifier {
                 // Try to avoid this but it's not the end of the world since it should never occur normally
                 // All constructors for characters should be designed to feed directly into the characters list unless speciffically told not to
         // For most purposes IsSentiant should always be true
-        public CharacterClassifier(bool isStatic, bool isSentiant, bool isPlayerControlled, CharacterAllegiance allegiance) : 
-                        base(isStatic, isSentiant) {
+        public CharacterClassifier(CharacterAllegiance allegiance, CharacterType type, bool isStatic = false, bool isSentiant = true) : base(isStatic, isSentiant) {
             Allegiance = allegiance;
-            IsPlayerControlled = isPlayerControlled;
+            Type = type;
+            IsPlayerControlled = allegiance == CharacterAllegiance.PLAYER ? true : false;
         }// end constructor
 
         public CharacterClassifier(CharacterClassifier classifier) : base(classifier.IsStatic, classifier.IsSentiant) {
             Allegiance = classifier.Allegiance;
-            IsPlayerControlled = classifier.IsPlayerControlled;
+            Type = classifier.Type;
+            IsPlayerControlled = Allegiance == CharacterAllegiance.PLAYER ? true : false;
         }// end constructor
 
     }// end CharacterClassifier class
