@@ -8,6 +8,7 @@ using Graphics.Rendering;
 namespace Containers {
     // To be moved into a container namespace later
     public interface IBaseAssetContainer : IDisposable {
+        bool IsDisposed { get; }
         Classifier.AssetClassifier AssetInfo { get; }
         Rectangle DestinationRectangle { get; }
         Vector2 Location { get; }
@@ -147,7 +148,7 @@ namespace Containers {
         // Note while HashSet would be useful for getting rid of duplicates, it's important that I'm able to sort the main list of arrays
         // This is important for rendering objects by their location
         // All other collections of assets will be in Hashsets that will then be fed into the main list 
-        public List<IBaseAssetContainer>           AllAssets { get; private set; }             // All Assets will be stored in this list (useful for drawing or map wide effect)
+        public List<IBaseAssetContainer>           AllAssetContainers { get; private set; }             // All Assets will be stored in this list (useful for drawing or map wide effect)
         public HashSet<IBaseAssetContainer>        NonActiveObjects { get; private set; }      // Contains all nonsentiant objects (like rocks, trees, pillars....)
         public HashSet<IBaseAssetContainer>        ActiveObjects { get; private set; }         // For objects (not characters) who can affect the environment
         public HashSet<IBaseAssetContainer>        StaticObjects { get; private set; }         // Static objects go here
@@ -159,7 +160,7 @@ namespace Containers {
         // TODO: Further optomizations
         public MasterAssetContainer(List<IBaseAssetContainer> containers) {
             // Initialize all lists/hashsets
-            AllAssets = new List<IBaseAssetContainer>();
+            AllAssetContainers = new List<IBaseAssetContainer>();
             NonActiveObjects = new HashSet<IBaseAssetContainer>();
             ActiveObjects = new HashSet<IBaseAssetContainer>();
             StaticObjects = new HashSet<IBaseAssetContainer>();
@@ -170,8 +171,8 @@ namespace Containers {
 
             foreach(var container in containers) {
                 // If container does not exist inside the main list add it and sort the value into its respective hashsets
-                if(!AllAssets.Contains(container)) {
-                    AllAssets.Add(container);
+                if(!AllAssetContainers.Contains(container)) {
+                    AllAssetContainers.Add(container);
                     // Sorts container into all applicable hashsets
                     SortContainer(container);
                 }
@@ -196,9 +197,8 @@ namespace Containers {
         private void LoadCharacterContainer(ICharacterAssetContainer container) {
             // Add to main character list
             AddAllCharacterObject(container);
-            // find info
-            var info = container.CharacterInfo;
-            if(info.IsPlayerControlled)
+            // Sort object
+            if(container.CharacterInfo.IsPlayerControlled)
                 AddPlayerCharacterObject(container);
             else
                 AddNonPlayerCharacterObject(container);
@@ -263,10 +263,10 @@ namespace Containers {
 
         private void LoadAllAssetsIntoMainList() {
             foreach(var obj in NonActiveObjects) {
-                AllAssets.Add(obj);
+                AllAssetContainers.Add(obj);
             }
             foreach(var obj in AllCharacters) {
-                AllAssets.Add(obj);
+                AllAssetContainers.Add(obj);
             }
         }// end LoadAllAssetsIntoMainList()
 
@@ -320,39 +320,91 @@ namespace Containers {
 
         // For Deletion
 
-        private void DeleteMovingObject(IMovingAssetContainer obj) {
-            
-        }// end DeleteMovingObject()
 
 
-        public void DeleteObject(IMovingAssetContainer obj) {
-            if(!obj.AssetInfo.IsStatic) {
-
+        public void DeleteObject(IBaseAssetContainer container) {
+            // If the container does not exist in the list exit
+            if(!AllAssetContainers.Contains(container))
+                return;
+            // Remove container from main list
+            AllAssetContainers.Remove(container);
+            // Check if the container is a character
+            var characterContainer = container as ICharacterAssetContainer;
+            if(characterContainer != null) {
+                DeleteCharacter(characterContainer);
+                return;
             }
-            else {
-
+            // Check if Container is a moving object
+            var movingContainer = container as IMovingAssetContainer;
+            if(movingContainer != null) {
+                DeleteMoving(movingContainer);
+                return;
             }
+            // Container must be of a static object
+            DeleteStatic(container);
         }// end DeleteObject()
 
+        private void DeleteCharacter(ICharacterAssetContainer container) {
+            AllCharacters.Remove(container);
+            if(container.CharacterInfo.IsPlayerControlled)
+                PlayerCharacters.Remove(container);
+            else
+                NonPlayerCharacters.Remove(container);
+        }// end DeleteCharacter()
+
+        private void DeleteMoving(IMovingAssetContainer container) {
+            if(!container.AssetInfo.IsSentiant)
+                NonActiveObjects.Remove(container);
+            else
+                ActiveObjects.Remove(container);
+            if(container.AssetInfo.IsStatic)
+                StaticObjects.Remove(container);
+            else
+                MovingObjects.Remove(container);
+        }// end DeleteMoving()
+
+        private void DeleteStatic(IBaseAssetContainer container) {
+            if(container.AssetInfo.IsStatic)
+                StaticObjects.Remove(container);
+            else
+                throw new ArgumentException("Container must be static");
+            if(container.AssetInfo.IsSentiant)
+                ActiveObjects.Remove(container);
+            else
+                NonActiveObjects.Remove(container); 
+        }// end DeleteStatic()
+
         private void SortAssets() {
-            AllAssets.Sort(delegate(IBaseAssetContainer x, IBaseAssetContainer y) { 
+            AllAssetContainers.Sort(delegate(IBaseAssetContainer x, IBaseAssetContainer y) { 
                 return x.Location.Y.CompareTo(y.Location.Y); 
             });
         }// end SortAssets()
 
+        private void DeleteObjects(List<IBaseAssetContainer> containers) {
+            foreach(var container in containers)
+                DeleteObject(container);
+        }// end DeleteObjects()
+
         public void Update(GameTime gameTime) {
+            List<IBaseAssetContainer> deletionList = new List<IBaseAssetContainer>();
             // Update all Assets
-            foreach(var obj in AllAssets)
+            foreach(var obj in AllAssetContainers) {
                 obj.Update(gameTime);
-            // Sort Assets for rendering
+                if(obj.IsDisposed)
+                    deletionList.Add(obj);
+            }
+            // Deletes all disposed objects
+            // Does not delete in main loop to avoid errors
+            DeleteObjects(deletionList);
+            // Sort Remaining Assets for rendering
             SortAssets();
         }// end Update()
 
         public void Draw(SpriteBunch spriteBunch) {
-            foreach(var obj in AllAssets) {
+            foreach(var obj in AllAssetContainers) {
                 obj.Draw(spriteBunch);
             }
-        }
+        }// end Draw()
 
     }// end AssetContainer class
 

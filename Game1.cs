@@ -2,10 +2,12 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-
+using Containers;
 using Input;
 using Graphics.Assets;
 using Graphics.Rendering;
+using Classifier;
+using Graphics.Sprites;
 
 namespace TestingTactics
 {
@@ -16,7 +18,7 @@ namespace TestingTactics
         private GraphicsDeviceManager _graphics;
         private Controllers.BackgroundController _backgroundController;
         // private MovingAsset<Graphics.Sprites.AnimatedSprite> _asset2;
-        private Testing.CharacterContainerTest _characterTest;
+        //private Testing.CharacterContainerTest _characterTest;
         private RockGuy _rockGuy;
         private RockGuy _rockGuy2;
         private SpriteBunch _sprites;
@@ -37,26 +39,54 @@ namespace TestingTactics
             // _graphics.PreferredBackBufferWidth = 400;
             // _graphics.PreferredBackBufferHeight = 800;
             // _graphics.ApplyChanges();
-            _characterTest = new Testing.CharacterContainerTest(this);
-            _characterTest.FindDuplicatesTest1();
-            _characterTest.FindDuplicateTest2();
-            _characterTest.FindDuplicateTest3();
-            _characterTest.FindDuplicateTest4();
-            _characterTest.FindDuplicateTest5();
+            // _characterTest = new Testing.CharacterContainerTest(this);
+            // _characterTest.FindDuplicatesTest1();
+            // _characterTest.FindDuplicateTest2();
+            // _characterTest.FindDuplicateTest3();
+            // _characterTest.FindDuplicateTest4();
+            // _characterTest.FindDuplicateTest5();
             //var baseTest = new Testing.BaseAssetContainerTest(this);
             //baseTest.TestIllegalStaticAsset();
             var masterTest = new Testing.MasterContainerTest(this);
 
             base.Initialize();
-            
         }
+
+
+        private void SortContainer(IBaseAssetContainer container) {
+            ICharacterAssetContainer characterContainer = container as ICharacterAssetContainer; 
+            if(characterContainer != null) {
+                Console.WriteLine("It's a character container");
+                return;
+            }
+            IMovingAssetContainer movingContainer = container as IMovingAssetContainer;
+            if(movingContainer != null) {
+                Console.WriteLine("It's a moving container");
+                return;
+            }
+            Console.WriteLine("It's a static object");
+        }
+
+        private CharacterContainer<RockGuy> GenerateCharacterContainer(bool isStatic, bool isSentiant, CharacterAllegiance allegiance, CharacterType type) {
+            var factory = new Factory.CharacterFactory();
+            var asset = factory.BuildRockGuy(this, Vector2.Zero);
+            CharacterClassifier classifier = new CharacterClassifier(allegiance, type, isStatic, isSentiant);
+            return new CharacterContainer<RockGuy>(asset, classifier);
+        }// end GenerateCharacterContainer()
+
+        private MovingAssetContainer<MovingAsset<AnimatedSprite>> GenerateMovingContainerBaseAsset(bool isStatic) {
+            // Create asset
+            AnimatedSprite sprite = new AnimatedSprite(Content.Load<Texture2D>("./Characters/RockGuyHitAnim"), 9);
+            MovingAsset<AnimatedSprite> asset = new MovingAsset<AnimatedSprite>(sprite, Vector2.Zero);
+            // Create Classifier
+            AssetClassifier classifier = new AssetClassifier(isStatic);
+            return new MovingAssetContainer<MovingAsset<AnimatedSprite>>(asset, classifier);
+        }// end GenerateMovingContainerBaseAsset()
         
         protected override void LoadContent()
         {
             // Doing some Tests
             // Loading Character container tests
-            
-
 
             _sprites = new SpriteBunch(this);
             _screen = new Graphics.Screen(this, 3840, 2160);
@@ -78,6 +108,14 @@ namespace TestingTactics
 
             var texture = Content.Load<Texture2D>("tile");
             var background = new Background.TileBackground(tiles, Vector2.Zero, Vector2.Zero, texture.Width, texture.Height);
+            Console.WriteLine("++++++++++++TEST++++++++++++");
+            var character1 = GenerateCharacterContainer(false, true, CharacterAllegiance.ENEMY, CharacterType.ROCK_GUY);
+            var character2 = GenerateMovingContainerBaseAsset(false);
+            SortContainer(character1);
+            SortContainer(character2);
+
+
+
 
             
             _backgroundController = new Controllers.BackgroundController(this, _sprites, "TestFile");
