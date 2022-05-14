@@ -4,10 +4,25 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using TestingTactics;
-using Graphics.Assets;
+using Containers;
 
 
 namespace Controllers {
+
+    // public class NPCTurnController : IController, IDisposable {
+    //     private MasterAssetContainer _masterContainer;
+    //     private HashSet<ICharacterAssetContainer> _allNPCs;
+
+    //     public NPCTurnController(MasterAssetContainer container) {
+    //         _masterContainer = container;
+    //         _allNPCs = container.NonPlayerCharacters;
+    //     }// end NPCTurnController()
+
+
+
+    // }// end NPCTurnController class
+
+
     public class AssetController : IController, IDisposable {
 
         // Controller also needs to account for collision
@@ -21,19 +36,17 @@ namespace Controllers {
 
         // Assets need to be sorted based off location (y direction)
         // Assets with lower y values need to be drawn first
-        private List<IAsset> _allAssets;
-        private List<IAsset> _staticAssets;
-        private List<IMovingAsset> _movingAssets;
-        private List<ICharacterAsset> _characterAssets;
+        private MasterAssetContainer _masterContainer;
+        private List<IBaseAssetContainer> _allAssets;
+        private HashSet<ICharacterAssetContainer> _allCharacters;
+
 
         public bool IsDisposed { get; private set; }
 
-        public AssetController(Game1 game) {
-            var factory = new Factory.CharacterFactory();
-            // var rockGuy = factory.BuildRockGuy(game, Vector2.Zero);
-            // var rockGuy2 = factory.BuildRockGuy(game, new Vector2(300f, 200f));
-            // _assets.Add(rockGuy);
-            // _assets.Add(rockGuy2);
+        public AssetController(Game1 game, Containers.MasterAssetContainer masterContainer) {
+            _masterContainer = masterContainer;
+            _allAssets = _masterContainer.AllAssetContainers;
+            _allCharacters = _masterContainer.AllCharacters;
             IsDisposed = false;
         }// end constructor
 
@@ -41,18 +54,17 @@ namespace Controllers {
             if(IsDisposed)
                 throw new ObjectDisposedException("Controller has already been disposed");
             // Dispose all assets
-            foreach (var asset in _allAssets) {
+            foreach (var asset in _masterContainer.AllAssetContainers) {
                 asset.Dispose();
             }
             IsDisposed = true;
         }// end Dispose()
 
-        public void Update() {
+        public void Update(GameTime gameTime) {
             if(IsDisposed)
                 throw new ObjectDisposedException("Controller has already been disposed");
-            foreach (var asset in _characterAssets) {
-                asset.Update();
-            }
+            // Update all assets in the container
+
         }// end Update()
 
         public void Draw() {

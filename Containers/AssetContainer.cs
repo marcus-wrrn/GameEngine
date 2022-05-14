@@ -35,6 +35,8 @@ namespace Containers {
         bool IsCharacterAlive { get; }
         int CharacterInitiative { get; }
         uint CharacterNumberOfTurns { get; }
+
+        void TakeDamage(int value);
         
     }// end ICharacterAssetContainer()
 
@@ -137,6 +139,10 @@ namespace Containers {
         public uint CharacterNumberOfTurns { get { return _asset.NumberOfTurns; } }
         public bool IsCharacterAlive { get { return _asset.IsAlive; } }
 
+        public virtual void TakeDamage(int value) {
+            _asset.HitForDamage(value);
+        }// end TakeDamage()
+
         public CharacterContainer(T asset, Classifier.CharacterClassifier characterClassifier) : base(asset, characterClassifier) {
             CharacterInfo = characterClassifier;
         }// end CharacterContainer constructor
@@ -157,8 +163,17 @@ namespace Containers {
         public HashSet<ICharacterAssetContainer>   NonPlayerCharacters { get; private set; }   // All NPCs go here
         public HashSet<ICharacterAssetContainer>   PlayerCharacters { get; private set; }      // All Player Characters here
 
+        public MasterAssetContainer() {
+            InitializeLists();
+        }// end constructor
+
         // TODO: Further optomizations
-        public MasterAssetContainer(List<IBaseAssetContainer> containers) {
+        public MasterAssetContainer(List<IBaseAssetContainer> assetContainers) {
+            InitializeLists();
+            SortContainerList(assetContainers);
+        }// end construtor
+
+        private void InitializeLists() {
             // Initialize all lists/hashsets
             AllAssetContainers = new List<IBaseAssetContainer>();
             NonActiveObjects = new HashSet<IBaseAssetContainer>();
@@ -168,19 +183,31 @@ namespace Containers {
             AllCharacters = new HashSet<ICharacterAssetContainer>();
             NonPlayerCharacters = new HashSet<ICharacterAssetContainer>();
             PlayerCharacters = new HashSet<ICharacterAssetContainer>();
+        }// end InitializeLists()
 
-            foreach(var container in containers) {
+        private void SortContainerList(List<IBaseAssetContainer> assetContainers) {
+            // Add each container to their respective hashset
+            foreach(var container in assetContainers) {
                 // If container does not exist inside the main list add it and sort the value into its respective hashsets
                 if(!AllAssetContainers.Contains(container)) {
                     AllAssetContainers.Add(container);
                     // Sorts container into all applicable hashsets
-                    SortContainer(container);
+                    SortIntoContainers(container);
                 }
             }
+        }// end SortContainerList
 
-        }// end construtor
+        public void AddAssets(List<IBaseAssetContainer> assetContainers) {
+            SortContainerList(assetContainers);
+        }// end AssAssets()
 
-        private void SortContainer(IBaseAssetContainer container) {
+        public void AddAsset(IBaseAssetContainer assetContainer) {
+            SortIntoContainers(assetContainer);
+        }// end AddAsset()
+
+        // Sorts containers into their respective hashsets
+        private void SortIntoContainers(IBaseAssetContainer container) {
+            // Checks to see which container interface container inherits from
             ICharacterAssetContainer characterContainer = container as ICharacterAssetContainer; 
             if(characterContainer != null) {
                 LoadCharacterContainer(characterContainer);
@@ -319,9 +346,6 @@ namespace Containers {
         }// end AddAllCharacterObject()
 
         // For Deletion
-
-
-
         public void DeleteObject(IBaseAssetContainer container) {
             // If the container does not exist in the list exit
             if(!AllAssetContainers.Contains(container))
@@ -384,21 +408,6 @@ namespace Containers {
             foreach(var container in containers)
                 DeleteObject(container);
         }// end DeleteObjects()
-
-        public void Update(GameTime gameTime) {
-            List<IBaseAssetContainer> deletionList = new List<IBaseAssetContainer>();
-            // Update all Assets
-            foreach(var obj in AllAssetContainers) {
-                obj.Update(gameTime);
-                if(obj.IsDisposed)
-                    deletionList.Add(obj);
-            }
-            // Deletes all disposed objects
-            // Does not delete in main loop to avoid errors
-            DeleteObjects(deletionList);
-            // Sort Remaining Assets for rendering
-            SortAssets();
-        }// end Update()
 
         public void Draw(SpriteBunch spriteBunch) {
             foreach(var obj in AllAssetContainers) {

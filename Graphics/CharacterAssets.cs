@@ -13,6 +13,7 @@ namespace Graphics.Assets {
         int Initiative{ get; }
         uint NumberOfTurns{ get; }
         //void MoveToLocation(Vector2 location, GameTime gameTime);
+        void HitForDamage(int val);
         void Kill();
     }// end IRockGuy interface
 
@@ -110,6 +111,16 @@ namespace Graphics.Assets {
                 Kill();
         }// end Update()
 
+        public virtual void HitForDamage(int damage) {
+            if(damage < 0)
+                return;
+            // Make sure to not make Health < 0 to avoid overflow
+            if(damage > Health)
+                Health = 0;
+            else
+                Health -= (uint)damage;
+        }// end HitForDamage()
+
         public virtual void Kill() {
             if(IsDisposed)
                 throw new ObjectDisposedException("Rock Guy is disposed");
@@ -152,16 +163,6 @@ namespace Graphics.Assets {
             // Update the asset to play a death animation
             _asset.AssetSprite.PlayFinalAnimation(RockGuyAnimations.DEATH);
         }// end Kill()
-
-        public void HitForDamage(int damage) {
-            if(damage < 0)
-                return;
-            // Make sure to not make Health < 0 to avoid overflow
-            if(damage > Health)
-                Health = 0;
-            else
-                Health -= (uint)damage;
-        }// end HitForDamage()
 
         public void HealDamage(int healingAmount) {
             if(healingAmount <= 0)

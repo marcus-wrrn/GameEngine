@@ -46,6 +46,7 @@ namespace Testing {
 
     }
 
+    // Now Defunct code : CharacterContainer and CharacterClassifier have both been modified
     // public class CharacterContainerTest {
     //     private TestingTactics.Game1 _game;
     //     public CharacterContainer<RockGuy> TestingContainerEnemyNPC { get; private set; }
