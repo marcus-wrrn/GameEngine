@@ -23,6 +23,7 @@ namespace Containers {
         // void MoveAssetDown(GameTime gameTime);
         // void MoveAssetLeft(GameTime gameTime);
         // void MoveAssetRight(GameTime gameTime);
+        bool IsMoving { get; }
         void MoveAssetToLocation(Vector2 vector);
         //void MoveAssetInDirection(Vector2 vector, GameTime gameTime);
         void Stop();

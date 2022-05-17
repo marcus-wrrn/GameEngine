@@ -305,7 +305,7 @@ namespace Testing {
 
         private CharacterContainer<RockGuy> GenerateCharacterContainer(bool isStatic, bool isSentiant, CharacterAllegiance allegiance, CharacterType type) {
             var factory = new Factory.CharacterFactory();
-            var asset = factory.BuildRockGuy(_game, Vector2.Zero);
+            var asset = factory.BuildRockGuyAsset(_game, Vector2.Zero);
             CharacterClassifier classifier = new CharacterClassifier(allegiance, type, isStatic, isSentiant);
             return new CharacterContainer<RockGuy>(asset, classifier);
         }// end GenerateCharacterContainer()

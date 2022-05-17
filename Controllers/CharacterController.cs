@@ -37,7 +37,7 @@ namespace Controllers {
         private HashSet<ICharacterAssetContainer> _players;
         private HashSet<ICharacterAssetContainer> _npcs;
         private HashSet<ICharacterAssetContainer> _allCharacters;
-        public bool TurnEnded{ get; private set; }
+        public bool TurnEnded{ get; set; }
 
         public PlayerController(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer) {
             _game = game;
@@ -55,9 +55,21 @@ namespace Controllers {
             return null;
         }// end HasClickedCharacter()
 
+
         public void Update(GameTime gameTime) {
             var mouse = Mouse.GetState();
-            
+            Vector2 mouseLocation = new Vector2(mouse.X, mouse.Y);
+            if(mouse.LeftButton == ButtonState.Pressed) {
+                var tempCharacter = HasClickedCharacter(mouseLocation);
+                if(tempCharacter != null && tempCharacter.CharacterInfo.Allegiance == Classifier.CharacterAllegiance.PLAYER)
+                    _currentPlayer = tempCharacter;
+            }
+            if(_currentPlayer != null) {
+                if(mouse.LeftButton == ButtonState.Pressed)
+                    _currentPlayer.MoveAssetToLocation(mouseLocation);
+            }
+            if(_keyboard.IsKeyClicked(Keys.E))
+                TurnEnded = true;
         }// end Update()
 
     }// end PlayerController class
@@ -67,8 +79,7 @@ namespace Controllers {
         private HashSet<ICharacterAssetContainer> _players;
         private HashSet<ICharacterAssetContainer> _npcs;
         private HashSet<ICharacterAssetContainer> _allCharacters;
-        private HashSet<IBaseAssetContainer> _allAssets;
-
+        private Vector2 loc = new Vector2(300f, 300f);
 
         public EnemyController(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer) {
             _game = game;
@@ -77,11 +88,24 @@ namespace Controllers {
             _allCharacters = masterContainer.AllCharacters;
         }// end EnemyController constructor
 
+        public void Update(GameTime gameTime) {
+            Vector2 location1 = new Vector2(300f, 300f);
+            Vector2 location2 = new Vector2(800f, 800f);
+            foreach(var character in _npcs) {
+                if(character.CharacterInfo.Allegiance == Classifier.CharacterAllegiance.ENEMY) {
+                    if(character.Location == location1 && !character.IsMoving)
+                        character.MoveAssetToLocation(location2);
+                    else if (character.Location == location2 && !character.IsMoving)
+                        character.MoveAssetToLocation(location1);
+                }
+            }
 
+        }
 
     }
 
     public class TurnController {
+        private Input.GameKeyboard _keyboard = Input.GameKeyboard.Instance;
         private enum TurnState { PLAYER, NPC }
         private TestingTactics.Game1 _game;
         private PlayerController _playerControl;
@@ -99,6 +123,15 @@ namespace Controllers {
         public void Update(GameTime gameTime) {
             if(_controllerState == TurnState.PLAYER) {
                 _playerControl.Update(gameTime);
+                if(_playerControl.TurnEnded) {
+                    _controllerState = TurnState.NPC;
+                    _playerControl.TurnEnded = false;
+                }
+            }
+            else if(_controllerState == TurnState.NPC) {
+                _enemyControl.Update(gameTime);
+                if(_keyboard.IsKeyClicked(Keys.J))
+                    _controllerState = TurnState.PLAYER;
             }
         }// end Update()
 
@@ -123,6 +156,7 @@ namespace Controllers {
         private MasterAssetContainer _masterContainer;
         private List<IBaseAssetContainer> _allAssets;
         private HashSet<ICharacterAssetContainer> _allCharacters;
+        private TurnController _turnController;
 
 
         public bool IsDisposed { get; private set; }
@@ -131,7 +165,8 @@ namespace Controllers {
             _masterContainer = masterContainer;
             _allAssets = _masterContainer.AllAssetContainers;
             _allCharacters = _masterContainer.AllCharacters;
-
+            // Initialize new turn controller
+            _turnController = new TurnController(game, masterContainer);
             IsDisposed = false;
         }// end constructor
 
@@ -139,7 +174,7 @@ namespace Controllers {
             if(IsDisposed)
                 throw new ObjectDisposedException("Controller has already been disposed");
             // Dispose all assets
-            foreach (var asset in _masterContainer.AllAssetContainers) {
+            foreach (var asset in _allAssets) {
                 asset.Dispose();
             }
             IsDisposed = true;
@@ -148,8 +183,11 @@ namespace Controllers {
         public void Update(GameTime gameTime) {
             if(IsDisposed)
                 throw new ObjectDisposedException("Controller has already been disposed");
-            // Update all assets in the container
-
+            // Update TurnController
+            _turnController.Update(gameTime);
+            foreach(var asset in _allAssets) {
+                asset.Update(gameTime);
+            }
         }// end Update()
 
         public void Draw() {

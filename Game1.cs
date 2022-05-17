@@ -69,7 +69,7 @@ namespace TestingTactics
 
         private CharacterContainer<RockGuy> GenerateCharacterContainer(bool isStatic, bool isSentiant, CharacterAllegiance allegiance, CharacterType type) {
             var factory = new Factory.CharacterFactory();
-            var asset = factory.BuildRockGuy(this, Vector2.Zero);
+            var asset = factory.BuildRockGuyAsset(this, Vector2.Zero);
             CharacterClassifier classifier = new CharacterClassifier(allegiance, type, isStatic, isSentiant);
             return new CharacterContainer<RockGuy>(asset, classifier);
         }// end GenerateCharacterContainer()
@@ -92,8 +92,8 @@ namespace TestingTactics
             _screen = new Graphics.Screen(this, 3840, 2160);
             
             var factory = new Factory.CharacterFactory();
-            _rockGuy = factory.BuildRockGuy(this, new Vector2(500, 700));
-            _rockGuy2 = factory.BuildRockGuy(this, new Vector2(800, 900));
+            _rockGuy = factory.BuildRockGuyAsset(this, new Vector2(500, 700));
+            _rockGuy2 = factory.BuildRockGuyAsset(this, new Vector2(800, 900));
 
             // Pretty terrible tile initialization system
             // Going to have make a proper "Map Factory"

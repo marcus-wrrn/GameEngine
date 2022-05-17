@@ -43,15 +43,17 @@ namespace Containers {
                 base.Update(gameTime);
                 return;
             }
-            if(CharacterInfo.Allegiance == Classifier.CharacterAllegiance.ENEMY) {
-                var nearestPlayer = FindNearestPlayer();
-                double distanceToPlayer = FindDistance(nearestPlayer);
-                if(distanceToPlayer <= 10) {
-                    // TODO : Create a proper damage system
-                    // Will probably have to flesh out character stats properly to get it to work
-                    TakeDamage(1);
-                }
-            }
+            base.Update(gameTime);
+            // TODO: Make a proper faction system to account for differing allegiances
+            // if(CharacterInfo.Allegiance == Classifier.CharacterAllegiance.ENEMY) {
+            //     var nearestPlayer = FindNearestPlayer();
+            //     double distanceToPlayer = FindDistance(nearestPlayer);
+            //     if(distanceToPlayer <= 10) {
+            //         // TODO : Create a proper damage system
+            //         // Will probably have to flesh out character stats properly to get it to work
+            //         TakeDamage(1);
+            //     }
+            // }
         }// end Update()
 
     }// end RockGuyContainer class
