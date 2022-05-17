@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -8,6 +9,11 @@ using Containers;
 
 
 namespace Controllers {
+
+    public interface ICharacterControl {
+        void Update(GameTime gameTime);
+    }// end ICharacterControl interface
+
 
     // public class NPCTurnController : IController, IDisposable {
     //     private MasterAssetContainer _masterContainer;
@@ -23,7 +29,85 @@ namespace Controllers {
     // }// end NPCTurnController class
 
 
+
+    public class PlayerController {
+        private Input.GameKeyboard _keyboard = Input.GameKeyboard.Instance;
+        private TestingTactics.Game1 _game;
+        private ICharacterAssetContainer _currentPlayer;
+        private HashSet<ICharacterAssetContainer> _players;
+        private HashSet<ICharacterAssetContainer> _npcs;
+        private HashSet<ICharacterAssetContainer> _allCharacters;
+        public bool TurnEnded{ get; private set; }
+
+        public PlayerController(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer) {
+            _game = game;
+            _players = masterContainer.PlayerCharacters;
+            _npcs = masterContainer.NonPlayerCharacters;
+            _allCharacters = masterContainer.AllCharacters;
+        }// end PlayerController()
+
+        // If a point is found on a character return that character, else return null
+        private ICharacterAssetContainer HasClickedCharacter(Vector2 location) {
+            foreach(var character in _allCharacters) {
+                if(character.DestinationRectangle.Contains(location.X, location.Y))
+                    return character;
+            }
+            return null;
+        }// end HasClickedCharacter()
+
+        public void Update(GameTime gameTime) {
+            var mouse = Mouse.GetState();
+            
+        }// end Update()
+
+    }// end PlayerController class
+
+    public class EnemyController {
+        private TestingTactics.Game1 _game;
+        private HashSet<ICharacterAssetContainer> _players;
+        private HashSet<ICharacterAssetContainer> _npcs;
+        private HashSet<ICharacterAssetContainer> _allCharacters;
+        private HashSet<IBaseAssetContainer> _allAssets;
+
+
+        public EnemyController(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer) {
+            _game = game;
+            _players = masterContainer.PlayerCharacters;
+            _npcs = masterContainer.NonPlayerCharacters;
+            _allCharacters = masterContainer.AllCharacters;
+        }// end EnemyController constructor
+
+
+
+    }
+
+    public class TurnController {
+        private enum TurnState { PLAYER, NPC }
+        private TestingTactics.Game1 _game;
+        private PlayerController _playerControl;
+        private EnemyController _enemyControl;
+        private TurnState _controllerState;
+
+
+        public TurnController(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer) {
+            _game = game;
+            _playerControl = new PlayerController(_game, masterContainer);
+            _enemyControl = new EnemyController(_game, masterContainer);
+            _controllerState = TurnState.PLAYER;
+        }// end TurnController()
+        
+        public void Update(GameTime gameTime) {
+            if(_controllerState == TurnState.PLAYER) {
+                _playerControl.Update(gameTime);
+            }
+        }// end Update()
+
+
+    }// end TurnController class
+
+
     public class AssetController : IController, IDisposable {
+
 
         // Controller also needs to account for collision
         // Assets trying to move into objects need to have their locations changed to the outer bounds of said object
@@ -47,6 +131,7 @@ namespace Controllers {
             _masterContainer = masterContainer;
             _allAssets = _masterContainer.AllAssetContainers;
             _allCharacters = _masterContainer.AllCharacters;
+
             IsDisposed = false;
         }// end constructor
 

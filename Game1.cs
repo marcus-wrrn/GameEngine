@@ -14,7 +14,7 @@ namespace TestingTactics
     public class Game1 : Game
     {
         int temp = 0;
-        GameKeyboard keyboard = GameKeyboard.Instance;
+        public GameKeyboard GameKeyboard = GameKeyboard.Instance;
         private GraphicsDeviceManager _graphics;
         private Controllers.BackgroundController _backgroundController;
         // private MovingAsset<Graphics.Sprites.AnimatedSprite> _asset2;

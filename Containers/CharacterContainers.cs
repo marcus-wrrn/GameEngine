@@ -14,7 +14,7 @@ namespace Containers {
         private HashSet<ICharacterAssetContainer> _playerCharacters;
         private HashSet<ICharacterAssetContainer> _nonPlayerCharacters;
         private HashSet<ICharacterAssetContainer> _allCharacters;
-
+        
 
         public RockGuyContainer(RockGuy asset, Classifier.CharacterClassifier classifier, MasterAssetContainer masterContainer) : base(asset, classifier) { 
             _playerCharacters = masterContainer.PlayerCharacters;
@@ -47,12 +47,13 @@ namespace Containers {
                 var nearestPlayer = FindNearestPlayer();
                 double distanceToPlayer = FindDistance(nearestPlayer);
                 if(distanceToPlayer <= 10) {
+                    // TODO : Create a proper damage system
+                    // Will probably have to flesh out character stats properly to get it to work
                     TakeDamage(1);
                 }
             }
+        }// end Update()
 
-        }
-        
     }// end RockGuyContainer class
 
 }// end namespace
