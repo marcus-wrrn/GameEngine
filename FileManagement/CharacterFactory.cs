@@ -17,6 +17,8 @@ namespace Factory {
             Classifier.CharacterClassifier classifier = new Classifier.CharacterClassifier(allegiance, Classifier.CharacterType.ROCK_GUY);
             masterContainer.AddAsset(new Containers.RockGuyContainer(rockGuyAsset, classifier, masterContainer));
         }// end CreateRockGuyCharacter
+
+        
         public RockGuy BuildRockGuyAsset(TestingTactics.Game1 game, Vector2 location, uint health = 3, int initiative = 10, uint numberOfTurns = 2, int acceleration = 10, int maxSpeed = 1000) {
             // Assigns the Path
             string path = "./Characters/";

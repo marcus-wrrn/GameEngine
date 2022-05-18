@@ -34,7 +34,7 @@ namespace AssetControl {
         void Draw(SpriteBunch spriteBunch);
     }// end IAssetController interface
 
-    public class AssetController<T> : IAssetController where T: IAsset {
+    public class AssetTestController<T> : IAssetController where T: IAsset {
         protected T _asset;
         // Determines how fast the animation of the sprite runs for
         private int _animationSpeed;
@@ -43,7 +43,7 @@ namespace AssetControl {
         public Rectangle AssetSourceRectangle{ get { return _asset.SourceRectangle; } }
         public Rectangle AssetDestinationRectangle{ get { return _asset.DestinationRectangle; } }
 
-        public AssetController(T asset, int animationSpeed) {
+        public AssetTestController(T asset, int animationSpeed) {
             if(animationSpeed <= 0 || animationSpeed >= 50)
                 throw new ArgumentOutOfRangeException("animation speed cannot br less than or equal to zero or greater than 50");
             _animationSpeed = animationSpeed;
@@ -78,7 +78,7 @@ namespace AssetControl {
 
     }// end AssetController class
 
-    public class CharacterController<T> : AssetController<T> where T : ICharacterAsset {
+    public class CharacterController<T> : AssetTestController<T> where T : ICharacterAsset {
         
         CharacterController(T asset, int animationSpeed) : base(asset, animationSpeed) {}
 

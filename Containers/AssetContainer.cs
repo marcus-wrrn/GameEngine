@@ -48,8 +48,10 @@ namespace Containers {
         public Rectangle DestinationRectangle { get { return _asset.DestinationRectangle; } }
         public Vector2 Location { get { return _asset.Location; } }
         public bool IsDisposed { get; private set; }
+        private readonly int ANIMATION_TIME;
+        private int _animationCounter = 0;
 
-        public AssetContainer(T asset, Classifier.AssetClassifier info) {
+        public AssetContainer(T asset, Classifier.AssetClassifier info, int animationSpeed = 7) {
             // Test to see if the object inherits from MovingAsset
             IMovingAsset test = asset as IMovingAsset;
             if(test == null && !info.IsStatic)
@@ -57,6 +59,7 @@ namespace Containers {
             AssetInfo = info;
             _asset = asset;
             IsDisposed = false;
+            ANIMATION_TIME = 7;
         }// end AssetContainer constructor
         
         // Makes a base static object
@@ -70,7 +73,12 @@ namespace Containers {
         }// end Dispose()
 
         public virtual void Update(GameTime gameTime) {
-            _asset.Update();
+            if(_animationCounter >= ANIMATION_TIME) {
+                _asset.Update();
+                _animationCounter = 0;
+            } 
+            else
+                _animationCounter++;
         }// end Update()
 
         public virtual void Draw(SpriteBunch spriteBunch) {
@@ -94,6 +102,7 @@ namespace Containers {
         }// end ChangeAssetSpeed()
 
         public void MoveAssetToLocation(Vector2 location) {
+            
             // If the object is currently static than a request to move should never have been called
             if(AssetInfo.IsStatic)
                 throw new MethodAccessException("Asset is currently static");
@@ -119,13 +128,12 @@ namespace Containers {
             }
             if(IsMoving) {
                 _asset.MoveToLocation(_locationToMove, gameTime);
-                base.Update(gameTime);
             }
-
             // If Asset has reached its destination stop moving
             // Remember that once an asset is in a specific range of a point it will automatically set its location to that point
             if(IsMoving && _locationToMove == Location)
                 IsMoving = false;
+            base.Update(gameTime);
         }// end Update()
 
     }// end MovingAssetContainer class

@@ -14,7 +14,8 @@ namespace Containers {
         private HashSet<ICharacterAssetContainer> _playerCharacters;
         private HashSet<ICharacterAssetContainer> _nonPlayerCharacters;
         private HashSet<ICharacterAssetContainer> _allCharacters;
-        
+        private const int AnimationTime = 7;
+        private int _animationCounter = 0;
 
         public RockGuyContainer(RockGuy asset, Classifier.CharacterClassifier classifier, MasterAssetContainer masterContainer) : base(asset, classifier) { 
             _playerCharacters = masterContainer.PlayerCharacters;
@@ -38,12 +39,23 @@ namespace Containers {
             return nearestPlayer;
         }// end FindNearestPlayer()
 
+        private void UpdateAnimation() {
+            if(_animationCounter >= AnimationTime) {
+                _asset.Update();
+                _animationCounter = 0;
+            } 
+            else
+                _animationCounter++;
+        }
+
         public override void Update(GameTime gameTime) {
-            if(CharacterInfo.IsStatic || CharacterInfo.Allegiance == Classifier.CharacterAllegiance.PLAYER) {
-                base.Update(gameTime);
-                return;
-            }
+            // if(CharacterInfo.IsStatic || CharacterInfo.Allegiance == Classifier.CharacterAllegiance.PLAYER) {
+            //     base.Update(gameTime);
+            //     UpdateAnimation();
+            //     return;
+            // }
             base.Update(gameTime);
+            //UpdateAnimation();
             // TODO: Make a proper faction system to account for differing allegiances
             // if(CharacterInfo.Allegiance == Classifier.CharacterAllegiance.ENEMY) {
             //     var nearestPlayer = FindNearestPlayer();

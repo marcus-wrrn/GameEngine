@@ -33,14 +33,17 @@ namespace Controllers {
     public class PlayerController {
         private Input.GameKeyboard _keyboard = Input.GameKeyboard.Instance;
         private TestingTactics.Game1 _game;
+        private Input.GameMouse _mouse;
         private ICharacterAssetContainer _currentPlayer;
         private HashSet<ICharacterAssetContainer> _players;
         private HashSet<ICharacterAssetContainer> _npcs;
         private HashSet<ICharacterAssetContainer> _allCharacters;
         public bool TurnEnded{ get; set; }
+        
 
         public PlayerController(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer) {
             _game = game;
+            _mouse = _game.MouseForGame;
             _players = masterContainer.PlayerCharacters;
             _npcs = masterContainer.NonPlayerCharacters;
             _allCharacters = masterContainer.AllCharacters;
@@ -49,23 +52,26 @@ namespace Controllers {
         // If a point is found on a character return that character, else return null
         private ICharacterAssetContainer HasClickedCharacter(Vector2 location) {
             foreach(var character in _allCharacters) {
-                if(character.DestinationRectangle.Contains(location.X, location.Y))
+                if(character.DestinationRectangle.Contains(location.X, location.Y)) {
                     return character;
+                }
             }
             return null;
         }// end HasClickedCharacter()
 
 
         public void Update(GameTime gameTime) {
-            var mouse = Mouse.GetState();
-            Vector2 mouseLocation = new Vector2(mouse.X, mouse.Y);
-            if(mouse.LeftButton == ButtonState.Pressed) {
+            // Update Mouse
+            _mouse.Update();
+            Vector2 mouseLocation = new Vector2(_mouse.X, _mouse.Y);
+            //Console.WriteLine(mouseLocation);
+            if(_mouse.LeftButtonPressed()) {
                 var tempCharacter = HasClickedCharacter(mouseLocation);
                 if(tempCharacter != null && tempCharacter.CharacterInfo.Allegiance == Classifier.CharacterAllegiance.PLAYER)
                     _currentPlayer = tempCharacter;
             }
             if(_currentPlayer != null) {
-                if(mouse.LeftButton == ButtonState.Pressed)
+                if(_mouse.LeftButtonPressed())
                     _currentPlayer.MoveAssetToLocation(mouseLocation);
             }
             if(_keyboard.IsKeyClicked(Keys.E))
@@ -185,7 +191,7 @@ namespace Controllers {
                 throw new ObjectDisposedException("Controller has already been disposed");
             // Update TurnController
             _turnController.Update(gameTime);
-            foreach(var asset in _allAssets) {
+            foreach(var asset in _allCharacters) {
                 asset.Update(gameTime);
             }
         }// end Update()
