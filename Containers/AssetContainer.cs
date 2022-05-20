@@ -9,6 +9,8 @@ namespace Containers {
     // To be moved into a container namespace later
     public interface IBaseAssetContainer : IDisposable {
         bool IsDisposed { get; }
+        // Dispose falgs the object for disposal
+        bool ToBeDisposed { get; }
         Classifier.AssetClassifier AssetInfo { get; }
         Rectangle DestinationRectangle { get; }
         Vector2 Location { get; }
@@ -31,25 +33,23 @@ namespace Containers {
 
     public interface ICharacterAssetContainer : IMovingAssetContainer {
         Classifier.CharacterClassifier CharacterInfo { get; }
-        uint CharacterHealth { get; }
-        uint CharacterMaxHealth { get; }
-        bool IsCharacterAlive { get; }
-        int CharacterInitiative { get; }
-        uint CharacterNumberOfTurns { get; }
-
+        IStats CharacterStats { get; }
         void TakeDamage(int value);
         
     }// end ICharacterAssetContainer()
 
     public class AssetContainer<T> : IBaseAssetContainer where T : IAsset {
         protected T _asset;
+        public bool ToBeDisposed { get; protected set; }
         public virtual Classifier.AssetClassifier AssetInfo { get; private set; }
         // Will later contain a Controller Object and a pointer to the MasterAssetContainer
         public Rectangle DestinationRectangle { get { return _asset.DestinationRectangle; } }
         public Vector2 Location { get { return _asset.Location; } }
         public bool IsDisposed { get; private set; }
+        private readonly int ANIMATION_TIME;
+        private int _animationCounter = 0;
 
-        public AssetContainer(T asset, Classifier.AssetClassifier info) {
+        public AssetContainer(T asset, Classifier.AssetClassifier info, int animationSpeed = 7) {
             // Test to see if the object inherits from MovingAsset
             IMovingAsset test = asset as IMovingAsset;
             if(test == null && !info.IsStatic)
@@ -57,6 +57,8 @@ namespace Containers {
             AssetInfo = info;
             _asset = asset;
             IsDisposed = false;
+            ToBeDisposed = false;
+            ANIMATION_TIME = 7;
         }// end AssetContainer constructor
         
         // Makes a base static object
@@ -70,7 +72,12 @@ namespace Containers {
         }// end Dispose()
 
         public virtual void Update(GameTime gameTime) {
-            _asset.Update();
+            if(_animationCounter >= ANIMATION_TIME) {
+                _asset.Update();
+                _animationCounter = 0;
+            } 
+            else
+                _animationCounter++;
         }// end Update()
 
         public virtual void Draw(SpriteBunch spriteBunch) {
@@ -119,13 +126,12 @@ namespace Containers {
             }
             if(IsMoving) {
                 _asset.MoveToLocation(_locationToMove, gameTime);
-                base.Update(gameTime);
             }
-
             // If Asset has reached its destination stop moving
             // Remember that once an asset is in a specific range of a point it will automatically set its location to that point
             if(IsMoving && _locationToMove == Location)
                 IsMoving = false;
+            base.Update(gameTime);
         }// end Update()
 
     }// end MovingAssetContainer class
@@ -134,19 +140,23 @@ namespace Containers {
         // A bit redundant but allows for characters to be classified alongside non character assets
         public override Classifier.AssetClassifier AssetInfo { get { return CharacterInfo; } }
         public Classifier.CharacterClassifier CharacterInfo { get; private set; }
-        public uint CharacterHealth { get { return _asset.Health; } }
-        public uint CharacterMaxHealth { get { return _asset.MaxHealth; } }
-        public int CharacterInitiative { get { return _asset.Initiative; } }
-        public uint CharacterNumberOfTurns { get { return _asset.NumberOfTurns; } }
         public bool IsCharacterAlive { get { return _asset.IsAlive; } }
+        public IStats CharacterStats { get; set; }
 
-        public virtual void TakeDamage(int value) {
-            _asset.HitForDamage(value);
-        }// end TakeDamage()
 
-        public CharacterContainer(T asset, Classifier.CharacterClassifier characterClassifier) : base(asset, characterClassifier) {
+        public CharacterContainer(T asset, Classifier.CharacterClassifier characterClassifier, IStats stats) : base(asset, characterClassifier) {
+            CharacterStats = stats;
             CharacterInfo = characterClassifier;
-        }// end CharacterContainer constructor
+        }// end CharacterContainer 
+        
+        public virtual void TakeDamage(int value) {
+            if(value > CharacterStats.Health)
+                CharacterStats.Health = 0;
+            else if (value < 0)
+                return;
+            else
+                CharacterStats.Health -= (uint)value;
+        }// end TakeDamage()
 
     }// end CharacterClassifier
 
@@ -190,11 +200,7 @@ namespace Containers {
             // Add each container to their respective hashset
             foreach(var container in assetContainers) {
                 // If container does not exist inside the main list add it and sort the value into its respective hashsets
-                if(!AllAssetContainers.Contains(container)) {
-                    AllAssetContainers.Add(container);
-                    // Sorts container into all applicable hashsets
-                    SortIntoContainers(container);
-                }
+                SortIntoContainers(container);
             }
         }// end SortContainerList
 
@@ -208,6 +214,9 @@ namespace Containers {
 
         // Sorts containers into their respective hashsets
         private void SortIntoContainers(IBaseAssetContainer container) {
+            if(AllAssetContainers.Contains(container))
+                return;
+            AllAssetContainers.Add(container);
             // Checks to see which container interface container inherits from
             ICharacterAssetContainer characterContainer = container as ICharacterAssetContainer; 
             if(characterContainer != null) {
@@ -346,27 +355,34 @@ namespace Containers {
                 throw new Exception("Duplicate asset found in list");
         }// end AddAllCharacterObject()
 
+        public void RemoveDisposedObjects() {
+            foreach(var obj in AllAssetContainers) {
+                if(obj.IsDisposed)
+                    DeleteObject(obj);
+            }
+        }
+
         // For Deletion
-        public void DeleteObject(IBaseAssetContainer container) {
+        public void DeleteObject(IBaseAssetContainer obj) {
             // If the container does not exist in the list exit
-            if(!AllAssetContainers.Contains(container))
+            if(!AllAssetContainers.Contains(obj))
                 return;
             // Remove container from main list
-            AllAssetContainers.Remove(container);
+            AllAssetContainers.Remove(obj);
             // Check if the container is a character
-            var characterContainer = container as ICharacterAssetContainer;
+            var characterContainer = obj as ICharacterAssetContainer;
             if(characterContainer != null) {
                 DeleteCharacter(characterContainer);
                 return;
             }
             // Check if Container is a moving object
-            var movingContainer = container as IMovingAssetContainer;
+            var movingContainer = obj as IMovingAssetContainer;
             if(movingContainer != null) {
                 DeleteMoving(movingContainer);
                 return;
             }
             // Container must be of a static object
-            DeleteStatic(container);
+            DeleteStatic(obj);
         }// end DeleteObject()
 
         private void DeleteCharacter(ICharacterAssetContainer container) {

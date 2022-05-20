@@ -15,6 +15,8 @@ namespace Input {
         public GameMouse(TestingTactics.Game1 game) {
             _currMouseState = Mouse.GetState();
             _screen  = game.Screen;
+            if(_screen == null)
+                throw new Exception("WTF");
         }// end constructor
 
         public void Update() {

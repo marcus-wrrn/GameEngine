@@ -33,14 +33,17 @@ namespace Controllers {
     public class PlayerController {
         private Input.GameKeyboard _keyboard = Input.GameKeyboard.Instance;
         private TestingTactics.Game1 _game;
+        private Input.GameMouse _mouse;
         private ICharacterAssetContainer _currentPlayer;
         private HashSet<ICharacterAssetContainer> _players;
         private HashSet<ICharacterAssetContainer> _npcs;
         private HashSet<ICharacterAssetContainer> _allCharacters;
         public bool TurnEnded{ get; set; }
+        
 
         public PlayerController(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer) {
             _game = game;
+            _mouse = _game.MouseForGame;
             _players = masterContainer.PlayerCharacters;
             _npcs = masterContainer.NonPlayerCharacters;
             _allCharacters = masterContainer.AllCharacters;
@@ -49,25 +52,30 @@ namespace Controllers {
         // If a point is found on a character return that character, else return null
         private ICharacterAssetContainer HasClickedCharacter(Vector2 location) {
             foreach(var character in _allCharacters) {
-                if(character.DestinationRectangle.Contains(location.X, location.Y))
+                if(character.DestinationRectangle.Contains(location.X, location.Y)) {
                     return character;
+                }
             }
             return null;
         }// end HasClickedCharacter()
 
 
         public void Update(GameTime gameTime) {
-            var mouse = Mouse.GetState();
-            Vector2 mouseLocation = new Vector2(mouse.X, mouse.Y);
-            if(mouse.LeftButton == ButtonState.Pressed) {
+            // Update Mouse
+            _mouse.Update();
+            Vector2 mouseLocation = new Vector2(_mouse.X, _mouse.Y);
+            //Console.WriteLine(mouseLocation);
+            if(_mouse.LeftButtonPressed()) {
                 var tempCharacter = HasClickedCharacter(mouseLocation);
                 if(tempCharacter != null && tempCharacter.CharacterInfo.Allegiance == Classifier.CharacterAllegiance.PLAYER)
                     _currentPlayer = tempCharacter;
             }
             if(_currentPlayer != null) {
-                if(mouse.LeftButton == ButtonState.Pressed)
+                if(_mouse.LeftButtonPressed())
                     _currentPlayer.MoveAssetToLocation(mouseLocation);
             }
+            if(_keyboard.IsKeyClicked(Keys.K) && _currentPlayer != null) 
+                _currentPlayer.TakeDamage(100);
             if(_keyboard.IsKeyClicked(Keys.E))
                 TurnEnded = true;
         }// end Update()
@@ -91,7 +99,7 @@ namespace Controllers {
         public void Update(GameTime gameTime) {
             Vector2 location1 = new Vector2(300f, 300f);
             Vector2 location2 = new Vector2(800f, 800f);
-            foreach(var character in _npcs) {
+            foreach(var character in _allCharacters) {
                 if(character.CharacterInfo.Allegiance == Classifier.CharacterAllegiance.ENEMY) {
                     if(character.Location == location1 && !character.IsMoving)
                         character.MoveAssetToLocation(location2);
@@ -99,10 +107,8 @@ namespace Controllers {
                         character.MoveAssetToLocation(location1);
                 }
             }
-
         }
-
-    }
+    }// end Update()
 
     public class TurnController {
         private Input.GameKeyboard _keyboard = Input.GameKeyboard.Instance;
@@ -129,6 +135,7 @@ namespace Controllers {
                 }
             }
             else if(_controllerState == TurnState.NPC) {
+                Console.WriteLine("Enemy is here");
                 _enemyControl.Update(gameTime);
                 if(_keyboard.IsKeyClicked(Keys.J))
                     _controllerState = TurnState.PLAYER;
@@ -140,8 +147,6 @@ namespace Controllers {
 
 
     public class AssetController : IController, IDisposable {
-
-
         // Controller also needs to account for collision
         // Assets trying to move into objects need to have their locations changed to the outer bounds of said object
         // need to work out a physics system
@@ -185,8 +190,19 @@ namespace Controllers {
                 throw new ObjectDisposedException("Controller has already been disposed");
             // Update TurnController
             _turnController.Update(gameTime);
-            foreach(var asset in _allAssets) {
+            List<IBaseAssetContainer> disposalList = new List<IBaseAssetContainer>();
+            foreach(var asset in _masterContainer.AllCharacters) {
                 asset.Update(gameTime);
+                if(asset.ToBeDisposed) {
+                    disposalList.Add(asset);
+                }
+            }
+            if(disposalList.Count > 0) {
+                foreach(var obj in disposalList) {
+                    if(obj.ToBeDisposed) {
+                        _masterContainer.DeleteObject(obj);
+                    }
+                }
             }
         }// end Update()
 

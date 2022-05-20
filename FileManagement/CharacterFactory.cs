@@ -12,11 +12,18 @@ namespace Factory {
 
     public class CharacterFactory {
 
-        public void CreateRockGuyCharacter(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer, Vector2 location, Classifier.CharacterAllegiance allegiance) {
+        public void CreateRockGuyCharacter(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer, Vector2 location, Classifier.CharacterAllegiance allegiance, Containers.BaseCharacterStats statusEffects) {
             var rockGuyAsset = BuildRockGuyAsset(game, location);
             Classifier.CharacterClassifier classifier = new Classifier.CharacterClassifier(allegiance, Classifier.CharacterType.ROCK_GUY);
-            masterContainer.AddAsset(new Containers.RockGuyContainer(rockGuyAsset, classifier, masterContainer));
+            masterContainer.AddAsset(new Containers.RockGuyCharacter(rockGuyAsset, classifier, masterContainer, statusEffects));
         }// end CreateRockGuyCharacter
+
+        public void CreateRockGuyCharacter(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer, Vector2 location, Classifier.CharacterAllegiance allegiance) {
+            var status = new Containers.BaseCharacterStats(10, 4, 0.65f, 0.25f, 0.05f);
+            this.CreateRockGuyCharacter(game, masterContainer, location, allegiance, status);
+        }
+
+        
         public RockGuy BuildRockGuyAsset(TestingTactics.Game1 game, Vector2 location, uint health = 3, int initiative = 10, uint numberOfTurns = 2, int acceleration = 10, int maxSpeed = 1000) {
             // Assigns the Path
             string path = "./Characters/";
@@ -24,7 +31,7 @@ namespace Factory {
             // Build Asset
             HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> asset = 
                                     new HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>>(mainSprite, location, maxSpeed, acceleration);
-            return new RockGuy(asset, health, initiative, numberOfTurns);
+            return new RockGuy(asset);
         }
 
         private PlayerSprite<RockGuyAnimations> BuildRockGuySprite(TestingTactics.Game1 game, string path) {

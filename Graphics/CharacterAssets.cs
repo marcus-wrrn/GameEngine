@@ -7,14 +7,12 @@ using System;
 namespace Graphics.Assets {
     
     public interface ICharacterAsset : IMovingAsset, IDisposable  {
-        uint Health{ get; }
-        uint MaxHealth{ get; }
-        bool IsAlive { get; }
-        int Initiative{ get; }
-        uint NumberOfTurns{ get; }
-        //void MoveToLocation(Vector2 location, GameTime gameTime);
-        void HitForDamage(int val);
-        void Kill();
+        bool IsAlive{ get; }
+        void PlayAttackAnimation();
+        void HurtAsset();
+        void KillAsset();
+        void BringBackAlive();
+        bool HasDeathAnimationEnded();
     }// end IRockGuy interface
 
 
@@ -23,10 +21,6 @@ namespace Graphics.Assets {
         public Texture2D Texture{ get { return GetTexture(); } }
         public Rectangle SourceRectangle{ get { return _asset.SourceRectangle; } }
         public Rectangle DestinationRectangle { get { return _asset.DestinationRectangle; } }
-        public uint Health{ get; protected set; }
-        public uint MaxHealth { get; protected set; }
-        public uint NumberOfTurns{ get; protected set; }
-        public int Initiative{ get; protected set; }
         public float Speed { get { return _asset.Speed; } }
         public Vector2 Location{ get { return _asset.Location; } }
         public Vector2 DrawingLocation{ get { return _asset.DrawingLocation; } }
@@ -34,18 +28,12 @@ namespace Graphics.Assets {
         public bool IsDisposed{ get; private set; }
         protected T _asset;
 
-        public BaseCharacter(T asset, uint health, int initiative, uint numberOfTurns) {
+        public BaseCharacter(T asset) {
             // Error checking
             if(asset == null)
                 throw new NullReferenceException("Null RockGuy asset");
-            if(initiative <= 0)
-                throw new ArgumentOutOfRangeException("Initiative cannot be less than zero");
             // Assigning values
             _asset = asset;
-            MaxHealth = health;
-            Health = MaxHealth;
-            Initiative = initiative;
-            NumberOfTurns = numberOfTurns;
             IsAlive = true;
         }// end constructor
 
@@ -79,6 +67,12 @@ namespace Graphics.Assets {
             _asset.ChangeSpeed(speed);
         }// end ChangeSpeed()
 
+        public virtual bool HasDeathAnimationEnded() {
+            if(!IsAlive)
+                return true;
+            return false;
+        }
+
         public virtual void Stop() {
             if(IsAlive)
                 _asset.Stop();
@@ -107,32 +101,40 @@ namespace Graphics.Assets {
                 throw new ObjectDisposedException("Rock Guy is disposed");
             // If health has reached zero and is still alive Kill the asset
             // This check shouldn't be neccessary but just in case
-            if (Health <= 0 && IsAlive)
-                Kill();
+            // if (Health <= 0 && IsAlive)
+            //     KillAsset();
+            _asset.Update();
         }// end Update()
 
-        public virtual void HitForDamage(int damage) {
-            if(damage < 0)
-                return;
-            // Make sure to not make Health < 0 to avoid overflow
-            if(damage > Health)
-                Health = 0;
-            else
-                Health -= (uint)damage;
-        }// end HitForDamage()
+        // public virtual void HitForDamage(int damage) {
+        //     if(damage < 0)
+        //         return;
+        //     // Make sure to not make Health < 0 to avoid overflow
+        //     if(damage > Health)
+        //         Health = 0;
+        //     else
+        //         Health -= (uint)damage;
+        // }// end HitForDamage()
 
-        public virtual void Kill() {
+        public virtual void PlayAttackAnimation() {
+            // TODO: Add attack animation code
+        }// end PlayAttackAnimation()
+
+        public virtual void HurtAsset() {
+            // TODO: Add a hurt animation
+        }// end HurtAsset()
+
+
+        // Plays the death animation and makes it impossible to play any animation following it
+        public virtual void KillAsset() {
             if(IsDisposed)
                 throw new ObjectDisposedException("Rock Guy is disposed");
-            // set health to zero
-            Health = 0;
             IsAlive = false;
         }// end Kill()
 
-        public virtual void BringBackFromDead() {
+        public virtual void BringBackAlive() {
             if(IsDisposed)
                 throw new ObjectDisposedException("Rock Guy is disposed");
-            Health = MaxHealth;
             IsAlive = true;
         }// end BringBackFromDead()
 
@@ -143,8 +145,7 @@ namespace Graphics.Assets {
     public class RockGuy : BaseCharacter<HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>>> {
 
 
-        public RockGuy(HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> asset, uint health, int initiative, uint numberOfTurns) :
-                base(asset, health, initiative, numberOfTurns) { }
+        public RockGuy(HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> asset) : base(asset) { }
         // end constructor
 
         public override void Update() {
@@ -152,29 +153,37 @@ namespace Graphics.Assets {
                 throw new ObjectDisposedException("Rock Guy is disposed");
             // If health has reached zero and is still alive Kill the asset
             // This check shouldn't be neccessary but just in case
-            if (Health <= 0 && IsAlive)
-                Kill();
+            // if (Health <= 0 && IsAlive)
+            //     KillAsset();
             _asset.AssetSprite.Update();
         }// end Update()
 
-        public override void Kill() {
+        public override void KillAsset() {
             // Sets the base state to dead
-            base.Kill();
+            base.KillAsset();
             // Update the asset to play a death animation
             _asset.AssetSprite.PlayFinalAnimation(RockGuyAnimations.DEATH);
         }// end Kill()
 
-        public void HealDamage(int healingAmount) {
-            if(healingAmount <= 0)
-                return;
-            if(healingAmount + Health >= MaxHealth)
-                Health = MaxHealth;
-            else
-                Health += (uint)healingAmount;
-        }// end HealDamage()
+        public override bool HasDeathAnimationEnded() {
+            if(IsAlive)
+                return false;
+            else if(_asset.AssetSprite.HasEnded)
+                return true;
+            return false;
+        }// end HasDeathAnimationEnded()
 
-        public override void BringBackFromDead() {
-            base.BringBackFromDead();
+        // public void HealDamage(int healingAmount) {
+        //     if(healingAmount <= 0)
+        //         return;
+        //     if(healingAmount + Health >= MaxHealth)
+        //         Health = MaxHealth;
+        //     else
+        //         Health += (uint)healingAmount;
+        // }// end HealDamage()
+
+        public override void BringBackAlive() {
+            base.BringBackAlive();
             _asset.AssetSprite.ResetSprite();
         }// end BringBackFromDead()
 
@@ -185,9 +194,6 @@ namespace Graphics.Assets {
                 binWriter.Write((string)"RockGuy");
                 // Writes Information
                 binWriter.Write(IsAlive);
-                binWriter.Write(Health);
-                binWriter.Write(Initiative);
-                binWriter.Write(NumberOfTurns);
                 // Writes Location
                 binWriter.Write(Location.X);
                 binWriter.Write(Location.Y);
@@ -201,28 +207,27 @@ namespace Graphics.Assets {
     public enum PlayerAnimations { DEATH, ATTACK }
 
     public class Player : BaseCharacter<HorizontalMovingAsset<PlayerSprite<PlayerAnimations>>> {
-        public Player(HorizontalMovingAsset<PlayerSprite<PlayerAnimations>> asset, uint health, int initiative, uint numberOfTurns) :
-                base(asset, health, initiative, numberOfTurns) {}
+        public Player(HorizontalMovingAsset<PlayerSprite<PlayerAnimations>> asset, uint health, int initiative, uint numberOfTurns) : base(asset) {}
         
         public override void Update() {
             if(IsDisposed)
                 throw new ObjectDisposedException("Player is disposed");
             // If health has reached zero and is still alive Kill the asset
             // This check shouldn't be neccessary but just in case
-            if (Health <= 0 && IsAlive)
-                Kill();
+            // if (Health <= 0 && IsAlive)
+            //     KillAsset();
             _asset.AssetSprite.Update();
         }// end Update()
 
-        public override void Kill() {
+        public override void KillAsset() {
             // Sets the base state to dead
-            base.Kill();
+            base.KillAsset();
             // Update the asset to play a death animation
             _asset.AssetSprite.PlayFinalAnimation(PlayerAnimations.DEATH);
         }// end Kill()
 
-        public override void BringBackFromDead() {
-            base.BringBackFromDead();
+        public override void BringBackAlive() {
+            base.BringBackAlive();
             _asset.AssetSprite.ResetSprite();
         }// end BringBackFromDead()
 
