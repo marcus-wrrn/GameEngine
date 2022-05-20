@@ -52,6 +52,7 @@ namespace TestingTactics
             factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(300f, 300f), Classifier.CharacterAllegiance.ENEMY);
             factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(900f, 600f), Classifier.CharacterAllegiance.ENEMY);
             factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(200f, 800f), Classifier.CharacterAllegiance.PLAYER);
+            factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(600f, 800f), Classifier.CharacterAllegiance.PLAYER);
             //var masterTest = new Testing.MasterContainerTest(this);
             base.Initialize();
             
@@ -150,7 +151,8 @@ namespace TestingTactics
             // _sprites.Draw(_asset2, Color.AliceBlue);
             //_sprites.Draw(_asset1, Color.AliceBlue);
             foreach(var asset in _masterAssetContainer.AllCharacters) {
-                asset.Draw(_sprites);
+                if(!asset.IsDisposed)
+                    asset.Draw(_sprites);
             }
             _sprites.End();
             

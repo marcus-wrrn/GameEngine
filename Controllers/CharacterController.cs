@@ -190,8 +190,19 @@ namespace Controllers {
                 throw new ObjectDisposedException("Controller has already been disposed");
             // Update TurnController
             _turnController.Update(gameTime);
-            foreach(var asset in _allCharacters) {
+            List<IBaseAssetContainer> disposalList = new List<IBaseAssetContainer>();
+            foreach(var asset in _masterContainer.AllCharacters) {
                 asset.Update(gameTime);
+                if(asset.ToBeDisposed) {
+                    disposalList.Add(asset);
+                }
+            }
+            if(disposalList.Count > 0) {
+                foreach(var obj in disposalList) {
+                    if(obj.ToBeDisposed) {
+                        _masterContainer.DeleteObject(obj);
+                    }
+                }
             }
         }// end Update()
 

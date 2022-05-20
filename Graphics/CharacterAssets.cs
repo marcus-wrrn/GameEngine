@@ -12,6 +12,7 @@ namespace Graphics.Assets {
         void HurtAsset();
         void KillAsset();
         void BringBackAlive();
+        bool HasDeathAnimationEnded();
     }// end IRockGuy interface
 
 
@@ -65,6 +66,12 @@ namespace Graphics.Assets {
         public void ChangeSpeed(float speed) {
             _asset.ChangeSpeed(speed);
         }// end ChangeSpeed()
+
+        public virtual bool HasDeathAnimationEnded() {
+            if(!IsAlive)
+                return true;
+            return false;
+        }
 
         public virtual void Stop() {
             if(IsAlive)
@@ -157,6 +164,14 @@ namespace Graphics.Assets {
             // Update the asset to play a death animation
             _asset.AssetSprite.PlayFinalAnimation(RockGuyAnimations.DEATH);
         }// end Kill()
+
+        public override bool HasDeathAnimationEnded() {
+            if(IsAlive)
+                return false;
+            else if(_asset.AssetSprite.HasEnded)
+                return true;
+            return false;
+        }// end HasDeathAnimationEnded()
 
         // public void HealDamage(int healingAmount) {
         //     if(healingAmount <= 0)
