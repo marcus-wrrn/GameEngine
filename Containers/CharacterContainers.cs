@@ -8,20 +8,47 @@ using Graphics.Assets;
 namespace Containers {
 
     public interface ICharacter {
-        int Health { get; }
+        // int Health { get; }
+        // int Speed { get; }
+        // float HitChance { get; }
+        // float Evasion { get; }
+        // float CriticalChance { get; }
+        IStats CharacterStats { get; }
+        bool IsAlive { get; }
+        
+    }// end ICharacter
+
+    public interface IStats {
+        uint Health { get; }
         int Speed { get; }
         float HitChance { get; }
         float Evasion { get; }
         float CriticalChance { get; }
-        bool IsAlive { get; }
-        
-    }// end ICharacter
+    }// end IStats
+
+    public class BaseCharacterStats : IStats {
+        public uint Health { get; set; }
+        public int Speed { get; set; }
+        public float HitChance { get; set; }
+        public float Evasion { get; set; }
+        public float CriticalChance { get; set; }
+
+        public BaseCharacterStats(uint health, int speed, float hitChance, float evasion, float criticalChance) {
+            Health = health;
+            Speed = speed;
+            HitChance = hitChance;
+            Evasion = evasion;
+            CriticalChance = criticalChance;
+        }// end constructor
+
+    }// end BaseCharacterStats class
 
     public class RockGuyCharacter : CharacterContainer<RockGuy>, ICharacter {
         // These lists are important to determine where everything is
         private HashSet<ICharacterAssetContainer> _playerCharacters;
         private HashSet<ICharacterAssetContainer> _nonPlayerCharacters;
         private HashSet<ICharacterAssetContainer> _allCharacters;
+
         // TODO: Make All Stats responsible in the ICharacter interfaces
         // I need to remove dependency from the asset
         public int Health { get; }
@@ -30,11 +57,13 @@ namespace Containers {
         public float CriticalChance { get; }
         public float Evasion { get; }
         public bool IsAlive { get { return _asset.IsAlive; } }
+        public IStats CharacterStats { get; private set; }
 
-        public RockGuyCharacter(RockGuy asset, Classifier.CharacterClassifier classifier, MasterAssetContainer masterContainer) : base(asset, classifier) { 
+        public RockGuyCharacter(RockGuy asset, Classifier.CharacterClassifier classifier, MasterAssetContainer masterContainer, BaseCharacterStats stats) : base(asset, classifier) { 
             _playerCharacters = masterContainer.PlayerCharacters;
             _nonPlayerCharacters = masterContainer.NonPlayerCharacters;
             _allCharacters = masterContainer.AllCharacters;
+
         }// end constructor
 
         private double FindDistance(IBaseAssetContainer container) {
