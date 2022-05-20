@@ -102,7 +102,6 @@ namespace Containers {
         }// end ChangeAssetSpeed()
 
         public void MoveAssetToLocation(Vector2 location) {
-            
             // If the object is currently static than a request to move should never have been called
             if(AssetInfo.IsStatic)
                 throw new MethodAccessException("Asset is currently static");
@@ -142,14 +141,14 @@ namespace Containers {
         // A bit redundant but allows for characters to be classified alongside non character assets
         public override Classifier.AssetClassifier AssetInfo { get { return CharacterInfo; } }
         public Classifier.CharacterClassifier CharacterInfo { get; private set; }
-        public uint CharacterHealth { get { return _asset.Health; } }
-        public uint CharacterMaxHealth { get { return _asset.MaxHealth; } }
-        public int CharacterInitiative { get { return _asset.Initiative; } }
-        public uint CharacterNumberOfTurns { get { return _asset.NumberOfTurns; } }
+        public uint CharacterHealth { get; }
+        public uint CharacterMaxHealth { get; }
+        public int CharacterInitiative { get; }
+        public uint CharacterNumberOfTurns { get; }
         public bool IsCharacterAlive { get { return _asset.IsAlive; } }
 
         public virtual void TakeDamage(int value) {
-            _asset.HitForDamage(value);
+            //_asset.HitForDamage(value);
         }// end TakeDamage()
 
         public CharacterContainer(T asset, Classifier.CharacterClassifier characterClassifier) : base(asset, characterClassifier) {

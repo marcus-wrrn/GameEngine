@@ -15,7 +15,7 @@ namespace Factory {
         public void CreateRockGuyCharacter(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer, Vector2 location, Classifier.CharacterAllegiance allegiance) {
             var rockGuyAsset = BuildRockGuyAsset(game, location);
             Classifier.CharacterClassifier classifier = new Classifier.CharacterClassifier(allegiance, Classifier.CharacterType.ROCK_GUY);
-            masterContainer.AddAsset(new Containers.RockGuyContainer(rockGuyAsset, classifier, masterContainer));
+            masterContainer.AddAsset(new Containers.RockGuyCharacter(rockGuyAsset, classifier, masterContainer));
         }// end CreateRockGuyCharacter
 
         
@@ -26,7 +26,7 @@ namespace Factory {
             // Build Asset
             HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> asset = 
                                     new HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>>(mainSprite, location, maxSpeed, acceleration);
-            return new RockGuy(asset, health, initiative, numberOfTurns);
+            return new RockGuy(asset);
         }
 
         private PlayerSprite<RockGuyAnimations> BuildRockGuySprite(TestingTactics.Game1 game, string path) {

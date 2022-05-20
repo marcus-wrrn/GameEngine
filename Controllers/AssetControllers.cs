@@ -85,9 +85,7 @@ namespace AssetControl {
         public override void Update() {
             // Put All checks here
             if(_asset.IsAlive) {
-                if(_asset.Health <= 0) {
-                    _asset.Kill();
-                }
+               //TODO: Add something here
             }
             // Make it be able to make some informed decisions
 

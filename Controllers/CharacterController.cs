@@ -74,6 +74,8 @@ namespace Controllers {
                 if(_mouse.LeftButtonPressed())
                     _currentPlayer.MoveAssetToLocation(mouseLocation);
             }
+            if(_keyboard.IsKeyClicked(Keys.K) && _currentPlayer != null) 
+                _currentPlayer.TakeDamage(100);
             if(_keyboard.IsKeyClicked(Keys.E))
                 TurnEnded = true;
         }// end Update()
@@ -97,7 +99,7 @@ namespace Controllers {
         public void Update(GameTime gameTime) {
             Vector2 location1 = new Vector2(300f, 300f);
             Vector2 location2 = new Vector2(800f, 800f);
-            foreach(var character in _npcs) {
+            foreach(var character in _allCharacters) {
                 if(character.CharacterInfo.Allegiance == Classifier.CharacterAllegiance.ENEMY) {
                     if(character.Location == location1 && !character.IsMoving)
                         character.MoveAssetToLocation(location2);
@@ -105,10 +107,8 @@ namespace Controllers {
                         character.MoveAssetToLocation(location1);
                 }
             }
-
         }
-
-    }
+    }// end Update()
 
     public class TurnController {
         private Input.GameKeyboard _keyboard = Input.GameKeyboard.Instance;
@@ -135,6 +135,7 @@ namespace Controllers {
                 }
             }
             else if(_controllerState == TurnState.NPC) {
+                Console.WriteLine("Enemy is here");
                 _enemyControl.Update(gameTime);
                 if(_keyboard.IsKeyClicked(Keys.J))
                     _controllerState = TurnState.PLAYER;
@@ -146,8 +147,6 @@ namespace Controllers {
 
 
     public class AssetController : IController, IDisposable {
-
-
         // Controller also needs to account for collision
         // Assets trying to move into objects need to have their locations changed to the outer bounds of said object
         // need to work out a physics system

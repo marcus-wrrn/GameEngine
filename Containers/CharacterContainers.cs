@@ -7,17 +7,31 @@ using Graphics.Assets;
 
 namespace Containers {
 
+    public interface ICharacter {
+        int Health { get; }
+        int Speed { get; }
+        float HitChance { get; }
+        float Evasion { get; }
+        float CriticalChance { get; }
+        bool IsAlive { get; }
+        
+    }// end ICharacter
 
-
-    public class RockGuyContainer : CharacterContainer<RockGuy> {
+    public class RockGuyCharacter : CharacterContainer<RockGuy>, ICharacter {
         // These lists are important to determine where everything is
         private HashSet<ICharacterAssetContainer> _playerCharacters;
         private HashSet<ICharacterAssetContainer> _nonPlayerCharacters;
         private HashSet<ICharacterAssetContainer> _allCharacters;
-        private const int AnimationTime = 7;
-        private int _animationCounter = 0;
+        // TODO: Make All Stats responsible in the ICharacter interfaces
+        // I need to remove dependency from the asset
+        public int Health { get; }
+        public int Speed { get { return (int)_asset.Speed; } }
+        public float HitChance { get; }
+        public float CriticalChance { get; }
+        public float Evasion { get; }
+        public bool IsAlive { get { return _asset.IsAlive; } }
 
-        public RockGuyContainer(RockGuy asset, Classifier.CharacterClassifier classifier, MasterAssetContainer masterContainer) : base(asset, classifier) { 
+        public RockGuyCharacter(RockGuy asset, Classifier.CharacterClassifier classifier, MasterAssetContainer masterContainer) : base(asset, classifier) { 
             _playerCharacters = masterContainer.PlayerCharacters;
             _nonPlayerCharacters = masterContainer.NonPlayerCharacters;
             _allCharacters = masterContainer.AllCharacters;
@@ -39,15 +53,6 @@ namespace Containers {
             return nearestPlayer;
         }// end FindNearestPlayer()
 
-        private void UpdateAnimation() {
-            if(_animationCounter >= AnimationTime) {
-                _asset.Update();
-                _animationCounter = 0;
-            } 
-            else
-                _animationCounter++;
-        }
-
         public override void Update(GameTime gameTime) {
             // if(CharacterInfo.IsStatic || CharacterInfo.Allegiance == Classifier.CharacterAllegiance.PLAYER) {
             //     base.Update(gameTime);
@@ -67,6 +72,8 @@ namespace Containers {
             //     }
             // }
         }// end Update()
+
+
 
     }// end RockGuyContainer class
 
