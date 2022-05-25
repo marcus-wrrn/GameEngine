@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using Graphics.Assets;
 using Graphics.Rendering;
@@ -14,6 +15,7 @@ namespace Containers {
         Classifier.AssetClassifier AssetInfo { get; }
         Rectangle DestinationRectangle { get; }
         Vector2 Location { get; }
+        void Save(BinaryWriter binWriter);
         void Update(GameTime gameTime);
         void Draw(SpriteBunch spriteBunch);
     }// end IBaseAssetContainer()
@@ -84,6 +86,12 @@ namespace Containers {
             spriteBunch.Draw(_asset.Texture, _asset.SourceRectangle, _asset.DestinationRectangle, Color.AliceBlue);
         }// end Draw()
 
+        public virtual void Save(BinaryWriter binWriter) {
+            // All Save Systems should start with the proper ASSET_CODE, this ensures
+            binWriter.Write(_asset.Location.X);
+            binWriter.Write(_asset.Location.Y);
+        }// end Save()
+
     }// end AssetContainer class
 
     public class MovingAssetContainer<T> : AssetContainer<T>, IMovingAssetContainer where T : IMovingAsset {
@@ -118,8 +126,7 @@ namespace Containers {
         }// end Stop()
 
         // This section will be replaced with a specific controller for a more defined container
-        public override void Update(GameTime gameTime)
-        {
+        public override void Update(GameTime gameTime) {
             if(AssetInfo.IsStatic) {
                 base.Update(gameTime);
                 return;
@@ -132,6 +139,7 @@ namespace Containers {
             if(IsMoving && _locationToMove == Location)
                 IsMoving = false;
             base.Update(gameTime);
+            
         }// end Update()
 
     }// end MovingAssetContainer class
@@ -142,7 +150,6 @@ namespace Containers {
         public Classifier.CharacterClassifier CharacterInfo { get; private set; }
         public bool IsCharacterAlive { get { return _asset.IsAlive; } }
         public IStats CharacterStats { get; set; }
-
 
         public CharacterContainer(T asset, Classifier.CharacterClassifier characterClassifier, IStats stats) : base(asset, characterClassifier) {
             CharacterStats = stats;
@@ -157,6 +164,23 @@ namespace Containers {
             else
                 CharacterStats.Health -= (uint)value;
         }// end TakeDamage()
+
+        public override void Save(BinaryWriter binWriter) {
+            // This should all go into seperate Functions
+            // Saves all of the Characters important info
+            binWriter.Write(CharacterInfo.Allegiance.ToString());
+            binWriter.Write(CharacterInfo.IsPlayerControlled);
+            binWriter.Write(CharacterInfo.IsSentiant);
+            binWriter.Write(CharacterInfo.IsStatic);
+            binWriter.Write(CharacterInfo.Type.ToString());
+            // Saves all Character Stats
+            binWriter.Write(CharacterStats.MaxHealth);
+            binWriter.Write(CharacterStats.Health);
+            binWriter.Write(CharacterStats.HitChance);
+            binWriter.Write(CharacterStats.CriticalChance);
+            binWriter.Write(CharacterStats.Evasion);
+            // Saves Asset Info
+        }// end Save()
 
     }// end CharacterClassifier
     

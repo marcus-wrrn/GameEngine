@@ -303,7 +303,7 @@ namespace Testing {
             }
         }// end GenerateMovingAssetsList()
 
-        private CharacterContainer<RockGuy> GenerateCharacterContainer(bool isStatic, bool isSentiant, CharacterAllegiance allegiance, CharacterType type) {
+        private CharacterContainer<RockGuy> GenerateCharacterContainer(bool isStatic, bool isSentiant, CharacterAllegiance allegiance, AssetType type) {
             var factory = new Factory.CharacterFactory();
             var asset = factory.BuildRockGuyAsset(_game, Vector2.Zero);
             CharacterClassifier classifier = new CharacterClassifier(allegiance, type, isStatic, isSentiant);
@@ -324,19 +324,19 @@ namespace Testing {
                 Console.WriteLine("\nLoading Character Containers: ");
                 CharacterContainers = new List<ICharacterAssetContainer>();
                 Console.Write("Creating Base Enemy Character: ");
-                CharacterContainers.Add(GenerateCharacterContainer(false,true,CharacterAllegiance.ENEMY, CharacterType.ROCK_GUY));
+                CharacterContainers.Add(GenerateCharacterContainer(false,true,CharacterAllegiance.ENEMY, AssetType.ROCK_GUY));
                 Console.Write("PASSED\n");
                 Console.Write("Create Base Player Character: ");
-                CharacterContainers.Add(GenerateCharacterContainer(false,true, CharacterAllegiance.PLAYER, CharacterType.ROCK_GUY));
+                CharacterContainers.Add(GenerateCharacterContainer(false,true, CharacterAllegiance.PLAYER, AssetType.ROCK_GUY));
                 Console.Write("PASSED\n");
                 Console.Write("Create non static character: ");
-                CharacterContainers.Add(GenerateCharacterContainer(true, true, CharacterAllegiance.NEUTRAL, CharacterType.ROCK_GUY));
+                CharacterContainers.Add(GenerateCharacterContainer(true, true, CharacterAllegiance.NEUTRAL, AssetType.ROCK_GUY));
                 Console.Write("PASSED\n");
                 Console.Write("Create non sentiant character: ");
-                CharacterContainers.Add(GenerateCharacterContainer(false, false, CharacterAllegiance.NEUTRAL, CharacterType.ROCK_GUY));
+                CharacterContainers.Add(GenerateCharacterContainer(false, false, CharacterAllegiance.NEUTRAL, AssetType.ROCK_GUY));
                 Console.Write("PASSED\n");
                 Console.Write("Create static and non sentiant character: ");
-                CharacterContainers.Add(GenerateCharacterContainer(true, true, CharacterAllegiance.NEUTRAL, CharacterType.ROCK_GUY));
+                CharacterContainers.Add(GenerateCharacterContainer(true, true, CharacterAllegiance.NEUTRAL, AssetType.ROCK_GUY));
                 Console.Write("PASSED\n");
             } catch {
                 Console.WriteLine("Loading Character Containers: FAILED");

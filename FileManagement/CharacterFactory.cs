@@ -14,7 +14,7 @@ namespace Factory {
 
         public void CreateRockGuyCharacter(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer, Vector2 location, Classifier.CharacterAllegiance allegiance, Containers.BaseCharacterStats statusEffects) {
             var rockGuyAsset = BuildRockGuyAsset(game, location);
-            Classifier.CharacterClassifier classifier = new Classifier.CharacterClassifier(allegiance, Classifier.CharacterType.ROCK_GUY);
+            Classifier.CharacterClassifier classifier = new Classifier.CharacterClassifier(allegiance, Classifier.AssetType.ROCK_GUY);
             masterContainer.AddAsset(new Containers.RockGuyCharacter(rockGuyAsset, classifier, masterContainer, statusEffects));
         }// end CreateRockGuyCharacter
 

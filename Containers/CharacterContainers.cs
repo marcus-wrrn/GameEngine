@@ -2,8 +2,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using Graphics.Assets;
-
-
+using System.IO;
 
 namespace Containers {
 
@@ -18,6 +17,8 @@ namespace Containers {
         IStats CharacterStats { get; }
         bool IsAlive { get; }
         
+
+
     }// end ICharacter
 
     
@@ -80,6 +81,12 @@ namespace Containers {
             }
 
         }// end Update()
+
+        public override void Save(BinaryWriter binWriter) {
+            // Write Character name first
+            binWriter.Write(Codes.AssetCodes.Instance.RockGuy);
+            base.Save(binWriter);
+        }// end Save()
 
     }// end RockGuyContainer class
 
