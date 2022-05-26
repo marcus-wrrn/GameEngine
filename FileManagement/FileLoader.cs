@@ -19,27 +19,61 @@ namespace FileIO {
             _fileName = fileName;
         }// end FileSaver() constructor
 
-        private void SaveAsset(Containers.IBaseAssetContainer baseContainer) {
+        private void SaveObject(BinaryWriter binWriter, Containers.IBaseAssetContainer baseContainer) {
             var characterContainer = baseContainer as Containers.ICharacterAssetContainer;
-            
+            if(characterContainer != null) {
+                SaveCharacter(binWriter, characterContainer);
+            }
+            else
+                SaveAsset(binWriter, baseContainer);
         }
+
+        private void SaveAsset(BinaryWriter binWriter, Containers.IBaseAssetContainer baseContainer) {
+            if(baseContainer.IsDisposed || baseContainer.ToBeDisposed)
+                return;
+            var info = baseContainer.AssetInfo;
+            // Copy Info
+            binWriter.Write(info.Type.ToString());
+            binWriter.Write(info.IsSentiant);
+            binWriter.Write(info.IsStatic);
+            // Copying Location
+            binWriter.Write(baseContainer.Location.X);
+            binWriter.Write(baseContainer.Location.Y);
+        }// end SaveAsset
+
+
+        private void SaveCharacterInfo(BinaryWriter binWriter, Containers.ICharacterAssetContainer character) {
+            var info = character.CharacterInfo;
+            // Record Character type
+            binWriter.Write(info.Type.ToString());
+            // Record Character Allegiance
+            binWriter.Write(info.Allegiance.ToString());
+            // Record Player Info
+            binWriter.Write(info.IsPlayerControlled);
+            binWriter.Write(info.IsSentiant);
+            binWriter.Write(info.IsStatic);
+        }// end SaveCharacterInfo()
+
+        private void SaveCharacterStats(BinaryWriter binWriter, Containers.ICharacterAssetContainer character) {
+            var stats = character.CharacterStats;
+            // Record Health
+            binWriter.Write(stats.MaxHealth);
+            binWriter.Write(stats.Health);
+            // Record Speed and Evasion
+            binWriter.Write(stats.Speed);
+            binWriter.Write(stats.Evasion);
+            // Record Hit/Crit chance
+            binWriter.Write(stats.HitChance);
+            binWriter.Write(stats.CriticalChance);
+        }// end SaveCharacterStats
 
         private void SaveCharacter(BinaryWriter binWriter, Containers.ICharacterAssetContainer character) {
             var info = character.CharacterInfo;
             var stats = character.CharacterStats;
             // Copying info
-            binWriter.Write(info.Type.ToString());
-            binWriter.Write(info.Allegiance.ToString());
-            binWriter.Write(info.IsPlayerControlled);
-            binWriter.Write(info.IsSentiant);
-            binWriter.Write(info.IsStatic);
+            
             // Copying Stats
-            binWriter.Write(stats.MaxHealth);
-            binWriter.Write(stats.Health);
-            binWriter.Write(stats.HitChance);
-            binWriter.Write(stats.Speed);
-            binWriter.Write(stats.Evasion);
-            binWriter.Write(stats.CriticalChance);
+            
             // Copying Location
             binWriter.Write(character.Location.X);
             binWriter.Write(character.Location.Y);

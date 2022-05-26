@@ -150,7 +150,7 @@ namespace TestingTactics
             _backgroundController.Draw();
             // _sprites.Draw(_asset2, Color.AliceBlue);
             //_sprites.Draw(_asset1, Color.AliceBlue);
-            foreach(var asset in _masterAssetContainer.AllCharacters) {
+            foreach(var asset in _masterAssetContainer.AllAssetContainers) {
                 if(!asset.IsDisposed)
                     asset.Draw(_sprites);
             }

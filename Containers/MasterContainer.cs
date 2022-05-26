@@ -261,9 +261,10 @@ namespace Containers {
                 NonActiveObjects.Remove(container); 
         }// end DeleteStatic()
 
-        private void SortAssets() {
+        public void SortAssets() {
+            Console.WriteLine("Sorting");
             AllAssetContainers.Sort(delegate(IBaseAssetContainer x, IBaseAssetContainer y) { 
-                return x.Location.Y.CompareTo(y.Location.Y); 
+                return y.Location.Y.CompareTo(x.Location.Y); 
             });
         }// end SortAssets()
 
