@@ -48,11 +48,11 @@ namespace TestingTactics
             //baseTest.TestIllegalStaticAsset();
             MouseForGame = new GameMouse(this);
             _masterAssetContainer = new MasterAssetContainer();
-            Factory.CharacterFactory factory = new Factory.CharacterFactory();
-            factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(300f, 300f), Classifier.CharacterAllegiance.ENEMY);
-            factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(900f, 600f), Classifier.CharacterAllegiance.ENEMY);
-            factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(200f, 800f), Classifier.CharacterAllegiance.PLAYER);
-            factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(600f, 800f), Classifier.CharacterAllegiance.PLAYER);
+            Factory.CharacterFactory factory = new Factory.CharacterFactory(this, _masterAssetContainer);
+            // factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(300f, 300f), Classifier.CharacterAllegiance.ENEMY);
+            // factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(900f, 600f), Classifier.CharacterAllegiance.ENEMY);
+            // factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(200f, 800f), Classifier.CharacterAllegiance.PLAYER);
+            // factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(600f, 800f), Classifier.CharacterAllegiance.PLAYER);
             //var masterTest = new Testing.MasterContainerTest(this);
             base.Initialize();
             
@@ -150,7 +150,7 @@ namespace TestingTactics
             _backgroundController.Draw();
             // _sprites.Draw(_asset2, Color.AliceBlue);
             //_sprites.Draw(_asset1, Color.AliceBlue);
-            foreach(var asset in _masterAssetContainer.AllCharacters) {
+            foreach(var asset in _masterAssetContainer.AllAssetContainers) {
                 if(!asset.IsDisposed)
                     asset.Draw(_sprites);
             }

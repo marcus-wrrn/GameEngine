@@ -204,6 +204,7 @@ namespace Controllers {
                     }
                 }
             }
+            _masterContainer.SortAssets();
         }// end Update()
 
         public void Draw() {

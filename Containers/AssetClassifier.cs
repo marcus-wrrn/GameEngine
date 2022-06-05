@@ -19,13 +19,14 @@ namespace Classifier {
 
 
     public enum AssetMovement { STATIC, DYNAMIC };
-    public enum CharacterAllegiance { FRIEND, ENEMY, NEUTRAL, PLAYER, NA };
-    public enum CharacterType { ROCK_GUY, ROCK_MAN };
+    public enum CharacterAllegiance { FRIEND, ENEMY, NEUTRAL, PLAYER, NOT_AVAILABLE };
+    public enum AssetType { ROCK_GUY, ROCK_MAN, STANDARD_ASSET, NOT_AVAILABLE };
 
     public interface IAssetClassifier {
         //CharacterAllegiance Allegiance { get; }
         bool IsStatic { get; }
         bool IsSentiant { get; }
+        AssetType Type { get; }
         //bool IsPlayerControlled { get; }
     }// end IAssetClassifier interface
 
@@ -41,12 +42,14 @@ namespace Classifier {
         public bool IsStatic { get; private set; }
         // For all standard assets IsSentiant will be false however inhereted classifiers will be able to choose
         public bool IsSentiant { get; private set; }
+        public AssetType Type { get; private set; }
         public AssetClassifier(bool isStatic) {
             IsStatic = isStatic;
             IsSentiant = false;
+            Type = AssetType.STANDARD_ASSET;
         }// end AssetClassifier constructor
 
-        protected AssetClassifier(bool isStatic, bool isSentiant) {
+        protected AssetClassifier(bool isStatic, bool isSentiant, AssetType type = AssetType.STANDARD_ASSET) {
             IsStatic = isStatic;
             IsSentiant = isSentiant;
         }// end protected constructor
@@ -56,23 +59,20 @@ namespace Classifier {
     // Classifier for characters
     public class CharacterClassifier : AssetClassifier, ICharacterClassifier {
         public CharacterAllegiance Allegiance { get; private set; }
-        public CharacterType Type { get; private set; }
         public bool IsPlayerControlled { get; private set; }
         // By making IsSentiant false, the character will effectively be brain dead (i.e the AI will be non functional)
         // This is mostly useful for testing purposes
         // This will also get rid of any stats or health the character may have if sorted into the non sentiant object list
-                // Try to avoid this but it's not the end of the world since it should never occur normally
+                // Try to avoid this but it's not the end of the world since it should never occur normally (I know that sounds awful but this should seriously never happen and even if it did it shouldn't be that big of a deal)
                 // All constructors for characters should be designed to feed directly into the characters list unless speciffically told not to
         // For most purposes IsSentiant should always be true
-        public CharacterClassifier(CharacterAllegiance allegiance, CharacterType type, bool isStatic = false, bool isSentiant = true) : base(isStatic, isSentiant) {
+        public CharacterClassifier(CharacterAllegiance allegiance, AssetType type, bool isStatic = false, bool isSentiant = true) : base(isStatic, isSentiant, type) {
             Allegiance = allegiance;
-            Type = type;
             IsPlayerControlled = allegiance == CharacterAllegiance.PLAYER ? true : false;
         }// end constructor
 
-        public CharacterClassifier(CharacterClassifier classifier) : base(classifier.IsStatic, classifier.IsSentiant) {
+        public CharacterClassifier(CharacterClassifier classifier) : base(classifier.IsStatic, classifier.IsSentiant, classifier.Type) {
             Allegiance = classifier.Allegiance;
-            Type = classifier.Type;
             IsPlayerControlled = Allegiance == CharacterAllegiance.PLAYER ? true : false;
         }// end constructor
 
