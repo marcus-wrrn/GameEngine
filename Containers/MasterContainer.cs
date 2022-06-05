@@ -11,6 +11,7 @@ namespace Containers {
         // Note while HashSet would be useful for getting rid of duplicates, it's important that I'm able to sort the main list of arrays
         // This is important for rendering objects by their location
         // All other collections of assets will be in Hashsets that will then be fed into the main list 
+        public bool IsEmpty { get { return AllAssetContainers.Count == 0; } }
         public List<IBaseAssetContainer>           AllAssetContainers { get; private set; }             // All Assets will be stored in this list (useful for drawing or map wide effect)
         public HashSet<IBaseAssetContainer>        NonActiveObjects { get; private set; }      // Contains all nonsentiant objects (like rocks, trees, pillars....)
         public HashSet<IBaseAssetContainer>        ActiveObjects { get; private set; }         // For objects (not characters) who can affect the environment
@@ -262,7 +263,6 @@ namespace Containers {
         }// end DeleteStatic()
 
         public void SortAssets() {
-            Console.WriteLine("Sorting");
             AllAssetContainers.Sort(delegate(IBaseAssetContainer x, IBaseAssetContainer y) { 
                 return y.Location.Y.CompareTo(x.Location.Y); 
             });
@@ -272,6 +272,21 @@ namespace Containers {
             foreach(var container in containers)
                 DeleteObject(container);
         }// end DeleteObjects()
+
+        // Disposes of then clears all asset containers from the main container
+        public void EmptyContainer() {
+            foreach(var obj in AllAssetContainers) {
+                obj.Dispose();
+            }
+            AllAssetContainers.Clear();
+            NonActiveObjects.Clear();
+            ActiveObjects.Clear();
+            StaticObjects.Clear();
+            MovingObjects.Clear();
+            AllCharacters.Clear();
+            NonPlayerCharacters.Clear();
+            PlayerCharacters.Clear();
+        }// end ClearContainer()
 
         public void Draw(SpriteBunch spriteBunch) {
             foreach(var obj in AllAssetContainers) {

@@ -19,8 +19,8 @@ namespace Classifier {
 
 
     public enum AssetMovement { STATIC, DYNAMIC };
-    public enum CharacterAllegiance { FRIEND, ENEMY, NEUTRAL, PLAYER, NA };
-    public enum AssetType { ROCK_GUY, ROCK_MAN, STANDARD_ASSET };
+    public enum CharacterAllegiance { FRIEND, ENEMY, NEUTRAL, PLAYER, NOT_AVAILABLE };
+    public enum AssetType { ROCK_GUY, ROCK_MAN, STANDARD_ASSET, NOT_AVAILABLE };
 
     public interface IAssetClassifier {
         //CharacterAllegiance Allegiance { get; }

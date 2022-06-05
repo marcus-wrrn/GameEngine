@@ -227,148 +227,148 @@ namespace Testing {
 
 
 
-    public class MasterContainerTest {
-        // All of this is for testing purposes
-        private TestingTactics.Game1 _game;
-        public MasterAssetContainer MasterContainer;
-        public List<ICharacterAssetContainer>   CharacterContainers;
-        public List<IMovingAssetContainer>      MovingAssetContainers;
-        public List<IBaseAssetContainer>        StaticAssetContainers;
+    // public class MasterContainerTest {
+    //     // All of this is for testing purposes
+    //     private TestingTactics.Game1 _game;
+    //     public MasterAssetContainer MasterContainer;
+    //     public List<ICharacterAssetContainer>   CharacterContainers;
+    //     public List<IMovingAssetContainer>      MovingAssetContainers;
+    //     public List<IBaseAssetContainer>        StaticAssetContainers;
 
-        public MasterContainerTest(TestingTactics.Game1 game) {
-            _game = game;
-            // Initialize containers
-            GenerateBaseStaticAssetList();
-            GenerateMovingAssetsList();
-            GenerateCharacterContainerList();
-            // Create List of Static Assets
-            // Create a List of Moving Asset Containers
-            // Create a List of Static Containers
-        }// end constructor
+    //     public MasterContainerTest(TestingTactics.Game1 game) {
+    //         _game = game;
+    //         // Initialize containers
+    //         GenerateBaseStaticAssetList();
+    //         GenerateMovingAssetsList();
+    //         GenerateCharacterContainerList();
+    //         // Create List of Static Assets
+    //         // Create a List of Moving Asset Containers
+    //         // Create a List of Static Containers
+    //     }// end constructor
 
-        private Asset<Sprite> GenerateBaseAsset() {
-            Sprite sprite = new Sprite(_game.Content.Load<Texture2D>("Ball"));
-            return new Asset<Sprite>(sprite, Vector2.Zero);
-        }// end GenerateBaseSprite()
+    //     private Asset<Sprite> GenerateBaseAsset() {
+    //         Sprite sprite = new Sprite(_game.Content.Load<Texture2D>("Ball"));
+    //         return new Asset<Sprite>(sprite, Vector2.Zero);
+    //     }// end GenerateBaseSprite()
 
-        private AssetContainer<Asset<Sprite>> GetBaseContainer() {
-            Asset<Sprite> asset = GenerateBaseAsset();
-            AssetClassifier classifier = new AssetClassifier(true);
-            return new AssetContainer<Asset<Sprite>>(asset, classifier);
-        }
+    //     private AssetContainer<Asset<Sprite>> GetBaseContainer() {
+    //         Asset<Sprite> asset = GenerateBaseAsset();
+    //         AssetClassifier classifier = new AssetClassifier(true);
+    //         return new AssetContainer<Asset<Sprite>>(asset, classifier);
+    //     }
 
-        private void GenerateBaseStaticAssetList() {
-            StaticAssetContainers = new List<IBaseAssetContainer>();
+    //     private void GenerateBaseStaticAssetList() {
+    //         StaticAssetContainers = new List<IBaseAssetContainer>();
 
-            // different types of static objects
-            try {
-                Console.WriteLine("Loading Static Asset Containers: ");
-                var container1 = GetBaseContainer();
-                var container2 = GetBaseContainer();
-                Console.Write("Loading Static Asset Containers 1... ");
-                StaticAssetContainers.Add(container1);
-                Console.Write("PASSED\n");
-                Console.Write("Loading Static Asset Containers 2... ");
-                StaticAssetContainers.Add(container2);
-                Console.Write("PASSED\n");
-                Console.WriteLine("Loading Static Asset Containers: PASSED");
-            } catch {
-                Console.WriteLine("Loading Static Asset Containers: FAILED");
-            }
+    //         // different types of static objects
+    //         try {
+    //             Console.WriteLine("Loading Static Asset Containers: ");
+    //             var container1 = GetBaseContainer();
+    //             var container2 = GetBaseContainer();
+    //             Console.Write("Loading Static Asset Containers 1... ");
+    //             StaticAssetContainers.Add(container1);
+    //             Console.Write("PASSED\n");
+    //             Console.Write("Loading Static Asset Containers 2... ");
+    //             StaticAssetContainers.Add(container2);
+    //             Console.Write("PASSED\n");
+    //             Console.WriteLine("Loading Static Asset Containers: PASSED");
+    //         } catch {
+    //             Console.WriteLine("Loading Static Asset Containers: FAILED");
+    //         }
             
-        }// end GenerateStaticAssetList()
+    //     }// end GenerateStaticAssetList()
 
-        private MovingAssetContainer<MovingAsset<AnimatedSprite>> GenerateMovingContainerBaseAsset(bool isStatic) {
-            // Create asset
-            AnimatedSprite sprite = new AnimatedSprite(_game.Content.Load<Texture2D>("./Characters/RockGuyHitAnim"), 9);
-            MovingAsset<AnimatedSprite> asset = new MovingAsset<AnimatedSprite>(sprite, Vector2.Zero);
-            // Create Classifier
-            AssetClassifier classifier = new AssetClassifier(isStatic);
-            return new MovingAssetContainer<MovingAsset<AnimatedSprite>>(asset, classifier);
-        }// end GenerateMovingContainerBaseAsset()
+    //     private MovingAssetContainer<MovingAsset<AnimatedSprite>> GenerateMovingContainerBaseAsset(bool isStatic) {
+    //         // Create asset
+    //         AnimatedSprite sprite = new AnimatedSprite(_game.Content.Load<Texture2D>("./Characters/RockGuyHitAnim"), 9);
+    //         MovingAsset<AnimatedSprite> asset = new MovingAsset<AnimatedSprite>(sprite, Vector2.Zero);
+    //         // Create Classifier
+    //         AssetClassifier classifier = new AssetClassifier(isStatic);
+    //         return new MovingAssetContainer<MovingAsset<AnimatedSprite>>(asset, classifier);
+    //     }// end GenerateMovingContainerBaseAsset()
 
-        private void GenerateMovingAssetsList() {
-            MovingAssetContainers = new List<IMovingAssetContainer>();
-            try {
-                Console.WriteLine("\nLoading Moving Asset Containers:");
-                Console.Write("Loading Static container... ");
-                MovingAssetContainers.Add(GenerateMovingContainerBaseAsset(true));
-                Console.Write("PASSED\n");
-                Console.Write("Loading Dynamic container...");
-                MovingAssetContainers.Add(GenerateMovingContainerBaseAsset(false));
-                Console.Write("PASSED\n");
-                Console.WriteLine("Loading Moving Asset Containers: PASSED");
-            } catch {
-                Console.WriteLine("Loading Moving Asset Containers: FAILED");
-            }
-        }// end GenerateMovingAssetsList()
+    //     private void GenerateMovingAssetsList() {
+    //         MovingAssetContainers = new List<IMovingAssetContainer>();
+    //         try {
+    //             Console.WriteLine("\nLoading Moving Asset Containers:");
+    //             Console.Write("Loading Static container... ");
+    //             MovingAssetContainers.Add(GenerateMovingContainerBaseAsset(true));
+    //             Console.Write("PASSED\n");
+    //             Console.Write("Loading Dynamic container...");
+    //             MovingAssetContainers.Add(GenerateMovingContainerBaseAsset(false));
+    //             Console.Write("PASSED\n");
+    //             Console.WriteLine("Loading Moving Asset Containers: PASSED");
+    //         } catch {
+    //             Console.WriteLine("Loading Moving Asset Containers: FAILED");
+    //         }
+    //     }// end GenerateMovingAssetsList()
 
-        private CharacterContainer<RockGuy> GenerateCharacterContainer(bool isStatic, bool isSentiant, CharacterAllegiance allegiance, AssetType type) {
-            var factory = new Factory.CharacterFactory();
-            var asset = factory.BuildRockGuyAsset(_game, Vector2.Zero);
-            CharacterClassifier classifier = new CharacterClassifier(allegiance, type, isStatic, isSentiant);
-            var stats = new Containers.BaseCharacterStats(30, 50, 0.4f, 0.3f, 0.25f);
-            return new CharacterContainer<RockGuy>(asset, classifier, stats);
-        }// end GenerateCharacterContainer()
+    //     // private CharacterContainer<RockGuy> GenerateCharacterContainer(bool isStatic, bool isSentiant, CharacterAllegiance allegiance, AssetType type) {
+    //     //     var factory = new Factory.CharacterFactory(_game, );
+    //     //     var asset = factory.BuildRockGuyAsset(Vector2.Zero);
+    //     //     CharacterClassifier classifier = new CharacterClassifier(allegiance, type, isStatic, isSentiant);
+    //     //     var stats = new Containers.BaseCharacterStats(30, 50, 0.4f, 0.3f, 0.25f);
+    //     //     return new CharacterContainer<RockGuy>(asset, classifier, stats);
+    //     // }// end GenerateCharacterContainer()
 
         
 
-        private void CharacterSort(ICharacterAssetContainer container) {
-            var info = container.CharacterInfo;
-            if(!info.IsPlayerControlled)
-                return;
-        }
+    //     private void CharacterSort(ICharacterAssetContainer container) {
+    //         var info = container.CharacterInfo;
+    //         if(!info.IsPlayerControlled)
+    //             return;
+    //     }
 
-        private void GenerateCharacterContainerList() {
-            try {
-                Console.WriteLine("\nLoading Character Containers: ");
-                CharacterContainers = new List<ICharacterAssetContainer>();
-                Console.Write("Creating Base Enemy Character: ");
-                CharacterContainers.Add(GenerateCharacterContainer(false,true,CharacterAllegiance.ENEMY, AssetType.ROCK_GUY));
-                Console.Write("PASSED\n");
-                Console.Write("Create Base Player Character: ");
-                CharacterContainers.Add(GenerateCharacterContainer(false,true, CharacterAllegiance.PLAYER, AssetType.ROCK_GUY));
-                Console.Write("PASSED\n");
-                Console.Write("Create non static character: ");
-                CharacterContainers.Add(GenerateCharacterContainer(true, true, CharacterAllegiance.NEUTRAL, AssetType.ROCK_GUY));
-                Console.Write("PASSED\n");
-                Console.Write("Create non sentiant character: ");
-                CharacterContainers.Add(GenerateCharacterContainer(false, false, CharacterAllegiance.NEUTRAL, AssetType.ROCK_GUY));
-                Console.Write("PASSED\n");
-                Console.Write("Create static and non sentiant character: ");
-                CharacterContainers.Add(GenerateCharacterContainer(true, true, CharacterAllegiance.NEUTRAL, AssetType.ROCK_GUY));
-                Console.Write("PASSED\n");
-            } catch {
-                Console.WriteLine("Loading Character Containers: FAILED");
-            }
-        }// end GenerateCharacterContainerList()
+    //     private void GenerateCharacterContainerList() {
+    //         try {
+    //             Console.WriteLine("\nLoading Character Containers: ");
+    //             CharacterContainers = new List<ICharacterAssetContainer>();
+    //             Console.Write("Creating Base Enemy Character: ");
+    //             CharacterContainers.Add(GenerateCharacterContainer(false,true,CharacterAllegiance.ENEMY, AssetType.ROCK_GUY));
+    //             Console.Write("PASSED\n");
+    //             Console.Write("Create Base Player Character: ");
+    //             CharacterContainers.Add(GenerateCharacterContainer(false,true, CharacterAllegiance.PLAYER, AssetType.ROCK_GUY));
+    //             Console.Write("PASSED\n");
+    //             Console.Write("Create non static character: ");
+    //             CharacterContainers.Add(GenerateCharacterContainer(true, true, CharacterAllegiance.NEUTRAL, AssetType.ROCK_GUY));
+    //             Console.Write("PASSED\n");
+    //             Console.Write("Create non sentiant character: ");
+    //             CharacterContainers.Add(GenerateCharacterContainer(false, false, CharacterAllegiance.NEUTRAL, AssetType.ROCK_GUY));
+    //             Console.Write("PASSED\n");
+    //             Console.Write("Create static and non sentiant character: ");
+    //             CharacterContainers.Add(GenerateCharacterContainer(true, true, CharacterAllegiance.NEUTRAL, AssetType.ROCK_GUY));
+    //             Console.Write("PASSED\n");
+    //         } catch {
+    //             Console.WriteLine("Loading Character Containers: FAILED");
+    //         }
+    //     }// end GenerateCharacterContainerList()
 
-        private void Test1() {
-            Console.WriteLine("\nTest 1: Initialization Test");
-            try {
-                Console.Write("Initializing Container... ");
-                MasterContainer = new MasterAssetContainer(StaticAssetContainers);
-                Console.Write("PASSED\n");
-            } catch {
-                Console.WriteLine("Test 1: FAILED");
-            }
+    //     private void Test1() {
+    //         Console.WriteLine("\nTest 1: Initialization Test");
+    //         try {
+    //             Console.Write("Initializing Container... ");
+    //             MasterContainer = new MasterAssetContainer(StaticAssetContainers);
+    //             Console.Write("PASSED\n");
+    //         } catch {
+    //             Console.WriteLine("Test 1: FAILED");
+    //         }
             
-        }// end Test1()
+    //     }// end Test1()
 
-        private void Test2() {
-            Console.WriteLine("\nTest 2: Sorting Test");
-            try {
-                Console.Write("Testing if item is correctly sorted into list: ");
-            } catch {
-                Console.WriteLine("Test 2: FAILED");
-            }
-        }// end Test2()
+    //     private void Test2() {
+    //         Console.WriteLine("\nTest 2: Sorting Test");
+    //         try {
+    //             Console.Write("Testing if item is correctly sorted into list: ");
+    //         } catch {
+    //             Console.WriteLine("Test 2: FAILED");
+    //         }
+    //     }// end Test2()
 
-        public void Test() {
-            Test1();
-        }// end Test()
+    //     public void Test() {
+    //         Test1();
+    //     }// end Test()
 
 
-    }// end MasterContainerTest class
+    // }// end MasterContainerTest class
 
 }// end Testing namespace

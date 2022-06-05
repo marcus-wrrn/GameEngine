@@ -19,14 +19,16 @@ namespace Containers {
         public float Evasion { get; set; }
         public float CriticalChance { get; set; }
 
-        public BaseCharacterStats(uint health, int speed, float hitChance, float evasion, float criticalChance) {
-            MaxHealth = health;
-            Health = MaxHealth;
+        public BaseCharacterStats(uint maxHealth, uint health, int speed, float hitChance, float evasion, float criticalChance) {
+            MaxHealth = maxHealth;
+            Health = health;
             Speed = speed;
             HitChance = hitChance;
             Evasion = evasion;
             CriticalChance = criticalChance;
-        }// end constructor
+        }// end BaseCharacterStats()
+
+        public BaseCharacterStats(uint health, int speed, float hitChance, float evasion, float criticalChance) : this(health, health, speed, hitChance, evasion, criticalChance) {}
 
     }// end BaseCharacterStats class
 }
