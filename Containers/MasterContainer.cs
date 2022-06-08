@@ -163,7 +163,7 @@ namespace Containers {
         }// end AddMovingObject()
 
         private void AddStaticObject(IBaseAssetContainer asset) {
-            if(asset.AssetInfo.IsStatic)
+            if(!asset.AssetInfo.IsStatic)
                 throw new Exception("Asset is not static");
             if(!StaticObjects.Add(asset))
                 throw new Exception("Duplicate asset found in list");
@@ -286,6 +286,8 @@ namespace Containers {
             AllCharacters.Clear();
             NonPlayerCharacters.Clear();
             PlayerCharacters.Clear();
+            // Intitializes lists again to avoid null values
+            InitializeLists();
         }// end ClearContainer()
 
         public void Draw(SpriteBunch spriteBunch) {

@@ -31,8 +31,41 @@ namespace FileIO {
             _assetFactory = new Factory.CharacterFactory(game, _masterContainer);
         }// end FileSaver() constructor
 
+        // Useful Algorithms ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private Classifier.AssetType FindAssetType(string type) {
+            foreach(Classifier.AssetType enumType in Enum.GetValues(typeof(Classifier.AssetType))) {
+                if(type == enumType.ToString())
+                    return enumType;
+            }
+            return Classifier.AssetType.NOT_AVAILABLE;
+        }// end FindAssetType()
+
+        private Classifier.CharacterAllegiance FindCharacterAllegiance(string allegiance) {
+            foreach(Classifier.CharacterAllegiance enumAllegiance in Enum.GetValues(typeof(Classifier.CharacterAllegiance))) {
+                if(allegiance == enumAllegiance.ToString())
+                    return enumAllegiance;
+            }
+            return Classifier.CharacterAllegiance.NOT_AVAILABLE;
+        }// end FindCharacterAllegiance()
 
 
+        // For Saving to a File ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void SaveObjectsToFile() {
+            using (BinaryWriter binWriter = new BinaryWriter(File.Open(_fileName, FileMode.Create))) {
+                try {
+                    foreach(var asset in _masterContainer.AllAssetContainers) {
+                        SaveObject(binWriter, asset);
+                    }
+                    binWriter.Write(END_MESSAGE);
+                } catch (Exception exp) {
+                    Console.WriteLine("Saving to File " + _fileName + " Failed: " + exp);
+                }
+            }
+        }// end Save()
+
+        // Determines what interface the object inherits from and determines which method to save object
         private void SaveObject(BinaryWriter binWriter, Containers.IBaseAssetContainer baseContainer) {
             var characterContainer = baseContainer as Containers.ICharacterAssetContainer;
             if(characterContainer != null) {
@@ -40,7 +73,7 @@ namespace FileIO {
             }
             var movingAssetContainer = baseContainer as Containers.IMovingAssetContainer;
             if(movingAssetContainer != null) {
-                
+                SaveMovingAsset(binWriter, movingAssetContainer);
             }
             else
                 SaveBaseAsset(binWriter, baseContainer);
@@ -112,34 +145,7 @@ namespace FileIO {
             SaveMovingAssetLocation(binWriter, character);
         }// end SaveCharacter()
 
-        public void SaveToFile() {
-            using (BinaryWriter binWriter = new BinaryWriter(File.Open(_fileName, FileMode.Create))) {
-                try {
-                    foreach(var asset in _masterContainer.AllAssetContainers) {
-                        SaveObject(binWriter, asset);
-                    }
-                    binWriter.Write(END_MESSAGE);
-                } catch (Exception exp) {
-                    Console.WriteLine("Saving to File " + _fileName + " Failed: " + exp);
-                }
-            }
-        }// end Save()
-
-        private Classifier.AssetType FindAssetType(string type) {
-            foreach(Classifier.AssetType enumType in Enum.GetValues(typeof(Classifier.AssetType))) {
-                if(type == enumType.ToString())
-                    return enumType;
-            }
-            return Classifier.AssetType.NOT_AVAILABLE;
-        }// end FindAssetType()
-
-        private Classifier.CharacterAllegiance FindCharacterAllegiance(string allegiance) {
-            foreach(Classifier.CharacterAllegiance enumAllegiance in Enum.GetValues(typeof(Classifier.CharacterAllegiance))) {
-                if(allegiance == enumAllegiance.ToString())
-                    return enumAllegiance;
-            }
-            return Classifier.CharacterAllegiance.NOT_AVAILABLE;
-        }// end FindCharacterAllegiance()
+        // For Loading to a file \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\        
 
         private Classifier.CharacterClassifier LoadCharacterInfo(BinaryReader binReader) {
             Classifier.AssetType type = FindAssetType(binReader.ReadString());
@@ -186,15 +192,45 @@ namespace FileIO {
             var stats = LoadCharacterStats(binReader);
             Vector2 Location = LoadLocation(binReader);
             var character = BuildCharacter(info, stats, Location);
+            // Checks if character is moving
             if(binReader.ReadBoolean()) {
+                // If Character is moving, move character to the proper location
                  Vector2 _locationToMove = LoadLocation(binReader);
                  character.MoveAssetToLocation(_locationToMove);
             }
         }// end LoadCharacterAssetFromFile()
 
+        private Classifier.AssetClassifier LoadAssetInfo(BinaryReader binReader) {
+            Classifier.AssetType type = FindAssetType(binReader.ReadString());
+            bool isSentiant = binReader.ReadBoolean();
+            bool isStatic = binReader.ReadBoolean();
+            return new Classifier.AssetClassifier(isStatic, isSentiant, type);
+        }// end LoadAssetInfo()
+
+        // private void SaveMovingAssetLocation(BinaryWriter binWriter, Containers.IMovingAssetContainer movingContainer) {
+        //     binWriter.Write(movingContainer.Location.X);
+        //     binWriter.Write(movingContainer.Location.Y);
+        //     binWriter.Write(movingContainer.IsMoving);
+        //     if(movingContainer.IsMoving) {
+        //         binWriter.Write(movingContainer.LocationMovingTo.X);
+        //         binWriter.Write(movingContainer.LocationMovingTo.Y);
+        //     }
+        // }// end SaveMovingAssetLocation()
+
+        private void LoadMovingAssetFromFile(BinaryReader binReader) {
+            Classifier.AssetClassifier assetInfo = LoadAssetInfo(binReader);
+            Vector2 location = LoadLocation(binReader);
+            // TODO add an example moving object
+            if(binReader.ReadBoolean()) {
+                Vector2 movingToLocation = LoadLocation(binReader);
+            }
+
+        }// end LoadMovingAssetFromFile()
+
         // Function Responsible for loading all assets from a file into a master container
         public void LoadAssetsFromFile(string fileName) {
-            
+            // Empties container of all current assets
+            _masterContainer.EmptyContainer();
             try {
                 BinaryReader binReader = new BinaryReader(new FileStream(fileName, FileMode.Open));
                 List<Containers.IBaseAssetContainer> assetsFromFile = new List<Containers.IBaseAssetContainer>();
@@ -206,6 +242,7 @@ namespace FileIO {
                             binReader.Close();
                             break;
                         case CHARACTER_ID:
+                            LoadCharacterAssetFromFile(binReader);
                             break;
                         case MOVING_ASSET_ID:
                             break;

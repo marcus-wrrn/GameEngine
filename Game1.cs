@@ -13,6 +13,7 @@ namespace TestingTactics
 {
     public class Game1 : Game
     {
+        private const string _assetSaveFile = "AssetFile";
         public GameMouse MouseForGame { get; private set; }
         private GraphicsDeviceManager _graphics;
         private Controllers.BackgroundController _backgroundController;
@@ -22,6 +23,8 @@ namespace TestingTactics
         private Containers.MasterAssetContainer _masterAssetContainer;
         private SpriteBunch _sprites;
         public Graphics.Screen Screen { get; private set; }
+        private Factory.CharacterFactory _characterFactory;
+        private FileIO.FileSaveLoader _fileLoader;
 
         public Game1() {
             _graphics = new GraphicsDeviceManager(this);
@@ -48,7 +51,8 @@ namespace TestingTactics
             //baseTest.TestIllegalStaticAsset();
             MouseForGame = new GameMouse(this);
             _masterAssetContainer = new MasterAssetContainer();
-            Factory.CharacterFactory factory = new Factory.CharacterFactory(this, _masterAssetContainer);
+            _characterFactory = new Factory.CharacterFactory(this, _masterAssetContainer);
+            _fileLoader = new FileIO.FileSaveLoader(this, _masterAssetContainer, _assetSaveFile);
             // factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(300f, 300f), Classifier.CharacterAllegiance.ENEMY);
             // factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(900f, 600f), Classifier.CharacterAllegiance.ENEMY);
             // factory.CreateRockGuyCharacter(this, _masterAssetContainer, new Vector2(200f, 800f), Classifier.CharacterAllegiance.PLAYER);
@@ -80,6 +84,8 @@ namespace TestingTactics
             var background = new Background.TileBackground(tiles, Vector2.Zero, Vector2.Zero, texture.Width, texture.Height);
             _controller = new Controllers.AssetController(this, _masterAssetContainer);
             _backgroundController = new Controllers.BackgroundController(this, _sprites, "TestFile");
+            CharacterClassifier classifier = new CharacterClassifier(CharacterAllegiance.PLAYER, AssetType.ROCK_GUY);
+            _characterFactory.CreateRockGuyCharacter(new Vector2(320f, 400f), classifier);
             // TODO: use this.Content to load your game content here
         }
 
@@ -93,6 +99,12 @@ namespace TestingTactics
             }
             if (kBoard.IsKeyClicked(Keys.P))
                 _backgroundController.SaveContent("TestFile");
+            if(kBoard.IsKeyClicked(Keys.A)) {
+                _fileLoader.SaveObjectsToFile();
+            }
+            if(kBoard.IsKeyClicked(Keys.L)) {
+                _fileLoader.LoadAssetsFromFile(_assetSaveFile);
+            }
 
             // Vector2 mousePosition = new Vector2(mouse.X, mouse.Y);
             // Vector2 p1 = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);

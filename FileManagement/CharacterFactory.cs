@@ -27,6 +27,8 @@ namespace Factory {
         // Creates A RockGuy Character and automatically adds it to the Master Asset Container. Due to the way the game environment is set up. No Character can exist not inside the container
         public Containers.RockGuyCharacter CreateRockGuyCharacter(Vector2 location, Classifier.CharacterClassifier classifier, Containers.BaseCharacterStats statusEffects) {
             var rockGuyAsset = BuildRockGuyAsset(location);
+            if(!classifier.Type.Equals(Classifier.AssetType.ROCK_GUY))
+                throw new ArgumentException("mismatching asset type: " + classifier.Type.ToString());
             var rockGuy = new Containers.RockGuyCharacter(rockGuyAsset, classifier, _masterContainer, statusEffects);
             _masterContainer.AddAsset(rockGuy);
             return rockGuy;
@@ -50,7 +52,7 @@ namespace Factory {
 
         private PlayerSprite<RockGuyAnimations> BuildRockGuySprite(string path) {
             // Load Textures
-            Texture2D idleSprite = _game.Content.Load<Texture2D>(path + "BandanGuyStandingAnim");
+            Texture2D idleSprite =  _game.Content.Load<Texture2D>(path + "BandanGuyStandingAnim");
             Texture2D movingSpriteLeft = _game.Content.Load<Texture2D>(path + "BlueBandanaAnimLeft");
             Texture2D movingSpriteRight = _game.Content.Load<Texture2D>(path + "BlueBandanaAnimRight");
             Texture2D deathSprite = _game.Content.Load<Texture2D>(path + "RockGuyDeathAnim");

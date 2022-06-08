@@ -9,12 +9,6 @@
 // Using classifications assign asset to a controller 
 // Using specific classifications asset will be loaded into container
 
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using Graphics.Assets;
-
 namespace Classifier {
 
 
@@ -43,16 +37,11 @@ namespace Classifier {
         // For all standard assets IsSentiant will be false however inhereted classifiers will be able to choose
         public bool IsSentiant { get; private set; }
         public AssetType Type { get; private set; }
-        public AssetClassifier(bool isStatic) {
+        public AssetClassifier(bool isStatic, bool isSentiant = false, AssetType type = AssetType.STANDARD_ASSET) {
             IsStatic = isStatic;
             IsSentiant = false;
-            Type = AssetType.STANDARD_ASSET;
+            Type = type;
         }// end AssetClassifier constructor
-
-        protected AssetClassifier(bool isStatic, bool isSentiant, AssetType type = AssetType.STANDARD_ASSET) {
-            IsStatic = isStatic;
-            IsSentiant = isSentiant;
-        }// end protected constructor
 
     }// end AssetClassifier class
 
