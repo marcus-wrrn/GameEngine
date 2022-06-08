@@ -67,6 +67,7 @@ namespace FileIO {
 
         // Determines what interface the object inherits from and determines which method to save object
         private void SaveObject(BinaryWriter binWriter, Containers.IBaseAssetContainer baseContainer) {
+            binWriter.Write(CHARACTER_ID);
             var characterContainer = baseContainer as Containers.ICharacterAssetContainer;
             if(characterContainer != null) {
                 SaveCharacter(binWriter, characterContainer);
