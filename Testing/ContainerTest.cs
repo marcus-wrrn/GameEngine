@@ -22,15 +22,15 @@ namespace Testing {
             _game = game;
         }
 
-        private Asset<Sprite> GenerateBaseAsset() {
+        private AssetBody<Sprite> GenerateBaseAsset() {
             Sprite sprite = new Sprite(_game.Content.Load<Texture2D>("Ball"));
-            return new Asset<Sprite>(sprite, Vector2.Zero);
+            return new AssetBody<Sprite>(sprite, Vector2.Zero);
         }// end GenerateBaseSprite()
 
-        private AssetContainer<Asset<Sprite>> GetBaseContainer(bool isStatic) {
-            Asset<Sprite> asset = GenerateBaseAsset();
+        private Asset<AssetBody<Sprite>> GetBaseContainer(bool isStatic) {
+            AssetBody<Sprite> asset = GenerateBaseAsset();
             AssetClassifier classifier = new AssetClassifier(isStatic);
-            return new AssetContainer<Asset<Sprite>>(asset, classifier);
+            return new Asset<AssetBody<Sprite>>(asset, classifier);
         }// end GetBaseContainer()
 
         public void TestIllegalStaticAsset() {

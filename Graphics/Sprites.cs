@@ -5,7 +5,7 @@ using Utilities;
 namespace Graphics.Sprites {
 
     ////////////////////////////////////////////////////////////// Base Sprite /////////////////////////////////////////////////////////////
-    public interface ISprite : IDisposable {
+    public interface ISprite : IDisposable{
         Texture2D Texture{ get; }
         Rectangle SourceRectangle{ get; }
         int Width{ get; }
@@ -42,7 +42,6 @@ namespace Graphics.Sprites {
         public void Dispose() {
             if(IsDisposed)
                 return;
-            Texture.Dispose();
             IsDisposed = true;
         }// end Dispose()
 

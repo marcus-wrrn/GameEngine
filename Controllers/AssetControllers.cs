@@ -34,7 +34,7 @@ namespace AssetControl {
         void Draw(SpriteBunch spriteBunch);
     }// end IAssetController interface
 
-    public class AssetTestController<T> : IAssetController where T: IAsset {
+    public class AssetTestController<T> : IAssetController where T: IAssetBody {
         protected T _asset;
         // Determines how fast the animation of the sprite runs for
         private int _animationSpeed;
@@ -78,7 +78,7 @@ namespace AssetControl {
 
     }// end AssetController class
 
-    public class CharacterController<T> : AssetTestController<T> where T : ICharacterAsset {
+    public class CharacterController<T> : AssetTestController<T> where T : ICharacterAssetBody {
         
         CharacterController(T asset, int animationSpeed) : base(asset, animationSpeed) {}
 

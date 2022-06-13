@@ -6,7 +6,7 @@ using System;
 
 namespace Graphics.Assets {
     
-    public interface ICharacterAsset : IMovingAsset, IDisposable  {
+    public interface ICharacterAssetBody : IMovingAssetBody, IDisposable  {
         bool IsAlive{ get; }
         void PlayAttackAnimation();
         void HurtAsset();
@@ -17,7 +17,7 @@ namespace Graphics.Assets {
 
 
 
-    public class BaseCharacter<T> : ICharacterAsset where T : IMovingAsset {
+    public class BaseCharacterBody<T> : ICharacterAssetBody where T : IMovingAssetBody {
         public Texture2D Texture{ get { return GetTexture(); } }
         public Rectangle SourceRectangle{ get { return _asset.SourceRectangle; } }
         public Rectangle DestinationRectangle { get { return _asset.DestinationRectangle; } }
@@ -28,7 +28,7 @@ namespace Graphics.Assets {
         public bool IsDisposed{ get; private set; }
         protected T _asset;
 
-        public BaseCharacter(T asset) {
+        public BaseCharacterBody(T asset) {
             // Error checking
             if(asset == null)
                 throw new NullReferenceException("Null RockGuy asset");
@@ -142,10 +142,10 @@ namespace Graphics.Assets {
 
     public enum RockGuyAnimations { DEATH, TAKE_DAMAGE }
 
-    public class RockGuy : BaseCharacter<HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>>> {
+    public class RockGuyBody : BaseCharacterBody<HorizontalMovingAssetBody<PlayerSprite<RockGuyAnimations>>> {
 
 
-        public RockGuy(HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> asset) : base(asset) { }
+        public RockGuyBody(HorizontalMovingAssetBody<PlayerSprite<RockGuyAnimations>> asset) : base(asset) { }
         // end constructor
 
         public override void Update() {
@@ -206,8 +206,8 @@ namespace Graphics.Assets {
 
     public enum PlayerAnimations { DEATH, ATTACK }
 
-    public class Player : BaseCharacter<HorizontalMovingAsset<PlayerSprite<PlayerAnimations>>> {
-        public Player(HorizontalMovingAsset<PlayerSprite<PlayerAnimations>> asset, uint health, int initiative, uint numberOfTurns) : base(asset) {}
+    public class Player : BaseCharacterBody<HorizontalMovingAssetBody<PlayerSprite<PlayerAnimations>>> {
+        public Player(HorizontalMovingAssetBody<PlayerSprite<PlayerAnimations>> asset, uint health, int initiative, uint numberOfTurns) : base(asset) {}
         
         public override void Update() {
             if(IsDisposed)
