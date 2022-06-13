@@ -38,7 +38,8 @@ namespace FileIO {
                 if(type == enumType.ToString())
                     return enumType;
             }
-            return Classifier.AssetType.NOT_AVAILABLE;
+            throw new ArgumentException("Error, type not found got: " + type);
+            //return Classifier.AssetType.NOT_AVAILABLE;
         }// end FindAssetType()
 
         private Classifier.CharacterAllegiance FindCharacterAllegiance(string allegiance) {
@@ -46,11 +47,17 @@ namespace FileIO {
                 if(allegiance == enumAllegiance.ToString())
                     return enumAllegiance;
             }
-            return Classifier.CharacterAllegiance.NOT_AVAILABLE;
+            throw new ArgumentException("Error, allegiance not found got: " + allegiance);
+            //return Classifier.CharacterAllegiance.NOT_AVAILABLE;
         }// end FindCharacterAllegiance()
 
 
         // For Saving to a File ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void SaveLocation(Vector2 location, BinaryWriter binWriter) {
+            binWriter.Write(location.X);
+            binWriter.Write(location.Y);
+        }// end SaveLocation()
 
         public void SaveObjectsToFile() {
             using (BinaryWriter binWriter = new BinaryWriter(File.Open(_fileName, FileMode.Create))) {
@@ -67,15 +74,13 @@ namespace FileIO {
 
         // Determines what interface the object inherits from and determines which method to save object
         private void SaveObject(BinaryWriter binWriter, Containers.IBaseAssetContainer baseContainer) {
-            binWriter.Write(CHARACTER_ID);
             var characterContainer = baseContainer as Containers.ICharacterAssetContainer;
+            var movingAssetContainer = baseContainer as Containers.IMovingAssetContainer;
             if(characterContainer != null) {
                 SaveCharacter(binWriter, characterContainer);
             }
-            var movingAssetContainer = baseContainer as Containers.IMovingAssetContainer;
-            if(movingAssetContainer != null) {
+            else if(movingAssetContainer != null)
                 SaveMovingAsset(binWriter, movingAssetContainer);
-            }
             else
                 SaveBaseAsset(binWriter, baseContainer);
         }// end SaveObject()
@@ -94,8 +99,7 @@ namespace FileIO {
             // Copy Info
             SaveAssetInfo(binWriter, baseContainer);
             // Copying Location
-            binWriter.Write(baseContainer.Location.X);
-            binWriter.Write(baseContainer.Location.Y);
+            SaveLocation(baseContainer.RenderingLocation, binWriter);
         }// end SaveAsset
 
         private void SaveMovingAsset(BinaryWriter binWriter, Containers.IMovingAssetContainer movingContainer) {
@@ -104,6 +108,15 @@ namespace FileIO {
             SaveMovingAssetLocation(binWriter, movingContainer);
         }// end SaveMovingAsset()
 
+        private void SaveCharacter(BinaryWriter binWriter, Containers.ICharacterAssetContainer character) {
+            binWriter.Write(CHARACTER_ID);
+            // Copying info
+            SaveCharacterInfo(binWriter, character);
+            // Copying Stats
+            SaveCharacterStats(binWriter, character);
+            // Save Location/Location asset is moving to
+            SaveMovingAssetLocation(binWriter, character);
+        }// end SaveCharacter()
 
         private void SaveCharacterInfo(BinaryWriter binWriter, Containers.ICharacterAssetContainer character) {
             var info = character.CharacterInfo;
@@ -127,24 +140,15 @@ namespace FileIO {
         }// end SaveCharacterStats
 
         private void SaveMovingAssetLocation(BinaryWriter binWriter, Containers.IMovingAssetContainer movingContainer) {
-            binWriter.Write(movingContainer.Location.X);
-            binWriter.Write(movingContainer.Location.Y);
+            // Saves Current Location
+            SaveLocation(movingContainer.RenderingLocation, binWriter);
+            // Saves Location the the asset is moving to
             binWriter.Write(movingContainer.IsMoving);
             if(movingContainer.IsMoving) {
                 binWriter.Write(movingContainer.LocationMovingTo.X);
                 binWriter.Write(movingContainer.LocationMovingTo.Y);
             }
         }// end SaveMovingAssetLocation()
-
-        private void SaveCharacter(BinaryWriter binWriter, Containers.ICharacterAssetContainer character) {
-            binWriter.Write(CHARACTER_ID);
-            // Copying info
-            SaveCharacterInfo(binWriter, character);
-            // Copying Stats
-            SaveCharacterStats(binWriter, character);
-            // Save Location/Location asset is moving to
-            SaveMovingAssetLocation(binWriter, character);
-        }// end SaveCharacter()
 
         // For Loading to a file \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\        
 
@@ -235,12 +239,14 @@ namespace FileIO {
             try {
                 BinaryReader binReader = new BinaryReader(new FileStream(fileName, FileMode.Open));
                 List<Containers.IBaseAssetContainer> assetsFromFile = new List<Containers.IBaseAssetContainer>();
-                while(true) {
+                bool fileOpen = true;
+                while(fileOpen) {
                     string id = binReader.ReadString();
                     switch (id)
                     {
                         case END_MESSAGE:
                             binReader.Close();
+                            fileOpen = false;
                             break;
                         case CHARACTER_ID:
                             LoadCharacterAssetFromFile(binReader);

@@ -15,6 +15,7 @@ namespace Containers {
         Classifier.AssetClassifier AssetInfo { get; }
         Rectangle DestinationRectangle { get; }
         Vector2 Location { get; }
+        Vector2 RenderingLocation{ get; }
         void Save(BinaryWriter binWriter);
         void Update(GameTime gameTime);
         void Draw(SpriteBunch spriteBunch);
@@ -48,6 +49,7 @@ namespace Containers {
         // Will later contain a Controller Object and a pointer to the MasterAssetContainer
         public Rectangle DestinationRectangle { get { return _asset.DestinationRectangle; } }
         public Vector2 Location { get { return _asset.Location; } }
+        public Vector2 RenderingLocation { get { return _asset.DrawingLocation; } }
         public bool IsDisposed { get; private set; }
         private readonly int ANIMATION_TIME;
         private int _animationCounter = 0;

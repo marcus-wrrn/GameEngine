@@ -25,12 +25,13 @@ namespace Factory {
         }// end CharacterFactory constructor
 
         // Creates A RockGuy Character and automatically adds it to the Master Asset Container. Due to the way the game environment is set up. No Character can exist not inside the container
-        public Containers.RockGuyCharacter CreateRockGuyCharacter(Vector2 location, Classifier.CharacterClassifier classifier, Containers.BaseCharacterStats statusEffects) {
+        public Containers.RockGuyCharacter CreateRockGuyCharacter(Vector2 location, Classifier.CharacterClassifier classifier, Containers.BaseCharacterStats stats, bool addToMasterAssetList = true) {
             var rockGuyAsset = BuildRockGuyAsset(location);
             if(!classifier.Type.Equals(Classifier.AssetType.ROCK_GUY))
                 throw new ArgumentException("mismatching asset type: " + classifier.Type.ToString());
-            var rockGuy = new Containers.RockGuyCharacter(rockGuyAsset, classifier, _masterContainer, statusEffects);
-            _masterContainer.AddAsset(rockGuy);
+            var rockGuy = new Containers.RockGuyCharacter(rockGuyAsset, classifier, _masterContainer, stats);
+            if(addToMasterAssetList)
+                _masterContainer.AddAsset(rockGuy);
             return rockGuy;
         }// end CreateRockGuyCharacter
 

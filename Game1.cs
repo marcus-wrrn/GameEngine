@@ -86,7 +86,10 @@ namespace TestingTactics
             _backgroundController = new Controllers.BackgroundController(this, _sprites, "TestFile");
             CharacterClassifier classifier = new CharacterClassifier(CharacterAllegiance.PLAYER, AssetType.ROCK_GUY);
             _characterFactory.CreateRockGuyCharacter(new Vector2(320f, 400f), classifier);
+            _characterFactory.CreateRockGuyCharacter(new Vector2(470f, 500f), classifier);
             // TODO: use this.Content to load your game content here
+            Testing.FileLoaderTest test = new Testing.FileLoaderTest();
+            test.Test1();
         }
 
         protected override void Update(GameTime gameTime) {
