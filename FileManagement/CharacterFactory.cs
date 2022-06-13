@@ -26,6 +26,19 @@ namespace Factory {
 
         // Creates A RockGuy Character and automatically adds it to the Master Asset Container. Due to the way the game environment is set up. No Character can exist not inside the container
         public Containers.RockGuyCharacter CreateRockGuyCharacter(Vector2 location, Classifier.CharacterClassifier classifier, Containers.BaseCharacterStats stats, bool addToMasterAssetList = true) {
+            return this.CreateRockGuyCharacter(location, stats.MaxHealth, stats.Health, stats.Speed, stats.HitChance, stats.Evasion, stats.CriticalChance, 
+                classifier.Allegiance, classifier.Type, classifier.IsStatic, classifier.IsSentiant, addToMasterAssetList);
+        }// end CreateRockGuyCharacter
+
+        public Containers.RockGuyCharacter CreateRockGuyCharacter(Vector2 location, Classifier.CharacterClassifier classifier, bool addToMasterAssetList = true) {
+            var status = new Containers.BaseCharacterStats(10, 4, 0.65f, 0.25f, 0.05f);
+            return this.CreateRockGuyCharacter(location, classifier, status, addToMasterAssetList);
+        }// end CreateRockGuyCharacter()
+
+        public Containers.RockGuyCharacter CreateRockGuyCharacter(Vector2 location, uint maxHealth, uint health, int speed, float hitChance, float evasion, float criticalChance,
+                                           Classifier.CharacterAllegiance allegiance, Classifier.AssetType type, bool isStatic, bool isSentiant, bool addToMasterAssetList = true) {
+            Containers.BaseCharacterStats stats = new Containers.BaseCharacterStats(maxHealth, health, speed, hitChance, evasion, criticalChance);
+            Classifier.CharacterClassifier classifier = new Classifier.CharacterClassifier(allegiance, type, isStatic, isSentiant);
             var rockGuyAsset = BuildRockGuyAsset(location);
             if(!classifier.Type.Equals(Classifier.AssetType.ROCK_GUY))
                 throw new ArgumentException("mismatching asset type: " + classifier.Type.ToString());
@@ -33,11 +46,6 @@ namespace Factory {
             if(addToMasterAssetList)
                 _masterContainer.AddAsset(rockGuy);
             return rockGuy;
-        }// end CreateRockGuyCharacter
-
-        public void CreateRockGuyCharacter(Vector2 location, Classifier.CharacterClassifier classifier) {
-            var status = new Containers.BaseCharacterStats(10, 4, 0.65f, 0.25f, 0.05f);
-            this.CreateRockGuyCharacter(location, classifier, status);
         }// end CreateRockGuyCharacter()
 
         
