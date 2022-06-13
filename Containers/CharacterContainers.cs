@@ -23,29 +23,29 @@ namespace Containers {
 
     
 
-    public class RockGuyCharacter : CharacterContainer<RockGuy>, ICharacter {
+    public class RockGuyCharacter : CharacterAsset<RockGuyBody>, ICharacter {
         // These lists are important to determine where everything is
-        private HashSet<ICharacterAssetContainer> _playerCharacters;
-        private HashSet<ICharacterAssetContainer> _nonPlayerCharacters;
-        private HashSet<ICharacterAssetContainer> _allCharacters;
+        private HashSet<ICharacterAsset> _playerCharacters;
+        private HashSet<ICharacterAsset> _nonPlayerCharacters;
+        private HashSet<ICharacterAsset> _allCharacters;
         private int _deathTimer = 0;      
         private readonly static int DISPOSAL_TIME = 100;                             // Death timer is for determining when to properly dispose the asset
         public bool IsAlive { get { return _asset.IsAlive; } }
         
 
-        public RockGuyCharacter(RockGuy asset, Classifier.CharacterClassifier classifier, MasterAssetContainer masterContainer, BaseCharacterStats stats) : base(asset, classifier, stats) { 
+        public RockGuyCharacter(RockGuyBody asset, Classifier.CharacterClassifier classifier, MasterAssetContainer masterContainer, BaseCharacterStats stats) : base(asset, classifier, stats) { 
             _playerCharacters = masterContainer.PlayerCharacters;
             _nonPlayerCharacters = masterContainer.NonPlayerCharacters;
             _allCharacters = masterContainer.AllCharacters;
         }// end constructor
 
-        private double FindDistance(IBaseAssetContainer container) {
+        private double FindDistance(IBaseAsset container) {
             Vector2 distance = container.Location - Location;
             return Math.Sqrt(distance.X*distance.X + distance.Y*distance.Y);
         }// end FindDistance()
 
-        private ICharacterAssetContainer FindNearestPlayer() {
-            ICharacterAssetContainer nearestPlayer = null;
+        private ICharacterAsset FindNearestPlayer() {
+            ICharacterAsset nearestPlayer = null;
             foreach(var player in _playerCharacters) {
                 if(nearestPlayer == null)
                     nearestPlayer = player;

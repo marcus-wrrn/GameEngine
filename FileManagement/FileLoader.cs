@@ -73,9 +73,9 @@ namespace FileIO {
         }// end Save()
 
         // Determines what interface the object inherits from and determines which method to save object
-        private void SaveObject(BinaryWriter binWriter, Containers.IBaseAssetContainer baseContainer) {
-            var characterContainer = baseContainer as Containers.ICharacterAssetContainer;
-            var movingAssetContainer = baseContainer as Containers.IMovingAssetContainer;
+        private void SaveObject(BinaryWriter binWriter, Containers.IBaseAsset baseContainer) {
+            var characterContainer = baseContainer as Containers.ICharacterAsset;
+            var movingAssetContainer = baseContainer as Containers.IMovingAsset;
             if(characterContainer != null) {
                 SaveCharacter(binWriter, characterContainer);
             }
@@ -85,14 +85,14 @@ namespace FileIO {
                 SaveBaseAsset(binWriter, baseContainer);
         }// end SaveObject()
 
-        private void SaveAssetInfo(BinaryWriter binWriter, Containers.IBaseAssetContainer container) {
+        private void SaveAssetInfo(BinaryWriter binWriter, Containers.IBaseAsset container) {
             var info = container.AssetInfo;
             binWriter.Write(info.Type.ToString());
             binWriter.Write(info.IsSentiant);
             binWriter.Write(info.IsStatic);
         }// end SaveAssetInfo()
 
-        private void SaveBaseAsset(BinaryWriter binWriter, Containers.IBaseAssetContainer baseContainer) {
+        private void SaveBaseAsset(BinaryWriter binWriter, Containers.IBaseAsset baseContainer) {
             if(baseContainer.IsDisposed || baseContainer.ToBeDisposed)
                 return;
             binWriter.Write(BASE_ASSET_ID);
@@ -102,13 +102,13 @@ namespace FileIO {
             SaveLocation(baseContainer.RenderingLocation, binWriter);
         }// end SaveAsset
 
-        private void SaveMovingAsset(BinaryWriter binWriter, Containers.IMovingAssetContainer movingContainer) {
+        private void SaveMovingAsset(BinaryWriter binWriter, Containers.IMovingAsset movingContainer) {
             binWriter.Write(MOVING_ASSET_ID);
             SaveAssetInfo(binWriter, movingContainer);
             SaveMovingAssetLocation(binWriter, movingContainer);
         }// end SaveMovingAsset()
 
-        private void SaveCharacter(BinaryWriter binWriter, Containers.ICharacterAssetContainer character) {
+        private void SaveCharacter(BinaryWriter binWriter, Containers.ICharacterAsset character) {
             binWriter.Write(CHARACTER_ID);
             // Copying info
             SaveCharacterInfo(binWriter, character);
@@ -118,7 +118,7 @@ namespace FileIO {
             SaveMovingAssetLocation(binWriter, character);
         }// end SaveCharacter()
 
-        private void SaveCharacterInfo(BinaryWriter binWriter, Containers.ICharacterAssetContainer character) {
+        private void SaveCharacterInfo(BinaryWriter binWriter, Containers.ICharacterAsset character) {
             var info = character.CharacterInfo;
             // Record standard asset info
             SaveAssetInfo(binWriter, character);
@@ -126,7 +126,7 @@ namespace FileIO {
             binWriter.Write(info.Allegiance.ToString());
         }// end SaveCharacterInfo()
 
-        private void SaveCharacterStats(BinaryWriter binWriter, Containers.ICharacterAssetContainer character) {
+        private void SaveCharacterStats(BinaryWriter binWriter, Containers.ICharacterAsset character) {
             var stats = character.CharacterStats;
             // Record Health
             binWriter.Write(stats.MaxHealth);
@@ -139,7 +139,7 @@ namespace FileIO {
             binWriter.Write(stats.CriticalChance);
         }// end SaveCharacterStats
 
-        private void SaveMovingAssetLocation(BinaryWriter binWriter, Containers.IMovingAssetContainer movingContainer) {
+        private void SaveMovingAssetLocation(BinaryWriter binWriter, Containers.IMovingAsset movingContainer) {
             // Saves Current Location
             SaveLocation(movingContainer.RenderingLocation, binWriter);
             // Saves Location the the asset is moving to
@@ -180,7 +180,7 @@ namespace FileIO {
             return new Vector2(x, y);
         }// end LoadLocation()
 
-        private Containers.ICharacterAssetContainer BuildCharacter(Classifier.CharacterClassifier classifier, Containers.BaseCharacterStats stats, Vector2 location) {
+        private Containers.ICharacterAsset BuildCharacter(Classifier.CharacterClassifier classifier, Containers.BaseCharacterStats stats, Vector2 location) {
             switch (classifier.Type) {
                 case (Classifier.AssetType.ROCK_GUY) :
                     var character = _assetFactory.CreateRockGuyCharacter(location, classifier, stats);
@@ -238,7 +238,7 @@ namespace FileIO {
             _masterContainer.EmptyContainer();
             try {
                 BinaryReader binReader = new BinaryReader(new FileStream(fileName, FileMode.Open));
-                List<Containers.IBaseAssetContainer> assetsFromFile = new List<Containers.IBaseAssetContainer>();
+                List<Containers.IBaseAsset> assetsFromFile = new List<Containers.IBaseAsset>();
                 bool fileOpen = true;
                 while(fileOpen) {
                     string id = binReader.ReadString();

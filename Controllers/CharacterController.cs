@@ -34,10 +34,10 @@ namespace Controllers {
         private Input.GameKeyboard _keyboard = Input.GameKeyboard.Instance;
         private TestingTactics.Game1 _game;
         private Input.GameMouse _mouse;
-        private ICharacterAssetContainer _currentPlayer;
-        private HashSet<ICharacterAssetContainer> _players;
-        private HashSet<ICharacterAssetContainer> _npcs;
-        private HashSet<ICharacterAssetContainer> _allCharacters;
+        private ICharacterAsset _currentPlayer;
+        private HashSet<ICharacterAsset> _players;
+        private HashSet<ICharacterAsset> _npcs;
+        private HashSet<ICharacterAsset> _allCharacters;
         public bool TurnEnded{ get; set; }
         
 
@@ -50,7 +50,7 @@ namespace Controllers {
         }// end PlayerController()
 
         // If a point is found on a character return that character, else return null
-        private ICharacterAssetContainer HasClickedCharacter(Vector2 location) {
+        private ICharacterAsset HasClickedCharacter(Vector2 location) {
             foreach(var character in _allCharacters) {
                 if(character.DestinationRectangle.Contains(location.X, location.Y)) {
                     return character;
@@ -84,9 +84,9 @@ namespace Controllers {
 
     public class EnemyController {
         private TestingTactics.Game1 _game;
-        private HashSet<ICharacterAssetContainer> _players;
-        private HashSet<ICharacterAssetContainer> _npcs;
-        private HashSet<ICharacterAssetContainer> _allCharacters;
+        private HashSet<ICharacterAsset> _players;
+        private HashSet<ICharacterAsset> _npcs;
+        private HashSet<ICharacterAsset> _allCharacters;
         private Vector2 loc = new Vector2(300f, 300f);
 
         public EnemyController(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer) {
@@ -159,8 +159,8 @@ namespace Controllers {
         // Assets need to be sorted based off location (y direction)
         // Assets with lower y values need to be drawn first
         private MasterAssetContainer _masterContainer;
-        private List<IBaseAssetContainer> _allAssets;
-        private HashSet<ICharacterAssetContainer> _allCharacters;
+        private List<IBaseAsset> _allAssets;
+        private HashSet<ICharacterAsset> _allCharacters;
         private TurnController _turnController;
 
 
@@ -190,7 +190,7 @@ namespace Controllers {
                 throw new ObjectDisposedException("Controller has already been disposed");
             // Update TurnController
             _turnController.Update(gameTime);
-            List<IBaseAssetContainer> disposalList = new List<IBaseAssetContainer>();
+            List<IBaseAsset> disposalList = new List<IBaseAsset>();
             foreach(var asset in _masterContainer.AllCharacters) {
                 asset.Update(gameTime);
                 if(asset.ToBeDisposed) {

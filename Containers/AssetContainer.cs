@@ -8,7 +8,7 @@ using Graphics.Rendering;
 
 namespace Containers {
     // To be moved into a container namespace later
-    public interface IBaseAssetContainer : IDisposable {
+    public interface IBaseAsset : IDisposable {
         bool IsDisposed { get; }
         // Dispose falgs the object for disposal
         bool ToBeDisposed { get; }
@@ -21,7 +21,7 @@ namespace Containers {
         void Draw(SpriteBunch spriteBunch);
     }// end IBaseAssetContainer()
 
-    public interface IMovingAssetContainer : IBaseAssetContainer {
+    public interface IMovingAsset : IBaseAsset {
         float AssetSpeed { get; }
         void ChangeAssetSpeed(float speed);
         // void MoveAssetUp(GameTime gameTime);
@@ -35,14 +35,14 @@ namespace Containers {
         void Stop();
     }// end IMovingAssetContainer interface
 
-    public interface ICharacterAssetContainer : IMovingAssetContainer {
+    public interface ICharacterAsset : IMovingAsset {
         Classifier.CharacterClassifier CharacterInfo { get; }
         IStats CharacterStats { get; }
         void TakeDamage(int value);
         
     }// end ICharacterAssetContainer()
 
-    public class AssetContainer<T> : IBaseAssetContainer where T : IAsset {
+    public class Asset<T> : IBaseAsset where T : IAssetBody {
         protected T _asset;
         public bool ToBeDisposed { get; protected set; }
         public virtual Classifier.AssetClassifier AssetInfo { get; private set; }
@@ -54,9 +54,9 @@ namespace Containers {
         private readonly int ANIMATION_TIME;
         private int _animationCounter = 0;
 
-        public AssetContainer(T asset, Classifier.AssetClassifier info, int animationSpeed = 7) {
+        public Asset(T asset, Classifier.AssetClassifier info, int animationSpeed = 7) {
             // Test to see if the object inherits from MovingAsset
-            IMovingAsset test = asset as IMovingAsset;
+            IMovingAssetBody test = asset as IMovingAssetBody;
             if(test == null && !info.IsStatic)
                 throw new ArgumentException("Container cannot posses a dynamic object that inherits from a static asset");
             AssetInfo = info;
@@ -67,7 +67,7 @@ namespace Containers {
         }// end AssetContainer constructor
         
         // Makes a base static object
-        public AssetContainer(T asset) : this(asset, new Classifier.AssetClassifier(true)) {}
+        public Asset(T asset) : this(asset, new Classifier.AssetClassifier(true)) {}
 
         public virtual void Dispose() {
             if(IsDisposed)
@@ -97,12 +97,12 @@ namespace Containers {
 
     }// end AssetContainer class
 
-    public class MovingAssetContainer<T> : AssetContainer<T>, IMovingAssetContainer where T : IMovingAsset {
+    public class MovingAsset<T> : Asset<T>, IMovingAsset where T : IMovingAssetBody {
         public float AssetSpeed { get { return _asset.Speed; } }
         public bool IsMoving { get; private set; }
         public Vector2 LocationMovingTo { get; private set; }
         
-        public MovingAssetContainer(T asset, Classifier.AssetClassifier classifier) : base(asset, classifier) {
+        public MovingAsset(T asset, Classifier.AssetClassifier classifier) : base(asset, classifier) {
             IsMoving = false;
             LocationMovingTo = asset.Location;
         }// end MovingAssetContainer()
@@ -147,14 +147,14 @@ namespace Containers {
 
     }// end MovingAssetContainer class
 
-    public class CharacterContainer<T> : MovingAssetContainer<T>, ICharacterAssetContainer where T: ICharacterAsset {
+    public class CharacterAsset<T> : MovingAsset<T>, ICharacterAsset where T: ICharacterAssetBody {
         // A bit redundant but allows for characters to be classified alongside non character assets
         public override Classifier.AssetClassifier AssetInfo { get { return CharacterInfo; } }
         public Classifier.CharacterClassifier CharacterInfo { get; private set; }
         public bool IsCharacterAlive { get { return _asset.IsAlive; } }
         public IStats CharacterStats { get; set; }
 
-        public CharacterContainer(T asset, Classifier.CharacterClassifier characterClassifier, IStats stats) : base(asset, characterClassifier) {
+        public CharacterAsset(T asset, Classifier.CharacterClassifier characterClassifier, IStats stats) : base(asset, characterClassifier) {
             CharacterStats = stats;
             CharacterInfo = characterClassifier;
         }// end CharacterContainer 

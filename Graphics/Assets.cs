@@ -5,7 +5,7 @@ using Graphics.Sprites;
 
 namespace Graphics.Assets {
     // =============================================================== Base Asset ===============================================================
-    public interface IAsset : IDisposable {
+    public interface IAssetBody : IDisposable {
         Texture2D Texture{ get; }
         Rectangle SourceRectangle { get; }
         Rectangle DestinationRectangle{ get; }
@@ -15,7 +15,7 @@ namespace Graphics.Assets {
     }// end IAsset interface
 
     // Base class used for all Assets
-    public class Asset<T> : IAsset where T: ISprite {
+    public class AssetBody<T> : IAssetBody where T: ISprite {
         public T AssetSprite{ get; private set; }   // texture of the asset
         protected Utility.TextureLocation<T> _locationOnMap;   // location of the asset
         public bool IsDisposed{ get; private set; }
@@ -26,15 +26,15 @@ namespace Graphics.Assets {
         public Texture2D Texture{ get { return AssetSprite.Texture; } }
         
 
-        public Asset(T sprite, Vector2 loc, bool hasCollision = true) {
+        public AssetBody(T sprite, Vector2 loc, bool hasCollision = true) {
             AssetSprite = sprite;
             _locationOnMap = new Utility.TextureLocation<T>(sprite, loc);
             IsDisposed = false;
         }// end constructor()
 
         // Additional Constructors
-        public Asset(T text, GraphicsDeviceManager graphics) : this(text, new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2)) {}
-        public Asset(T text) : this(text, new Vector2(0, 0)) {}
+        public AssetBody(T text, GraphicsDeviceManager graphics) : this(text, new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2)) {}
+        public AssetBody(T text) : this(text, new Vector2(0, 0)) {}
 
         // Immediatly move to a new location
         // TODO Make this depend on the map screen/other objects
@@ -63,7 +63,7 @@ namespace Graphics.Assets {
     }// end Asset
 
     // ======================================================== Moving Asset ===============================================================
-    public interface IMovingAsset : IAsset {
+    public interface IMovingAssetBody : IAssetBody {
         float Speed{ get; }
         void ChangeSpeed(float speed);
         void MoveUp(GameTime gameTime);
@@ -77,22 +77,22 @@ namespace Graphics.Assets {
     }// end IMovingAsset interface
 
     // An Asset that moves a specific direction
-    public class MovingAsset<T> : Asset<T>, IMovingAsset where T: ISprite {
+    public class MovingAssetBody<T> : AssetBody<T>, IMovingAssetBody where T: ISprite {
         public float Speed{ get; private set; }
 
-        public MovingAsset(T sprite, Vector2 location, float maxSpeed, float acceleration) : base(sprite, location) {
+        public MovingAssetBody(T sprite, Vector2 location, float maxSpeed, float acceleration) : base(sprite, location) {
             Speed = maxSpeed;
         }// end MovingAsset()
 
-        public MovingAsset(T sprite, GraphicsDeviceManager graphicsManager, float maxSpeed) : base(sprite, graphicsManager) {
+        public MovingAssetBody(T sprite, GraphicsDeviceManager graphicsManager, float maxSpeed) : base(sprite, graphicsManager) {
             Speed = maxSpeed;
         }// end MovingAsset()
 
-        public MovingAsset(T sprite, Vector2 location) : base(sprite, location) {
+        public MovingAssetBody(T sprite, Vector2 location) : base(sprite, location) {
             Speed = 0.0f;
         }// end MovingAsset()
 
-        public MovingAsset(T sprite) : base(sprite) {
+        public MovingAssetBody(T sprite) : base(sprite) {
             Speed = 0.0f;
         }// end MovingAsset()
 
@@ -160,9 +160,9 @@ namespace Graphics.Assets {
 
     }// end MovingAsset class
 
-    public class HorizontalMovingAsset<T> : MovingAsset<T>, IMovingAsset where T: ISimpleMovingSprite {
+    public class HorizontalMovingAssetBody<T> : MovingAssetBody<T>, IMovingAssetBody where T: ISimpleMovingSprite {
         // (T sprite, Vector2 location, float maxSpeed, float acceleration) : base(sprite, location)
-        public HorizontalMovingAsset(T sprite, Vector2 location, float maxSpeed, float acceleration) 
+        public HorizontalMovingAssetBody(T sprite, Vector2 location, float maxSpeed, float acceleration) 
             : base (sprite, location, maxSpeed, acceleration) {}
 
         public override void MoveRight(GameTime gameTime) {

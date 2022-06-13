@@ -14,7 +14,6 @@ namespace Factory {
         private TestingTactics.Game1 _game;
         private Containers.MasterAssetContainer _masterContainer;
 
-
         public CharacterFactory(TestingTactics.Game1 game, Containers.MasterAssetContainer masterContainer) {
             if(game == null)
                 throw new NullReferenceException("Game cannot be null");
@@ -49,14 +48,14 @@ namespace Factory {
         }// end CreateRockGuyCharacter()
 
         
-        public RockGuy BuildRockGuyAsset(Vector2 location, uint health = 3, int initiative = 10, uint numberOfTurns = 2, int acceleration = 10, int maxSpeed = 1000) {
+        private RockGuyBody BuildRockGuyAsset(Vector2 location, uint health = 3, int initiative = 10, uint numberOfTurns = 2, int acceleration = 10, int maxSpeed = 1000) {
             // Assigns the Path
             string path = "./Characters/";
             var mainSprite = BuildRockGuySprite(path);
             // Build Asset
-            HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>> asset = 
-                new HorizontalMovingAsset<PlayerSprite<RockGuyAnimations>>(mainSprite, location, maxSpeed, acceleration);
-            return new RockGuy(asset);
+            HorizontalMovingAssetBody<PlayerSprite<RockGuyAnimations>> asset = 
+                new HorizontalMovingAssetBody<PlayerSprite<RockGuyAnimations>>(mainSprite, location, maxSpeed, acceleration);
+            return new RockGuyBody(asset);
         }
 
         private PlayerSprite<RockGuyAnimations> BuildRockGuySprite(string path) {
@@ -83,6 +82,12 @@ namespace Factory {
             // Builds Main Sprite
             return new PlayerSprite<RockGuyAnimations>(baseSprite, animationList, animationNamesList);
         }// end BuildRockGuySprite()
+
+
+
+
+
+
 
     }// end CharacterFactory Class
 
